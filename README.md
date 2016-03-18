@@ -7,22 +7,14 @@ Initialization
 --------------
 - fcc-edm and podio has to be compiled
 - Have to init FCCSW, fcc-edm and podio + FCC_analysis_cpp
+
   source setup.sh
 
 Notes:
-- problem in initialization of fcc-edm and podio: 
+- problem in initialization of fcc-edm and podio  (seems to be running fine)
 
   dirname: missing operand
-  but seems to be running fine
-- yaml seems not installed (for python)
-
-  Check that the yaml python module is available
-  python
-  >>> import yaml
-  If the import goes fine (no message), you're all set. If not, you need to install yam
-- fastjets removed
-
-  Problems in compilation, not needed
+ 
 
 Make
 -----
