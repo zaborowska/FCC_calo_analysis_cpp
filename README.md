@@ -1,5 +1,3 @@
-analysis-cpp
-============
 
 C++ example analysis package based on the FCC event datamodel
 
@@ -37,4 +35,7 @@ Test of the shared library
     ${FCCEDM}/bin/fccedm-write
     python -i example-lib/test_macro.py 
 
+
+=======
+# FCC_calo_analysis_cpp
 
