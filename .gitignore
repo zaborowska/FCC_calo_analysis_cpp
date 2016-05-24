@@ -1,0 +1,10 @@
+build/
+install/
+*~
+*.root
+*.png
+*.pdf
+*.d
+*.so
+*.pcm
+
