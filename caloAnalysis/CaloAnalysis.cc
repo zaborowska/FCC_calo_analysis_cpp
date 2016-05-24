@@ -6,6 +6,7 @@
 
 #include "datamodel/EventInfoCollection.h"
 #include "datamodel/MCParticleCollection.h"
+#include "datamodel/GenVertexCollection.h"
 #include "datamodel/CaloClusterCollection.h"
 #include "datamodel/CaloHitCollection.h"
 
@@ -181,7 +182,7 @@ void CaloAnalysis::loop(const std::string filename) {
   }
   store.setReader(&reader);
 
-  bool verbose = false;
+  bool verbose = true;
 
   //unsigned nEvents = 5;
   unsigned nEvents = reader.getEntries();
@@ -244,9 +245,13 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
       std::cout << "event number " << evinfo.Number() << std::endl;
   }
 
-  //  const fcc::MCParticleCollection*  colGenParticles(nullptr);
+  const fcc::MCParticleCollection*  colMCParticles(nullptr);
+  const fcc::GenVertexCollection*  colGenVertex(nullptr);
   const fcc::CaloClusterCollection* colECalCluster(nullptr);
   const fcc::CaloHitCollection*     colECalHit(nullptr);
+ 
+  bool colMCParticlesOK = store.get("MCTruthParticles", colMCParticles);
+  bool colGenVertexOK =store.get("GenVertices", colGenVertex);
   
   bool colECalClusterOK = store.get("ECalClusters" , colECalCluster);
   bool colECalHitOK     = store.get("ECalHits" , colECalHit);
@@ -352,6 +357,53 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
    nbin_max = r_e->GetMaximumBin();
    r_max->SetBinContent(nbin_max,1+r_max->GetBinContent(nbin_max));
  }
+
+ 
+ /* 
+ if (colMCParticlesOK) {
+   if (verbose) {
+     std::cout << "-> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
+
+
+   }
+ }
+ 
+ if (colGenVertexOK) {
+   if (verbose) {
+   std::cout <<"-> #GenVertices:     " << colGenVertex->size()    << std::endl;
+   }
+ }
+ */
+ 
+ if (colMCParticlesOK && colGenVertexOK) {
+   //if (colGenVertexOK) { 
+   if (verbose) {
+     std::cout << " Collections: "          << std::endl;
+     std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
+     std::cout << " -> #GenVertices:     " << colGenVertex->size()    << std::endl;
+   }
+
+   for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
+     std::cout << "Particle PDG " << iparticle->Core().Type
+	       << " px " << iparticle->Core().P4.Px
+	       << " py " << iparticle->Core().P4.Py
+	       << " pz " << iparticle->Core().P4.Pz
+	       << " x " << iparticle->Core().Vertex.X
+	       << " y "<< iparticle->Core().Vertex.Y
+	       << " z "<< iparticle->Core().Vertex.Z
+	       <<std::endl;
+     std::cout << "OneToOne StartVertex x " << iparticle->StartVertex().Position().X 
+	       << " y " << iparticle->StartVertex().Position().Y
+	       << " z " << iparticle->StartVertex().Position().Z
+	       << " EndVertex x " << iparticle->EndVertex().Position().X
+               << " y " << iparticle->EndVertex().Position().Y
+               << " z " << iparticle->EndVertex().Position().Z
+	       << std::endl; 
+	      
+   }
+
+ }
+ 
 
 }
 

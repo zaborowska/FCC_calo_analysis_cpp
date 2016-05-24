@@ -17,7 +17,8 @@ SF2=5.73 #B field
 #filename2 = "/tmp/novaj/hits_fccsw_ecal_bfield0_"+PARTICLE+str(ENERGY)+"GeV_eta025_"+SUFFIX+".root"
 #filename2 = "/tmp/novaj/hits_fccsw_ecal_bfield1_mu100GeV_v2.root"
 
-filename2 = "../../FCCSW/output_b1_n100.root"
+#filename2 = "../../FCCSW/output_b1_n100.root"
+filename2 = "../../FCCSW/output.root"   
 
 print "Processing file ",filename2
 ma2 = CaloAnalysis(SF2, ENERGY, PARTICLE)
