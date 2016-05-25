@@ -87,8 +87,6 @@ CaloAnalysis::CaloAnalysis(const double sf, const double ENE, const std::string 
   }
 
 
-
-
 }
 
 
@@ -398,8 +396,8 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
 	       << " EndVertex x " << iparticle->EndVertex().Position().X
                << " y " << iparticle->EndVertex().Position().Y
                << " z " << iparticle->EndVertex().Position().Z
-	       << std::endl; 
-	      
+	       << std::endl; 	      
+
    }
 
  }
