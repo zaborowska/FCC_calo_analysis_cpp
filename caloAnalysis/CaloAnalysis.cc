@@ -40,13 +40,14 @@ CaloAnalysis::CaloAnalysis(const double sf, const double ENE, const std::string 
 
   SF = sf;
   PARTICLE=particle;
+  ENERGY = ENE;
 
-  hitenergy = new TH1F("hitenergy","hitenergy", 200, 0, ENE);
+  hitenergy = new TH1F("hitenergy","hitenergy", 200, 0, ENERGY);
   if (PARTICLE=="e") {
-    cellenergy = new TH1F("cellenergy","cellenergy", 100, ENE-0.2*ENE, ENE+0.2*ENE);
+    cellenergy = new TH1F("cellenergy","cellenergy", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
   }
   else {
-    if (PARTICLE=="mu") cellenergy = new TH1F("cellenergy","cellenergy", 1000, 0, ENE-0.8*ENE);
+    if (PARTICLE=="mu") cellenergy = new TH1F("cellenergy","cellenergy", 1000, 0, ENERGY-0.8*ENERGY);
     else std::cout << "WARNING!!! Undefined particle type!!!" <<std::endl;
   }
   hitphi = new TH1F("hitphi","hitphi", 64, -TMath::Pi(), TMath::Pi());
@@ -57,19 +58,41 @@ CaloAnalysis::CaloAnalysis(const double sf, const double ENE, const std::string 
   phi_outliers = new TH1F("phi_outliers","phi_outliers",64, -TMath::Pi(), TMath::Pi());
   x_outliers = new TH1F("x_outliers","x_outliers",100, -3500, 3500);
   y_outliers = new TH1F("y_outliers","y_outliers",100, -3500, 3500);
-  z_outliers = new TH1F("z_outliers","z_outliers",100, -4000, 4000);
+  z_outliers = new TH1F("z_outliers","z_outliers",100, -8000, 8000);
   r_outliers = new TH1F("r_outliers","r_outliers",100, 2600, 3500);
 
   phi_e = new TH1F("phi_e","phi_e",64, -TMath::Pi(), TMath::Pi());
   x_e = new TH1F("x_e","x_e",100, -3500, 3500);
   y_e = new TH1F("y_e","y_e",100, -3500, 3500);
-  z_e = new TH1F("z_e","z_e",100, -4000, 4000);
+  z_e = new TH1F("z_e","z_e",100, -8000, 8000);
   r_e = new TH1F("r_e","r_e",100, 2600, 3500);
 
   phi_max = new TH1F("phi_max","phi_max",64, -TMath::Pi(), TMath::Pi());
   x_max = new TH1F("x_max","x_max",100, -3500, 3500);
   y_max = new TH1F("y_max","y_max",100, -3500, 3500);
   r_max = new TH1F("r_max","r_max",100, 2600, 3500);
+
+  //primary particle
+  phi_prim = new TH1F("phi_prim","phi_prim",64, -TMath::Pi(), TMath::Pi());
+  p_prim = new TH1F("p_prim","p_prim",100, 0, ENERGY*1.1);
+  pt_prim = new TH1F("pt_prim","pt_prim",100, 0, ENERGY*1.1);
+
+  phi_prim_out = new TH1F("phi_prim_out","phi_prim_out",64, -TMath::Pi(), TMath::Pi());
+
+  diff_phimaxhit_phi_prim = new TH1F("diff_phimaxhit_phi_prim","diff_phimaxhit_prim",64, -TMath::Pi(), TMath::Pi());
+
+  //bremstralung gamma
+  phi_brem = new TH1F("phi_brem","phi_brem",64, -TMath::Pi(), TMath::Pi());
+  p_brem = new TH1F("p_brem","p_brem",100, 0, ENERGY*1.1);
+  pt_brem = new TH1F("pt_brem","pt_brem",100, 0, ENERGY*1.1);
+  r_brem = new TH1F("r_brem","r_brem",100, 0, 3500);
+
+  phi_brem_out = new TH1F("phi_brem_out","phi_brem_out",64, -TMath::Pi(), TMath::Pi());
+  p_brem_out = new TH1F("p_brem_out","p_brem_out",100, 0, ENERGY*1.1);
+  pt_brem_out = new TH1F("pt_brem_out","pt_brem_out",100, 0, ENERGY*1.1);
+  r_brem_out = new TH1F("r_brem_out","r_brem_out",100, 0, 3500);
+
+  h_ene_diff = new TH1F("h_ene_diff","h_ene_diff",100,-100,100);
 
   //nlayers = (rmax-rmin)/dr;
 
@@ -78,10 +101,10 @@ CaloAnalysis::CaloAnalysis(const double sf, const double ENE, const std::string 
   longprofile = new TH1F("longprofile","longprofile",nlayers,rmin,rmax);
   for (unsigned int ii = 0; ii<NLAYERS_MAX; ii++) {
     if (PARTICLE=="e") {
-      h_layers[ii] = new TH1F(Form("h_%d",ii),Form("h_%d",ii),100,0,ENE);
+      h_layers[ii] = new TH1F(Form("h_%d",ii),Form("h_%d",ii),100,0,ENERGY);
     }
     else {
-      if (PARTICLE=="mu") h_layers[ii] = new TH1F(Form("h_%d",ii),Form("h_%d",ii),1000, 0, ENE-0.8*ENE);
+      if (PARTICLE=="mu") h_layers[ii] = new TH1F(Form("h_%d",ii),Form("h_%d",ii),1000, 0, ENERGY-0.8*ENERGY);
       else std::cout << "WARNING!!! Undefined particle type!!!" <<std::endl;
     }
   }
@@ -114,6 +137,22 @@ CaloAnalysis::~CaloAnalysis() {
   delete z_outliers;
   delete r_outliers;
 
+  delete phi_prim;
+  delete pt_prim;
+  delete p_prim;
+  delete phi_prim_out;
+  delete diff_phimaxhit_phi_prim;
+
+  delete phi_brem;
+  delete pt_brem;
+  delete p_brem;
+  delete r_brem;
+  delete phi_brem_out;
+  delete pt_brem_out;
+  delete p_brem_out;
+  delete r_brem_out;
+
+  delete h_ene_diff;
   delete phi_e;
   delete x_e;
   delete y_e;
@@ -145,6 +184,21 @@ void CaloAnalysis::loop(const std::string filename) {
   z_outliers->Reset();
   r_outliers->Reset();
 
+  phi_prim->Reset();
+  p_prim->Reset();
+  pt_prim->Reset();
+  phi_prim_out->Reset();
+  diff_phimaxhit_phi_prim->Reset();
+  phi_brem->Reset();
+  p_brem->Reset();
+  pt_brem->Reset();
+  r_brem->Reset();
+  phi_brem_out->Reset();
+  p_brem_out->Reset();
+  pt_brem_out->Reset();
+  r_brem_out->Reset();
+  h_ene_diff->Reset();
+
   hitenergy->Sumw2();
   cellenergy->Sumw2();
   hitphi->Sumw2();
@@ -161,6 +215,21 @@ void CaloAnalysis::loop(const std::string filename) {
   z_outliers->Sumw2();
   r_outliers->Sumw2();
 
+  phi_prim->Sumw2();
+  p_prim->Sumw2();
+  pt_prim->Sumw2();
+  phi_prim_out->Sumw2();
+  diff_phimaxhit_phi_prim->Sumw2();
+  phi_brem->Sumw2();
+  p_brem->Sumw2();
+  pt_brem->Sumw2();
+  r_brem->Sumw2();
+  phi_brem_out->Sumw2();
+  p_brem_out->Sumw2();
+  pt_brem_out->Sumw2();
+  r_brem_out->Sumw2();
+  h_ene_diff->Sumw2();
+
   double truncation = 0.01;
   double mean = 0.0;
   double mean_err = 0.0;
@@ -170,7 +239,7 @@ void CaloAnalysis::loop(const std::string filename) {
   auto store = podio::EventStore();
   try {
     //reader.openFile(filename);
-    // filename_eos =  "root://eospublic.cern.ch//eos/fcc/users/n/novaj/April22/" + filename;
+    //filename_eos =  "root://eospublic.cern.ch//eos/fcc/users/n/novaj/June10_ecalShifted/"+filename;
     reader.openFile(filename);
     std::cout << "CaloAnalysis opening file " << filename << std::endl;
   }
@@ -187,7 +256,7 @@ void CaloAnalysis::loop(const std::string filename) {
   std::cout << "Number of events: " << nEvents << std::endl;
   for(unsigned i=0; i<nEvents; ++i) {
     if(i%1000==0) std::cout<<"reading event "<<i<<std::endl;
-    if(i>10) verbose = false;
+    if(i>11) verbose = false;
 
     processEvent(store, verbose, reader);
 
@@ -214,9 +283,11 @@ void CaloAnalysis::loop(const std::string filename) {
      longprofile->SetBinContent(ii+1, mean);
      longprofile->SetBinError(ii+1, mean_err);
      
+     /*
      if (verbose) {
        std::cout << "layer rho # " << ii << " from " << rmin+ii*dr << " to " << rmin+(ii+1)*dr << " bins " << longprofile->GetBinLowEdge(ii+1) << " to " <<  longprofile->GetBinLowEdge(ii+1)+ longprofile->GetBinWidth(ii+1)<< std::endl;
      }
+     */
    }
 
   return;
@@ -224,7 +295,7 @@ void CaloAnalysis::loop(const std::string filename) {
 
 
 void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
-                              podio::ROOTReader& reader) {
+				podio::ROOTReader& reader) {
 
 
   phi_e->Reset();
@@ -259,13 +330,16 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
     SumE_layer[ii] = 0.;
   }
 
-  const double ECUT = 96.0;
+  const double ECUT = ENERGY*0.98;
   int layer;
   double hit_energy;
   double x_hit, y_hit, z_hit, phi_hit;
   double rho;
   const double r_epsilon = 0.0001;
   int nbin_max = 0;
+  double phi_bin_max_center = -100;
+  
+  bool is_out = false;
 
  if (colECalClusterOK && colECalHitOK) {
    if (verbose) {
@@ -327,8 +401,11 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
      h_layers[ii]->Fill(SumE_layer[ii]*SF/GeV);
    }
 
+   is_out = false;
 
    if (SumE_hit_ecal*SF/GeV<ECUT) {
+  
+     is_out = true;
      if (phi_out->GetEntries()==0) phi_out = (TH1F *)phi_e->Clone("phi_out");
      nbin_max = phi_e->GetMaximumBin();
      // std::cout << "Total hit energy: " << SumE_hit_ecal << " hit collection size: " << colECalHit->size() << " Maximum bin in phi " << nbin_max << " from " << phi_outliers->GetBinLowEdge(nbin_max) << " to " <<  phi_outliers->GetBinLowEdge(nbin_max)+ phi_outliers->GetBinWidth(nbin_max)<< std::endl;
@@ -346,7 +423,8 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
    }
    deltaphi->Fill(phi_e->GetRMS());
    nbin_max = phi_e->GetMaximumBin();
-   // std::cout << nbin_max << std::endl;
+   phi_bin_max_center = phi_e->GetBinCenter(nbin_max);
+   if (verbose) std::cout << "phi_max " << phi_e->GetBinCenter(nbin_max) << std::endl;
    phi_max->SetBinContent(nbin_max,1+phi_max->GetBinContent(nbin_max));
    nbin_max = x_e->GetMaximumBin();
    x_max->SetBinContent(nbin_max,1+x_max->GetBinContent(nbin_max));
@@ -373,33 +451,96 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
  }
  */
  
+
+ 
  if (colMCParticlesOK && colGenVertexOK) {
-   //if (colGenVertexOK) { 
    if (verbose) {
      std::cout << " Collections: "          << std::endl;
      std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
      std::cout << " -> #GenVertices:     " << colGenVertex->size()    << std::endl;
-   }
+    }
+
+   double ene_diff = 0;
+   double ene_diff_x = 0;
+   double ene_diff_y = 0;
+   double ene_diff_z = 0;
+   bool is_brem = false;
 
    for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
-     std::cout << "Particle PDG " << iparticle->Core().Type
-	       << " px " << iparticle->Core().P4.Px
-	       << " py " << iparticle->Core().P4.Py
-	       << " pz " << iparticle->Core().P4.Pz
-	       << " x " << iparticle->Core().Vertex.X
-	       << " y "<< iparticle->Core().Vertex.Y
-	       << " z "<< iparticle->Core().Vertex.Z
-	       <<std::endl;
-     std::cout << "OneToOne StartVertex x " << iparticle->StartVertex().Position().X 
-	       << " y " << iparticle->StartVertex().Position().Y
-	       << " z " << iparticle->StartVertex().Position().Z
-	       << " EndVertex x " << iparticle->EndVertex().Position().X
-               << " y " << iparticle->EndVertex().Position().Y
-               << " z " << iparticle->EndVertex().Position().Z
-	       << std::endl; 	      
+     double momentum = sqrt( pow(iparticle->Core().P4.Px,2)+
+			     pow(iparticle->Core().P4.Py,2)+
+			     pow(iparticle->Core().P4.Pz,2) );
+     double momentum_pt = sqrt( pow(iparticle->Core().P4.Px,2)+
+			     pow(iparticle->Core().P4.Py,2) );
+     double phi_particle = atan2(iparticle->Core().P4.Py,iparticle->Core().P4.Px);
+     double r_vertex = sqrt( pow(iparticle->Core().Vertex.X,2)+
+			     pow(iparticle->Core().Vertex.Y,2) );
+     double r_startVertex = sqrt( pow(iparticle->StartVertex().Position().X,2)+
+				  pow(iparticle->StartVertex().Position().Y,2) );
+     double r_endVertex = sqrt( pow(iparticle->EndVertex().Position().X,2)+
+				pow(iparticle->EndVertex().Position().Y,2) );
+
+  
+     //primary particle
+     if (iparticle->Core().Status==1) {
+       phi_prim->Fill(phi_particle);
+       p_prim->Fill(momentum);
+       pt_prim->Fill(momentum_pt);
+       if (is_out) {
+	 std::cout << "=== Energy " << SumE_hit_ecal*SF/GeV  << " phi " << phi_particle << std::endl; 
+	 phi_prim_out->Fill(phi_particle);
+       }
+       diff_phimaxhit_phi_prim->Fill(phi_particle- phi_bin_max_center);
+     }
+
+     if (iparticle->Core().Status==1) {
+       ene_diff_x += iparticle->Core().P4.Px;
+       ene_diff_y += iparticle->Core().P4.Py;
+       ene_diff_z += iparticle->Core().P4.Pz;
+     }
+     if ( (iparticle->Core().Status==10) || (iparticle->Core().Status==20) ) {
+       ene_diff_x -= iparticle->Core().P4.Px;
+       ene_diff_y -= iparticle->Core().P4.Py;
+       ene_diff_z -= iparticle->Core().P4.Pz;
+     }
+
+
+     //bremstralung gamma
+     if ( fabs(iparticle->Core().Type) == 22) {
+       is_brem = true;
+       phi_brem->Fill(phi_particle);
+       p_brem->Fill(momentum);
+       pt_brem->Fill(momentum_pt);
+       r_brem->Fill(r_startVertex);
+       if (is_out){
+	 phi_brem_out->Fill(phi_particle);
+	 p_brem_out->Fill(momentum);
+	 pt_brem_out->Fill(momentum_pt);
+	 r_brem_out->Fill(r_startVertex);
+       }
+     }
+
+
+     if (is_out) {
+       std::cout << "Particle PDG " << iparticle->Core().Type
+		 << " P " << momentum
+		 << " r " << r_vertex
+		 << " z "<< iparticle->Core().Vertex.Z
+		 << " StartVertex r " << r_startVertex
+		 << " z " << iparticle->StartVertex().Position().Z
+		 << " EndVertex r " << r_endVertex
+		 << " z " << iparticle->EndVertex().Position().Z
+		 << std::endl; 	      
+     }
 
    }
-
+   ene_diff = sqrt(pow(ene_diff_x,2)+pow(ene_diff_y,2)+pow(ene_diff_z,2));
+   if (is_brem) h_ene_diff->Fill(ene_diff);
+ }
+ else {
+   if (verbose) {
+     std::cout << "No MCTruth info available" << std:: endl;
+   }
  }
  
 

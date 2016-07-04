@@ -3,8 +3,8 @@ gSystem.Load("libcaloanalysis-myanalysis")
 from ROOT import CaloAnalysis, TCanvas, TFile, gPad
 
 PARTICLE = "e"
-ENERGY = 100
-SUFFIX = "primvertexX0Y2599Z0"
+ENERGY = 50
+SUFFIX = "classicalrk4"
 
 SF1=6.11 #no B field
 #filename1 = "/tmp/novaj/hits_fccsw_ecal_bfield0_e100GeV_v2.root"
