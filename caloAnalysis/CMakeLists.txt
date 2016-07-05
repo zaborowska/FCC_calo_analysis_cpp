@@ -8,7 +8,7 @@ file(GLOB headers *.h)
 # Pay attention to the name of the dictionary...
 # you want a unique name, not to pick up another .o file,
 # e.g. the one of fcc-edm
-ROOT_GENERATE_DICTIONARY(caloanalysis-CaloAnalysisDict CaloAnalysis.h LINKDEF LinkDef.h )
+ROOT_GENERATE_DICTIONARY(caloanalysis-CaloAnalysisDict CaloAnalysis.h CaloAnalysis_simple.h LINKDEF LinkDef.h )
 
 add_library(caloanalysis-myanalysis SHARED ${sources} ${headers} ${}caloanalysis-CaloAnalysisDict.cxx)
 

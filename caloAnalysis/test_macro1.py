@@ -10,8 +10,8 @@ PARTICLE = "e"
 ENERGY = 50
 SUFFIX = ""
 
-SF2=5.39
-#SF2=1.0
+#SF2=5.39
+SF2=1.0
 #SF2=5.73 #B field
 #SF2 = 6.12 #no B field
 #filename2 = "/tmp/novaj/hits_fccsw_ecal_bfield1_"+PARTICLE+str(ENERGY)+"GeV_dim"+SUFFIX+".root"
@@ -20,42 +20,31 @@ SF2=5.39
 #filename2 = "../../FCCSW/output_b1_e50_n500_mctruthbranc_classicalrk4_mfieldfix.root"
 #filename2 = "../../FCCSW/output_b1.root"
 #filename2 = "/localscratch2/novaj/HEP-FCCSW/FCCSW/e20_LAr4mm_Lead2mm_nocryo.root"
-filename2="../../FCCSW/output.root"
+filename2="../../FCCSW/output_calibHits.root"
+#filename2="../../FCCSW/output.root" 
 
 print "Processing file ",filename2
 ma2 = CaloAnalysis(SF2, ENERGY, PARTICLE)
 ma2.loop(filename2)
 print "Mean hit energy: ", ma2.hitenergy.GetMean()
 print "1/SF calculated: ", ENERGY/(ma2.hitenergy.GetMean())
-if ( (PARTICLE=="e") and (abs(ENERGY/(ma2.hitenergy.GetMean())-SF2)>0.01) ) :
-   print "Correct sampling fraction used??? Using ", SF2
+#if ( (PARTICLE=="e") and (abs(ENERGY/(ma2.hitenergy.GetMean())-SF2)>0.01) ) :
+#   print "Correct sampling fraction used??? Using ", SF2
 
-c1 = TCanvas("c1","c1",1000,1000)
-c1.Divide(2,2)
-c1.cd(1)
-ma2.cellenergy.Draw()
-ma2.cellenergy.Rebin(2)
-ma2.cellenergy.Fit("gaus")
+#c1 = TCanvas("c1","c1",1000,1000)
+#c1.Divide(2,2)
+#c1.cd(1)
+#ma2.cellenergy.Draw()
+#ma2.cellenergy.Rebin(2)
+#ma2.cellenergy.Fit("gaus")
 #ma2.r_max.Draw()
-c1.cd(2)
-ma2.phi_max.Draw()
-c1.cd(3)
-ma2.x_max.Draw()
-c1.cd(4)
-ma2.y_max.Draw()
-gPad.Update()
-
-c2 = TCanvas("c2","c2",1000,1000)
-c2.Divide(2,2)
-c2.cd(1)
-ma2.r_outliers.Draw()
-c2.cd(2)
-ma2.phi_outliers.Draw()
-c2.cd(3)
-ma2.x_outliers.Draw()
-c2.cd(4)
-ma2.y_outliers.Draw()
-gPad.Update()
+#c1.cd(2)
+#ma2.phi_max.Draw()
+#c1.cd(3)
+#ma2.x_max.Draw()
+#c1.cd(4)
+#ma2.y_max.Draw()
+#gPad.Update()
 
 closeInput = raw_input("Press ENTER to exit") 
 

@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class CaloAnalysis+;
+#pragma link C++ class CaloAnalysis_simple+;
 
 #endif

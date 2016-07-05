@@ -118,12 +118,14 @@ CaloAnalysis::~CaloAnalysis() {
   delete hitenergy;
   delete cellenergy;
   delete longprofile;
+  
   //  delete[] h_layers;
   /*
   for (unsigned int ii = 0; ii<NLAYERS_MAX; ii++) {
     delete h_layers;
   }
   */
+  
   delete hitphi;
   delete deltaphi;
   delete phi_out;
@@ -158,7 +160,7 @@ CaloAnalysis::~CaloAnalysis() {
   delete y_e;
   delete z_e;
   delete r_e;
-  
+ 
 }
 
   
@@ -289,6 +291,8 @@ void CaloAnalysis::loop(const std::string filename) {
      }
      */
    }
+
+   std::cout << "End of loop" << std::endl;
 
   return;
 }
@@ -539,10 +543,11 @@ void CaloAnalysis::processEvent(podio::EventStore& store, bool verbose,
  }
  else {
    if (verbose) {
-     std::cout << "No MCTruth info available" << std:: endl;
+     std::cout << "No MCTruth info available" << std::endl;
    }
  }
- 
+
+ std::cout << "End of processEvent" << std::endl;
 
 }
 
