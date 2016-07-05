@@ -6,8 +6,10 @@ PARTICLE = "e"
 ENERGY = 50
 SUFFIX = ""
 
-SF=5.36 #B field
-filename="../../FCCSW/output.root" 
+#SF=5.36
+#filename="../../FCCSW/output.root" 
+SF=1.0
+filename="../../FCCSW/output_calibHits.root" 
 
 print "Processing file ",filename
 ma = CaloAnalysis_simple(SF, ENERGY, PARTICLE)
@@ -21,10 +23,8 @@ c1.cd(1)
 ma.h_hitEnergy.Draw()
 c1.cd(2)
 ma.h_cellEnergy.Draw()
-#ma.h_cellEnergy.Fit("gaus")
+ma.h_cellEnergy.Fit("gaus")
 c1.cd(3)
-ma.h_longProfile.Draw()
-c1.cd(4)
 ma.h_ptGen.Draw()
 
 gPad.Update()
