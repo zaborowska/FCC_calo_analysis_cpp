@@ -10,10 +10,6 @@
 #include "datamodel/CaloClusterCollection.h"
 #include "datamodel/CaloHitCollection.h"
 
-// Utility functions
-//#include "utilities/VectorUtils.h"
-//#include "utilities/ParticleUtils.h"
-
 // ROOT
 #include "TObject.h"
 #include "TBranch.h"
@@ -33,7 +29,7 @@
 #include <bitset>
 
 
-CaloAnalysis_simple::CaloAnalysis_simple(const double sf, const double ENE, const std::string particle) 
+CaloAnalysis_simple::CaloAnalysis_simple(const double sf, const double ENE, const TString particle) 
 {
 
   TH1::AddDirectory(kFALSE);
@@ -42,51 +38,31 @@ CaloAnalysis_simple::CaloAnalysis_simple(const double sf, const double ENE, cons
   PARTICLE=particle;
   ENERGY = ENE;
 
-  h_hitEnergy = new TH1F("h_hitEnergy","h_hitEnergy", 200, 0, ENERGY);
-  
-  if (PARTICLE=="e") {
-    h_cellEnergy = new TH1F("h_cellenergy","h_cellEnergy", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
-  }
-  else {
-    if (PARTICLE=="mu") h_cellEnergy = new TH1F("h_cellEnergy","h_cellEnergy", 1000, 0, ENERGY-0.8*ENERGY);
-    else std::cout << "WARNING!!! Undefined particle type!!!" <<std::endl;
-  }
-
-  h_ptGen = new TH1F("h_ptGen","h_ptGen", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
-  
+  //Histograms initialization
+  histClass = new HistogramClass(SF, ENERGY, PARTICLE);
+  histClass->Initialize_histos();
 }
 
 
 CaloAnalysis_simple::~CaloAnalysis_simple() {
 
-  delete h_hitEnergy;
-  delete h_cellEnergy;
-  delete h_ptGen;
- 
+  histClass->Delete_histos();
+  delete histClass;
+
 }
 
   
 
 void CaloAnalysis_simple::loop(const std::string filename) {
 
-  h_hitEnergy->Reset();
-  h_cellEnergy->Reset();
-  h_ptGen->Reset();
+  //Reset histograms
+  histClass->Reset_histos();
 
-  h_hitEnergy->Sumw2();
-  h_cellEnergy->Sumw2();
-  h_ptGen->Sumw2();
-  
-
-  double truncation = 0.01;
-  double mean = 0.0;
-  double mean_err = 0.0;
-
-  std::string filename_eos;
+  //Open file in the reader
+  TString filename_eos;
   auto reader = podio::ROOTReader();
   auto store = podio::EventStore();
   try {
-    //reader.openFile(filename);
     //filename_eos =  "root://eospublic.cern.ch//eos/fcc/users/n/novaj/June10_ecalShifted/"+filename;
     reader.openFile(filename);
     std::cout << "CaloAnalysis_simple opening file " << filename << std::endl;
@@ -99,7 +75,7 @@ void CaloAnalysis_simple::loop(const std::string filename) {
 
   bool verbose = true;
 
-  //unsigned nEvents = 5;
+  //Loop over all events
   unsigned nEvents = reader.getEntries();
   std::cout << "Number of events: " << nEvents << std::endl;
   for(unsigned i=0; i<nEvents; ++i) {
@@ -112,6 +88,7 @@ void CaloAnalysis_simple::loop(const std::string filename) {
     reader.endOfEvent();
   }
 
+  std::cout << "Total energy: " << histClass->h_cellEnergy->GetMean() << std::endl;
   std::cout << "End of loop" << std::endl;
 
   return;
@@ -132,6 +109,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
       std::cout << "event number " << evinfo.Number() << std::endl;
   }
 
+  //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
   const fcc::GenVertexCollection*  colGenVertex(nullptr);
   const fcc::CaloClusterCollection* colECalCluster(nullptr);
@@ -143,16 +121,16 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
   bool colECalClusterOK = store.get("ECalClusters" , colECalCluster);
   bool colECalHitOK     = store.get("ECalHits" , colECalHit);
 
+  //Total hit energy per event
   SumE_hit_ecal = 0.;
   
+  //Hit & cluster collection
   if (colECalClusterOK && colECalHitOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
       std::cout << " -> #ECalClusters:     " << colECalCluster->size()    << std::endl;;
     }
-    //  std::cout << std::endl;
-    //  std::cout << "ECalClusters: " << std::endl;
-     
+    //Loop through the collection
     auto& iehit=colECalHit->begin();
     for (auto& iecluster=colECalCluster->begin(); iecluster!=colECalCluster->end(); ++iecluster) 
         {
@@ -162,29 +140,37 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
 
     if (verbose) std::cout << "Total hit energy: " << SumE_hit_ecal << " hit collection size: " << colECalHit->size() << std::endl;
 
-    h_hitEnergy->Fill(SumE_hit_ecal/GeV);
-    h_cellEnergy->Fill(SumE_hit_ecal*SF/GeV);
+    //Fill histograms
+    histClass->h_hitEnergy->Fill(SumE_hit_ecal/GeV);
+    histClass->h_cellEnergy->Fill(SumE_hit_ecal*SF/GeV);
 
   }
- 
- 
- if (colMCParticlesOK && colGenVertexOK) {
-   if (verbose) {
-     std::cout << " Collections: "          << std::endl;
-     std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
-     std::cout << " -> #GenVertices:     " << colGenVertex->size()    << std::endl;
+  else {
+    if (verbose) {
+      std::cout << "No CaloHit or CaloCluster Collection!!!!!" << std::endl;
     }
-   
-   for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
-     h_ptGen->Fill( sqrt( pow(iparticle->Core().P4.Px,2)+
-			  pow(iparticle->Core().P4.Py,2) ) );
-   }
-   
- }
- else {
-   if (verbose) {
-     std::cout << "No MCTruth info available" << std::endl;
-   }
- }
+  }
+
+ 
+  //MCParticle and Vertices collection 
+  if (colMCParticlesOK && colGenVertexOK) {
+    if (verbose) {
+      std::cout << " Collections: "          << std::endl;
+      std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
+      std::cout << " -> #GenVertices:     " << colGenVertex->size()    << std::endl;
+    }
+    //Loop through the collection   
+    for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
+      //Fill histogram
+      histClass->h_ptGen->Fill( sqrt( pow(iparticle->Core().P4.Px,2)+
+				      pow(iparticle->Core().P4.Py,2) ) );
+    }
+    
+  }
+  else {
+    if (verbose) {
+      std::cout << "No MCTruth info available" << std::endl;
+    }
+  }
 
 }

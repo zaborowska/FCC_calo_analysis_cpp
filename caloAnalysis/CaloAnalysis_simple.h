@@ -1,6 +1,8 @@
 #ifndef __CALOANALYSIS_SIMPLE_H__
 #define __CALOANALYSIS_SIMPLE_H__
 
+#include "HistogramClass.h"
+
 #include "TObject.h"
 #include "TH1F.h"
 #include "TString.h"
@@ -13,23 +15,21 @@ namespace podio {
 class CaloAnalysis_simple {
 
  public:
-  CaloAnalysis_simple(const double sf, const double ENE, const std::string particle);
+  CaloAnalysis_simple(const double sf, const double ENE, const TString particle);
   ~CaloAnalysis_simple();
 
-  void loop(const std::string filename);
+  void loop(const std::string filename);  //Open the file in the reader and loop through the events
   void processEvent(podio::EventStore& store, bool verbose,
 		    podio::ROOTReader& reader);
 
-  TH1F* h_hitEnergy;
-  TH1F* h_cellEnergy;
-  TH1F* h_ptGen;
+  HistogramClass* histClass; 
 
  private:
   const double GeV=1000;
-  double SF;
-  TString PARTICLE;
-  double ENERGY;
-  double SumE_hit_ecal;
+  double SF;               // 1/sampling_fraction
+  TString PARTICLE;        // Particle type: e/mu
+  double ENERGY;           // Beam energy
+  double SumE_hit_ecal;    // Total hit energy per event
 
 };
 
