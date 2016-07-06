@@ -1,7 +1,7 @@
 FCC_calo_analysis_cpp
 =====================
 
-C++ reader of calorimeter hits based on https://github.com/HEP-FCC/analysis-cpp.
+C++ reader of calorimeter hits based on https://github.com/HEP-FCC/analysis-cpp
 
 Initialization
 --------------
@@ -21,16 +21,22 @@ Make
 	mkdir build
 	cd build
 	cmake -DCMAKE_INSTALL_PREFIX=../install ..
-	make -j 4 install
+	make -j 8 install
 
-Run
------
+Run caloAnalysis
+----------------
+- Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
+
+   	 python test_macro_simple.py
+
+Run example (old)
+------------------
 - Default example (from analysis-cpp):
    
    reads example.root (produced with ${FCCEDM}/bin/fccedm-write)
    
-   ./install/bin/fccanalysiscpp-read    
-    python: python -i example-lib/test_macro.py	
+        ./install/bin/fccanalysiscpp-read    
+        python -i example-lib/test_macro.py	
 
 - My calo hit reader (example/read-calo.cc) 
 
@@ -38,6 +44,6 @@ Run
 
    creates output-calo-hits.root with histograms total hit energy in ECAL and in HCAL
    
-   ./install/bin/read-calo
+        ./install/bin/read-calo
 
 

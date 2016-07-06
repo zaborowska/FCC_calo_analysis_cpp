@@ -1,3 +1,4 @@
+
 #ifndef __CALOANALYSIS_MYANALYSIS_H__
 #define __CALOANALYSIS_MYANALYSIS_H__
 
@@ -35,11 +36,26 @@ class CaloAnalysis {
   TH1F* y_outliers;
   TH1F* z_outliers;
   TH1F* r_outliers;
+  TH1F* phi_prim;
+  TH1F* p_prim;
+  TH1F* pt_prim;
+  TH1F* phi_prim_out;
+  TH1F* diff_phimaxhit_phi_prim;
+  TH1F* phi_brem;
+  TH1F* p_brem;
+  TH1F* pt_brem;
+  TH1F* r_brem;
+  TH1F* phi_brem_out;
+  TH1F* p_brem_out;
+  TH1F* pt_brem_out;
+  TH1F* r_brem_out;
+  TH1F* h_ene_diff;
 
  private:
   const double GeV = 1000;
   double SF = 1.0;
   TString PARTICLE = "e";
+  double ENERGY = 100.0;
   static const int NLAYERS_MAX = 500;
   const double rmin = 2700.;
   const double rmax = 3400.;
