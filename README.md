@@ -26,7 +26,8 @@ Make
 Run caloAnalysis
 ----------------
 - Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
-python test_macro_simple.py
+
+  	python test_macro_simple.py
 
 Run example (old)
 ------------------
@@ -34,8 +35,8 @@ Run example (old)
    
    reads example.root (produced with ${FCCEDM}/bin/fccedm-write)
    
-   ./install/bin/fccanalysiscpp-read    
-    python: python -i example-lib/test_macro.py	
+        ./install/bin/fccanalysiscpp-read    
+        python -i example-lib/test_macro.py	
 
 - My calo hit reader (example/read-calo.cc) 
 
@@ -43,6 +44,6 @@ Run example (old)
 
    creates output-calo-hits.root with histograms total hit energy in ECAL and in HCAL
    
-   ./install/bin/read-calo
+        ./install/bin/read-calo
 
 
