@@ -21,10 +21,15 @@ Make
 	mkdir build
 	cd build
 	cmake -DCMAKE_INSTALL_PREFIX=../install ..
-	make -j 4 install
+	make -j 8 install
 
-Run
------
+Run caloAnalysis
+----------------
+- Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
+python test_macro_simple.py
+
+Run example (old)
+------------------
 - Default example (from analysis-cpp):
    
    reads example.root (produced with ${FCCEDM}/bin/fccedm-write)
