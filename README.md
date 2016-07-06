@@ -27,7 +27,7 @@ Run caloAnalysis
 ----------------
 - Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
 
-  	python test_macro_simple.py
+   	 python test_macro_simple.py
 
 Run example (old)
 ------------------
