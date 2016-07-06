@@ -1,7 +1,7 @@
 FCC_calo_analysis_cpp
 =====================
 
-C++ reader of calorimeter hits based on https://github.com/HEP-FCC/analysis-cpp.
+C++ reader of calorimeter hits based on https://github.com/HEP-FCC/analysis-cpp
 
 Initialization
 --------------
