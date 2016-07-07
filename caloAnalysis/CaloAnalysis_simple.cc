@@ -4,10 +4,7 @@
 #include "podio/EventStore.h"
 #include "podio/ROOTReader.h"
 
-#include "datamodel/EventInfoCollection.h"
 #include "datamodel/MCParticleCollection.h"
-#include "datamodel/GenVertexCollection.h"
-#include "datamodel/CaloClusterCollection.h"
 #include "datamodel/CaloHitCollection.h"
 
 // ROOT
@@ -98,44 +95,27 @@ void CaloAnalysis_simple::loop(const std::string filename) {
 void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
 				podio::ROOTReader& reader) {
 
-
-  // read event information
-  const fcc::EventInfoCollection* evinfocoll(nullptr);
-  bool evinfo_available = store.get("EventInfo", evinfocoll);
-  if(evinfo_available) {
-    auto evinfo = evinfocoll->at(0);
-
-   if(verbose)
-      std::cout << "event number " << evinfo.Number() << std::endl;
-  }
-
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
-  const fcc::GenVertexCollection*  colGenVertex(nullptr);
-  const fcc::CaloClusterCollection* colECalCluster(nullptr);
   const fcc::CaloHitCollection*     colECalHit(nullptr);
  
   bool colMCParticlesOK = store.get("GenParticles", colMCParticles);
-  bool colGenVertexOK =store.get("GenVertices", colGenVertex);
-  
-  bool colECalClusterOK = store.get("ECalClusters" , colECalCluster);
   bool colECalHitOK     = store.get("ECalHits" , colECalHit);
 
   //Total hit energy per event
   SumE_hit_ecal = 0.;
   
-  //Hit & cluster collection
-  if (colECalClusterOK && colECalHitOK) {
+  //Hit collection
+  if (colECalHitOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #ECalClusters:     " << colECalCluster->size()    << std::endl;;
+      std::cout << " -> #ECalHits:     " << colECalHit->size()    << std::endl;;
     }
     //Loop through the collection
-    auto& iehit=colECalHit->begin();
-    for (auto& iecluster=colECalCluster->begin(); iecluster!=colECalCluster->end(); ++iecluster) 
+    for (auto& iehit=colECalHit->begin(); iehit!=colECalHit->end(); ++iehit) 
         {
-          //if (verbose) std::cout << "ECal cluster energy " << iecluster->Core().Energy << std::endl;
-          SumE_hit_ecal += iecluster->Core().Energy;
+          //if (verbose) std::cout << "ECal hit energy " << iehit->Core().Energy << std::endl;
+          SumE_hit_ecal += iehit->Core().Energy;
 	}
 
     if (verbose) std::cout << "Total hit energy: " << SumE_hit_ecal << " hit collection size: " << colECalHit->size() << std::endl;
@@ -153,11 +133,10 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
 
  
   //MCParticle and Vertices collection 
-  if (colMCParticlesOK && colGenVertexOK) {
+  if (colMCParticlesOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
       std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
-      std::cout << " -> #GenVertices:     " << colGenVertex->size()    << std::endl;
     }
     //Loop through the collection   
     for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
