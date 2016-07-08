@@ -1,4 +1,4 @@
-#!bin/bash
+#!bin/sh -u
 
 export CURRENT_DIR=$PWD
 export FCCSW_DIR="../FCCSW"
@@ -17,3 +17,4 @@ source init.sh
 echo "FCC_analysis_cpp setup"
 cd $CURRENT_DIR
 source init.sh
+

@@ -1,4 +1,3 @@
-
 platform='unknown'
 sw_afs=0
 unamestr=`uname`
@@ -21,4 +20,3 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
     export DYLD_LIBRARY_PATH=$ANALYSISCPP/lib:$DYLD_LIBRARY_PATH
 fi
 echo platform detected: $platform
-

@@ -5,7 +5,7 @@
 #include "podio/ROOTReader.h"
 
 #include "datamodel/MCParticleCollection.h"
-#include "datamodel/CaloHitCollection.h"
+#include "datamodel/CaloClusterCollection.h"
 
 // ROOT
 #include "TObject.h"
@@ -97,28 +97,28 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
 
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
-  const fcc::CaloHitCollection*     colECalHit(nullptr);
+  const fcc::CaloClusterCollection*     colECalCluster(nullptr);
  
   bool colMCParticlesOK = store.get("GenParticles", colMCParticles);
-  bool colECalHitOK     = store.get("ECalHits" , colECalHit);
+  bool colECalClusterOK     = store.get("ECalClusters" , colECalCluster);
 
   //Total hit energy per event
   SumE_hit_ecal = 0.;
   
-  //Hit collection
-  if (colECalHitOK) {
+  //Cluster collection
+  if (colECalClusterOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #ECalHits:     " << colECalHit->size()    << std::endl;;
+      std::cout << " -> #ECalClusters:     " << colECalCluster->size()    << std::endl;;
     }
     //Loop through the collection
-    for (auto& iehit=colECalHit->begin(); iehit!=colECalHit->end(); ++iehit) 
+    for (auto& iecl=colECalCluster->begin(); iecl!=colECalCluster->end(); ++iecl) 
         {
           //if (verbose) std::cout << "ECal hit energy " << iehit->Core().Energy << std::endl;
-          SumE_hit_ecal += iehit->Core().Energy;
+          SumE_hit_ecal += iecl->Core().Energy;
 	}
 
-    if (verbose) std::cout << "Total hit energy: " << SumE_hit_ecal << " hit collection size: " << colECalHit->size() << std::endl;
+    if (verbose) std::cout << "Total hit energy: " << SumE_hit_ecal << " hit collection size: " << colECalCluster->size() << std::endl;
 
     //Fill histograms
     histClass->h_hitEnergy->Fill(SumE_hit_ecal/GeV);
@@ -127,7 +127,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
   }
   else {
     if (verbose) {
-      std::cout << "No CaloHit or CaloCluster Collection!!!!!" << std::endl;
+      std::cout << "No CaloCluster Collection!!!!!" << std::endl;
     }
   }
 
