@@ -7,7 +7,7 @@ export PODIO_DIR="../podio"
 
 echo "FCCSW init"
 cd $FCCSW_DIR
-source init.sh
+source init.sh afs
 echo "fcc-edm init"
 cd $FCCEDM_DIR
 source init.sh

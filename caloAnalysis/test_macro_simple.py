@@ -5,8 +5,8 @@ from ROOT import CaloAnalysis_simple, TCanvas, TFile, TF1, gPad
 PARTICLE = "e"
 ENERGY = 50
 
-SF=5.36
-filename="../../FCCSW/output.root" 
+SF=5.4
+filename="../../FCCSW/output_e50_10events.root" 
 
 print "Processing file ",filename
 ma = CaloAnalysis_simple(SF, ENERGY, PARTICLE)

@@ -7,7 +7,9 @@
 
 #pragma link C++ class CaloAnalysis_simple+;
 #pragma link C++ class CaloAnalysis_more+;
+#pragma link C++ class CaloAnalysis_cell+;
 #pragma link C++ class HistogramClass+;
+#pragma link C++ class HistogramClass_cell+;
 #pragma link C++ class HistogramClass_more+;
 
 #endif

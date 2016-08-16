@@ -101,7 +101,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
  
   bool colMCParticlesOK = store.get("GenParticles", colMCParticles);
   bool colECalClusterOK     = store.get("ECalClusters" , colECalCluster);
-
+ 
   //Total hit energy per event
   SumE_hit_ecal = 0.;
   
@@ -118,7 +118,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
           SumE_hit_ecal += iecl->Core().Energy;
 	}
 
-    if (verbose) std::cout << "Total hit energy: " << SumE_hit_ecal << " hit collection size: " << colECalCluster->size() << std::endl;
+    if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit_ecal/GeV << " total cell energy (GeV): " << SumE_hit_ecal*SF/GeV << " hit collection size: " << colECalCluster->size() << std::endl;
 
     //Fill histograms
     histClass->h_hitEnergy->Fill(SumE_hit_ecal/GeV);
