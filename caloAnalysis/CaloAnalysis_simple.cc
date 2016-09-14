@@ -5,6 +5,7 @@
 #include "podio/ROOTReader.h"
 
 #include "datamodel/MCParticleCollection.h"
+#include "datamodel/GenVertexCollection.h"
 #include "datamodel/CaloClusterCollection.h"
 
 // ROOT
@@ -143,6 +144,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
       //Fill histogram
       histClass->h_ptGen->Fill( sqrt( pow(iparticle->Core().P4.Px,2)+
 				      pow(iparticle->Core().P4.Py,2) ) );
+      //      std::cout << std::atan2(iparticle.StartVertex.Position.Y, iparticle.StartVertex.Position.X) << std::endl;
     }
     
   }

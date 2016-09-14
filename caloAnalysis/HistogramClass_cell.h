@@ -17,6 +17,16 @@ class HistogramClass_cell {
 
   TH1F* h_cellEnergy;
   TH1F* h_cellId;
+  
+  TH1F* h_ene_eta;
+  TH1F* h_ene_phi;
+  TH1F* h_ene_r;
+
+  TH1F* h_cellEnergy_check;
+  TH1F* h_ene_eta_check;
+  TH1F* h_ene_phi_check;
+  TH1F* h_ene_r_check;
+  
   std::vector<TH1F*> histVector;
 
  private:
