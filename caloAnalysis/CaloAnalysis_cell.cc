@@ -113,7 +113,7 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
   const fcc::CaloClusterCollection*     colECalCluster_old(nullptr);
  
   bool colECalCellOK     = store.get("caloCells" , colECalCell);
-  bool colECalCluster_newOK     = store.get("newCaloClusters" , colECalCluster_new);
+  bool colECalCluster_newOK     = store.get("caloCellsClusters" , colECalCluster_new);
   bool colECalCluster_oldOK     = store.get("ECalClusters" , colECalCluster_old);
 
   //Total hit energy per event
@@ -157,7 +157,7 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 
 	  //if (verbose) std::cout << "ECal cell energy " << iecl->Core().Energy << std::endl;
 	  SumE_cell += iecl->Core().Energy;
-	  if (iecl->Core().Energy>0.0001) {
+	  //if (iecl->Core().Energy>0.005) {
 	    double r = sqrt(pow(iecl->Core().position.X,2)+pow(iecl->Core().position.Y,2));
 	//if (verbose) std::cout << " x " << iecl->Core().position.X << " y " << iecl->Core().position.Y << std::endl;
 	    TVector3 vec(iecl->Core().position.X,iecl->Core().position.Y,iecl->Core().position.Z);
@@ -167,7 +167,7 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 	    histClass->h_ene_r->Fill(r,iecl->Core().Energy);
 	    histClass->h_ene_phi->Fill(phi,iecl->Core().Energy);
 	    histClass->h_ene_eta->Fill(eta,iecl->Core().Energy);
-	  }
+	    //	  }
       }
   
     std::cout << "Total energy 2: " << SumE_cell/GeV << std::endl;

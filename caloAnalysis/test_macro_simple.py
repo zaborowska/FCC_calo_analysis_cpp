@@ -7,7 +7,7 @@ ENERGY = 50
 
 SF=5.4
 #filename="../../FCCSW/output_e50_10events.root" 
-filename="../../FCCSW/output_ecalXYZ.root"
+filename="../../FCCSW/output_ecal.root"
 
 print "Processing file ",filename
 ma = CaloAnalysis_simple(SF, ENERGY, PARTICLE)

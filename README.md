@@ -3,47 +3,31 @@ FCC_calo_analysis_cpp
 
 C++ reader of calorimeter hits based on https://github.com/HEP-FCC/analysis-cpp
 
-Initialization
---------------
+# Initialization
 - fcc-edm and podio has to be compiled
 - Have to init FCCSW, fcc-edm and podio + FCC_analysis_cpp
+~~~{.sh}
+source setup.sh
+~~~
 
-  source setup.sh
+*Notes:*
+* problem in initialization of fcc-edm and podio  (seems to be running fine)
+~~~{.sh}
+dirname: missing operand
+~~~
 
-Notes:
-- problem in initialization of fcc-edm and podio  (seems to be running fine)
+#Make
+~~~{.sh}
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=../install ..
+make -j 8 install
+~~~
 
-  dirname: missing operand
- 
-
-Make
------
-	mkdir build
-	cd build
-	cmake -DCMAKE_INSTALL_PREFIX=../install ..
-	make -j 8 install
-
-Run caloAnalysis
-----------------
-- Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
-
-   	 python test_macro_simple.py
-
-Run example (old)
-------------------
-- Default example (from analysis-cpp):
-   
-   reads example.root (produced with ${FCCEDM}/bin/fccedm-write)
-   
-        ./install/bin/fccanalysiscpp-read    
-        python -i example-lib/test_macro.py	
-
-- My calo hit reader (example/read-calo.cc) 
-
-   needs output-calo.root with ECal + HCal hits
-
-   creates output-calo-hits.root with histograms total hit energy in ECAL and in HCAL
-   
-        ./install/bin/read-calo
-
+# Run analysis
+Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
+~~~{.sh}
+cd caloAnalysis
+python test_macro_simple.py
+~~~
 

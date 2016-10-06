@@ -8,7 +8,7 @@ ENERGY = 50
 #SF not used in the code for cells - calibration by SF done in FCCSW 
 SF=1.0
 ##filename="../../FCCSW/output_reco_ecal.root"  
-filename="../../FCCSW/output_recoPhiEta_noise_test.root"  
+filename="../../FCCSW/output_ecalReco_test.root"  
 
 print "Processing file ",filename
 ma = CaloAnalysis_cell(SF, ENERGY, PARTICLE)
