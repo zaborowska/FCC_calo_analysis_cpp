@@ -3,11 +3,9 @@
 // STL
 #include <vector>
 #include <iostream>
-#include <bitset>
 
-HistogramClass_cell::HistogramClass_cell(double sf, double ENE, TString particle)
+HistogramClass_cell::HistogramClass_cell(double ENE)
 {
-  PARTICLE=particle;
   ENERGY = ENE;
 }
 
@@ -19,22 +17,9 @@ HistogramClass_cell::~HistogramClass_cell()
 void HistogramClass_cell::Initialize_histos()
 {
 
-  if (PARTICLE=="e") {
-    h_cellEnergy = new TH1F("h_cellEnergy","", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
-    h_cellEnergy_check = new TH1F("h_cellEnergy_check","", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
-  }
-  else {
-    if (PARTICLE=="mu") {
-      h_cellEnergy = new TH1F("h_cellEnergy","", 1000, 0, ENERGY-0.8*ENERGY);
-      h_cellEnergy_check = new TH1F("h_cellEnergy_check","", 1000, 0, ENERGY-0.8*ENERGY);
-    }
-    else {
-      std::cout << "WARNING!!! Histogram ranges for " << PARTICLE << " particle not defined!!!" <<std::endl;
-      h_cellEnergy = new TH1F("h_cellenergy","", 100, 0, ENERGY+0.2*ENERGY);
-      h_cellEnergy_check = new TH1F("h_cellenergy_check","", 100, 0, ENERGY+0.2*ENERGY);
-    }
-  }
+  h_cellEnergy = new TH1F("h_cellEnergy","", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
   histVector.push_back(h_cellEnergy);
+  h_cellEnergy_check = new TH1F("h_cellEnergy_check","", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
   histVector.push_back(h_cellEnergy_check);
 
   h_cellId = new TH1F("h_cellId","", 1000, 0,5000e6);

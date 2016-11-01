@@ -6,7 +6,7 @@
 
 #include "datamodel/MCParticleCollection.h"
 #include "datamodel/GenVertexCollection.h"
-#include "datamodel/CaloClusterCollection.h"
+#include "datamodel/PositionedCaloHitCollection.h"
 
 // ROOT
 #include "TObject.h"
@@ -28,17 +28,16 @@
 #include <bitset>
 
 
-CaloAnalysis_profiles::CaloAnalysis_profiles(const double sf, const double ENE, const TString particle) 
+CaloAnalysis_profiles::CaloAnalysis_profiles(const double sf, const double ENE) 
 {
 
   TH1::AddDirectory(kFALSE);
 
   SF = sf;
-  PARTICLE=particle;
   ENERGY = ENE;
 
   //Histograms initialization
-  histClass = new HistogramClass_profiles(SF, ENERGY, PARTICLE);
+  histClass = new HistogramClass_profiles(ENERGY);
   histClass->Initialize_histos();
 }
 
@@ -104,11 +103,11 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
 
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
-  const fcc::CaloClusterCollection*     colECalCluster(nullptr);
+  const fcc::PositionedCaloHitCollection*     colECalPositionedHits(nullptr);
  
   bool colMCParticlesOK = store.get("GenParticles", colMCParticles);
-  bool colECalClusterOK     = store.get("ECalClusters" , colECalCluster);
- 
+  bool colECalPositionedHitsOK     = store.get("ECalPositionedHits" , colECalPositionedHits);
+
   //Total hit energy per event
   SumE_hit = 0.;
   //EM shower axis - assuming single shower per event!!!!
@@ -125,13 +124,13 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
     }
     //Loop through the collection   
     for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
-      TVector3 particle(iparticle->Core().P4.Px,iparticle->Core().P4.Py,iparticle->Core().P4.Pz);
+      TVector3 particle(iparticle->core().p4.px,iparticle->core().p4.py,iparticle->core().p4.pz);
       //unit vector
       directionParticle = particle.Unit();
       //Fill histograms
-      histClass->h_ptGen->Fill( sqrt( pow(iparticle->Core().P4.Px,2)+
-				      pow(iparticle->Core().P4.Py,2) ) );
-      histClass->h_pdgGen->Fill( iparticle->Core().Type );
+      histClass->h_ptGen->Fill( sqrt( pow(iparticle->core().p4.px,2)+
+				      pow(iparticle->core().p4.py,2) ) );
+      histClass->h_pdgGen->Fill( iparticle->core().pdgId );
     }
   }
   else {
@@ -141,25 +140,24 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
   }
 
 
-  //Cluster collection
-  if (colECalClusterOK) {
+  //PositionedHits collection
+  if (colECalPositionedHitsOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #ECalClusters:     " << colECalCluster->size()    << std::endl;;
+      std::cout << " -> #ECalPositionedHits:     " << colECalPositionedHits->size()    << std::endl;;
     }
- 
     TH1F *h_hitR = new TH1F("h_hitR", "h_hitR", 1000, RcaloMin, RcaloMin+1.5*layerThickness);
     TH1F *h_hitPhi = new TH1F("h_hitPhi", "h_hitPhi", 100000, -TMath::Pi(), TMath::Pi());
     TH1F *h_hitEta = new TH1F("h_hitEta", "h_hitEta", 1000000, -EtaMax, EtaMax);
 
     //Loop through the collection
     //First: find the mean position in the first layer, calculate total energy
-    for (auto& iecl=colECalCluster->begin(); iecl!=colECalCluster->end(); ++iecl) 
+    for (auto& iecl=colECalPositionedHits->begin(); iecl!=colECalPositionedHits->end(); ++iecl) 
       {
-	double hitEnergy = iecl->Core().Energy;
+	double hitEnergy = iecl->core().energy;
 	SumE_hit += hitEnergy;
 
-	TVector3 hit_position(iecl->Core().position.X,iecl->Core().position.Y,iecl->Core().position.Z);
+	TVector3 hit_position(iecl->position().x,iecl->position().y,iecl->position().z);
 	double R_firstLayer = RcaloMin+layerThickness;
 	if (hit_position.Pt()<RcaloMin) {
 	  std::cout <<"Hit before the calorimeter????? Please check the value of RcaloMin!"<< std::endl;
@@ -212,10 +210,10 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
     delete h_hitEta;
     
     //Second loop: radial & longitudinal profiles 
-   for (auto& iecl=colECalCluster->begin(); iecl!=colECalCluster->end(); ++iecl) 
+    for (auto& iecl=colECalPositionedHits->begin(); iecl!=colECalPositionedHits->end(); ++iecl) 
      {
-       double hitEnergy = iecl->Core().Energy;
-       TVector3 hitPosition(iecl->Core().position.X,iecl->Core().position.Y,iecl->Core().position.Z);
+       double hitEnergy = iecl->core().energy;
+       TVector3 hitPosition(iecl->position().x,iecl->position().y,iecl->position().z);
 
        //gen. particle direction
        TVector3 showerStart_particle = directionParticle*RcaloMin;
@@ -247,15 +245,13 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
        histClass->h_longProfile->Fill(hitLong/X0, hitEnergy*SF/GeV);
       
      }
-   if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit/GeV << " total cell energy (GeV): " << SumE_hit*SF/GeV << " hit collection size: " << colECalCluster->size() << std::endl;
+   if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit/GeV << " total cell energy (GeV): " << SumE_hit*SF/GeV << " hit collection size: " << colECalPositionedHits->size() << std::endl;
 
   }
   else {
     if (verbose) {
-      std::cout << "No CaloCluster Collection!!!!!" << std::endl;
+      std::cout << "No CaloPositionedHits Collection!!!!!" << std::endl;
     }
   }
-
-
 
 }

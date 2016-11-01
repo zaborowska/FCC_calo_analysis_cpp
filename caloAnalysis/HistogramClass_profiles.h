@@ -3,12 +3,11 @@
 
 #include "TObject.h"
 #include "TH1F.h"
-#include "TString.h"
 
 class HistogramClass_profiles {
 
  public:
-  HistogramClass_profiles(double sf, double ENE, TString particle);
+  HistogramClass_profiles(double ENE);
   ~HistogramClass_profiles();
 
   void Initialize_histos();
@@ -34,9 +33,7 @@ class HistogramClass_profiles {
   // vector of all TH1F histograms (for easier manipulation)
   std::vector<TH1F*> histVector;
 
- private:
-  double SF;
-  TString PARTICLE;
+private:
   double ENERGY;
 
 };

@@ -5,15 +5,12 @@ from ROOT import CaloAnalysis_profiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
 #import draw functions
 from draw_functions import draw_1histogram, draw_2histograms
 
-PARTICLE = "e"
 ENERGY = 50
-
 SF=5.4
-#filename="../../FCCSW/output_ecal.root"
-filename="../../FCCSW/output_ecalSim_e50GeV_eta0_100events.root"
+filename="../../FCCSW/output_ecalSim_e50GeV_eta0_10events.root"
 
 print "Processing file ",filename
-ma = CaloAnalysis_profiles(SF, ENERGY, PARTICLE)
+ma = CaloAnalysis_profiles(SF, ENERGY)
 ma.loop(filename)
 print "Mean hit energy: ", ma.histClass.h_hitEnergy.GetMean()
 print "1/SF calculated: ", ENERGY/(ma.histClass.h_hitEnergy.GetMean())

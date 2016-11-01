@@ -5,7 +5,6 @@
 
 #include "TObject.h"
 #include "TH1F.h"
-#include "TString.h"
 
 namespace podio {
   class EventStore;
@@ -15,7 +14,7 @@ namespace podio {
 class CaloAnalysis_profiles {
 
  public:
-  CaloAnalysis_profiles(const double sf, const double ENE, const TString particle);
+  CaloAnalysis_profiles(const double sf, const double ENE);
   ~CaloAnalysis_profiles();
 
   void loop(const std::string filename);  //Open the file in the reader and loop through the events
@@ -27,7 +26,6 @@ class CaloAnalysis_profiles {
  private:
   const double GeV=1000;
   double SF;               // 1/sampling_fraction
-  TString PARTICLE;        // Particle type: e/mu
   double ENERGY;           // Beam energy
   double SumE_hit;    // Total hit energy per event
   const double RcaloMin = 2700.;

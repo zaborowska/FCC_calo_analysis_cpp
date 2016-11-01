@@ -3,12 +3,11 @@
 
 #include "TObject.h"
 #include "TH1F.h"
-#include "TString.h"
 
 class HistogramClass_cell {
 
  public:
-  HistogramClass_cell(double sf, double ENE, TString particle);
+  HistogramClass_cell(double ENE);
   ~HistogramClass_cell();
 
   void Initialize_histos();
@@ -30,8 +29,6 @@ class HistogramClass_cell {
   std::vector<TH1F*> histVector;
 
  private:
-  double SF;
-  TString PARTICLE;
   double ENERGY;
 
 };

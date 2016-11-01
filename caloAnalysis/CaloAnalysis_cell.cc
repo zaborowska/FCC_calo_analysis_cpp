@@ -5,7 +5,7 @@
 #include "podio/ROOTReader.h"
 
 #include "datamodel/CaloHitCollection.h"
-#include "datamodel/CaloClusterCollection.h"
+#include "datamodel/PositionedCaloHitCollection.h"
 
 // ROOT
 #include "TObject.h"
@@ -27,17 +27,16 @@
 #include <bitset>
 
 
-CaloAnalysis_cell::CaloAnalysis_cell(const double sf, const double ENE, const TString particle) 
+CaloAnalysis_cell::CaloAnalysis_cell(const double sf, const double ENE) 
 {
 
   TH1::AddDirectory(kFALSE);
 
   SF = sf;
-  PARTICLE=particle;
   ENERGY = ENE;
 
   //Histograms initialization
-  histClass = new HistogramClass_cell(SF, ENERGY, PARTICLE);
+  histClass = new HistogramClass_cell(ENERGY);
   histClass->Initialize_histos();
 }
 
@@ -109,12 +108,12 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 
   //Get the collections
   const fcc::CaloHitCollection*     colECalCell(nullptr);
-  const fcc::CaloClusterCollection*     colECalCluster_new(nullptr);
-  const fcc::CaloClusterCollection*     colECalCluster_old(nullptr);
+  const fcc::PositionedCaloHitCollection*     colECalPositionedHits_new(nullptr);
+  const fcc::PositionedCaloHitCollection*     colECalPositionedHits_old(nullptr);
  
   bool colECalCellOK     = store.get("caloCells" , colECalCell);
-  bool colECalCluster_newOK     = store.get("caloCellsClusters" , colECalCluster_new);
-  bool colECalCluster_oldOK     = store.get("ECalClusters" , colECalCluster_old);
+  bool colECalPositionedHits_newOK     = store.get("caloCellsPositions" , colECalPositionedHits_new);
+  bool colECalPositionedHits_oldOK     = store.get("ECalPositionedHits" , colECalPositionedHits_old);
 
   //Total hit energy per event
   SumE_cell = 0.;
@@ -128,9 +127,9 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
     //Loop through the collection
     for (auto& iecl=colECalCell->begin(); iecl!=colECalCell->end(); ++iecl) 
       {
-	//if (verbose) std::cout << "ECal cell energy " << iecl->Core().Energy << std::endl;
-	SumE_cell += iecl->Core().Energy;
-	histClass->h_cellId->Fill(iecl->Core().Cellid);
+	//if (verbose) std::cout << "ECal cell energy " << iecl->core().energy << std::endl;
+	SumE_cell += iecl->core().energy;
+	histClass->h_cellId->Fill(iecl->core().cellId);
       }
     //Fill histograms
     //histClass->h_cellEnergy->Fill(SumE_cell/GeV);
@@ -147,26 +146,26 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 
   SumE_cell = 0.;
   //Cell collection
-  if (colECalCluster_newOK) {
+  if (colECalPositionedHits_newOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #newCaloClusters:     " << colECalCluster_new->size()    << std::endl;;
+      std::cout << " -> #newCaloPositionedHits:     " << colECalPositionedHits_new->size()    << std::endl;;
     }
-    for (auto& iecl=colECalCluster_new->begin(); iecl!=colECalCluster_new->end(); ++iecl) 
+    for (auto& iecl=colECalPositionedHits_new->begin(); iecl!=colECalPositionedHits_new->end(); ++iecl) 
       {
 
-	  //if (verbose) std::cout << "ECal cell energy " << iecl->Core().Energy << std::endl;
-	  SumE_cell += iecl->Core().Energy;
-	  //if (iecl->Core().Energy>0.005) {
-	    double r = sqrt(pow(iecl->Core().position.X,2)+pow(iecl->Core().position.Y,2));
-	//if (verbose) std::cout << " x " << iecl->Core().position.X << " y " << iecl->Core().position.Y << std::endl;
-	    TVector3 vec(iecl->Core().position.X,iecl->Core().position.Y,iecl->Core().position.Z);
-	    double phi = atan2( iecl->Core().position.Y, iecl->Core().position.X );
+	  //if (verbose) std::cout << "ECal cell energy " << iecl->core().energy << std::endl;
+	  SumE_cell += iecl->core().energy;
+	  //if (iecl->core().energy>0.005) {
+	    double r = sqrt(pow(iecl->position().x,2)+pow(iecl->position().y,2));
+	//if (verbose) std::cout << " x " << iecl->position().x << " y " << iecl->position().y << std::endl;
+	    TVector3 vec(iecl->position().x,iecl->position().y,iecl->position().z);
+	    double phi = atan2( iecl->position().y, iecl->position().x );
 	    double eta = vec.Eta();
-	  //if (verbose && iecl->Core().Energy>2.) std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->Core().Energy << std::endl;
-	    histClass->h_ene_r->Fill(r,iecl->Core().Energy);
-	    histClass->h_ene_phi->Fill(phi,iecl->Core().Energy);
-	    histClass->h_ene_eta->Fill(eta,iecl->Core().Energy);
+	  //if (verbose && iecl->core().energy>2.) std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->core().energy << std::endl;
+	    histClass->h_ene_r->Fill(r,iecl->core().energy);
+	    histClass->h_ene_phi->Fill(phi,iecl->core().energy);
+	    histClass->h_ene_eta->Fill(eta,iecl->core().energy);
 	    //	  }
       }
   
@@ -176,7 +175,7 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
   }
   else {
     if (verbose) {
-      std::cout << "No colECalCluster_new Collection!!!!!" << std::endl;
+      std::cout << "No colECalPositionedHits_new Collection!!!!!" << std::endl;
     }
   }
 
@@ -186,35 +185,35 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
   //Cell collection
   double n_noDouble = 0;
   int n_clusters = 0;
-  if (colECalCluster_oldOK) {
+  if (colECalPositionedHits_oldOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #oldCaloClusters:     " << colECalCluster_old->size()    << std::endl;;
+      std::cout << " -> #oldCaloPositionedHitss:     " << colECalPositionedHits_old->size()    << std::endl;;
     }
-    n_noDouble = (float)colECalCluster_old->size()/2.;
-    for (auto& iecl=colECalCluster_old->begin(); iecl!=colECalCluster_old->end(); ++iecl) 
+    n_noDouble = (float)colECalPositionedHits_old->size()/2.;
+    for (auto& iecl=colECalPositionedHits_old->begin(); iecl!=colECalPositionedHits_old->end(); ++iecl) 
       {
 	n_clusters += 1;
 	if (n_clusters>n_noDouble) break;
-	SumE_cell_check += iecl->Core().Energy;
-	double r = sqrt(pow(iecl->Core().position.X,2)+pow(iecl->Core().position.Y,2));
-	TVector3 vec(iecl->Core().position.X,iecl->Core().position.Y,iecl->Core().position.Z);
-	double phi = atan2( iecl->Core().position.Y, iecl->Core().position.X );
+	SumE_cell_check += iecl->core().energy;
+	double r = sqrt(pow(iecl->position().x,2)+pow(iecl->position().y,2));
+	TVector3 vec(iecl->position().x,iecl->position().y,iecl->position().z);
+	double phi = atan2( iecl->position().y, iecl->position().x );
 	double eta = vec.Eta();
 
 
-	//if (verbose && iecl->Core().Energy>2.) std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->Core().Energy << std::endl;
+	//if (verbose && iecl->core().energy>2.) std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->core().energy << std::endl;
 
-	histClass->h_ene_r_check->Fill(r,iecl->Core().Energy*SF);
-	histClass->h_ene_phi_check->Fill(phi,iecl->Core().Energy*SF);
-	histClass->h_ene_eta_check->Fill(eta,iecl->Core().Energy*SF);
+	histClass->h_ene_r_check->Fill(r,iecl->core().energy*SF);
+	histClass->h_ene_phi_check->Fill(phi,iecl->core().energy*SF);
+	histClass->h_ene_eta_check->Fill(eta,iecl->core().energy*SF);
       }
     std::cout << "Total energy 3: " << SumE_cell_check*SF/GeV << std::endl;
     histClass->h_cellEnergy_check->Fill(SumE_cell_check*SF/GeV);
   }
   else {
     if (verbose) {
-      std::cout << "No colECalCluster_old Collection!!!!!" << std::endl;
+      std::cout << "No colECalPositionedHits_old Collection!!!!!" << std::endl;
     }
   }
  

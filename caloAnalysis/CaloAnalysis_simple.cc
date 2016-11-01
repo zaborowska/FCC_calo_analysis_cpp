@@ -6,7 +6,7 @@
 
 #include "datamodel/MCParticleCollection.h"
 #include "datamodel/GenVertexCollection.h"
-#include "datamodel/CaloClusterCollection.h"
+#include "datamodel/PositionedCaloHitCollection.h"
 
 // ROOT
 #include "TObject.h"
@@ -24,20 +24,17 @@
 // STL
 #include <vector>
 #include <iostream>
-#include <bitset>
 
-
-CaloAnalysis_simple::CaloAnalysis_simple(const double sf, const double ENE, const TString particle) 
+CaloAnalysis_simple::CaloAnalysis_simple(const double sf, const double ENE) 
 {
 
   TH1::AddDirectory(kFALSE);
 
   SF = sf;
-  PARTICLE=particle;
   ENERGY = ENE;
 
   //Histograms initialization
-  histClass = new HistogramClass(SF, ENERGY, PARTICLE);
+  histClass = new HistogramClass(ENERGY);
   histClass->Initialize_histos();
 }
 
@@ -98,28 +95,28 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
 
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
-  const fcc::CaloClusterCollection*     colECalCluster(nullptr);
+  const fcc::PositionedCaloHitCollection*     colECalPositionedHits(nullptr);
  
   bool colMCParticlesOK = store.get("GenParticles", colMCParticles);
-  bool colECalClusterOK     = store.get("ECalClusters" , colECalCluster);
+  bool colECalPositionedHitsOK     = store.get("ECalPositionedHits" , colECalPositionedHits);
  
   //Total hit energy per event
   SumE_hit_ecal = 0.;
   
-  //Cluster collection
-  if (colECalClusterOK) {
+  //PositionedHits collection
+  if (colECalPositionedHitsOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #ECalClusters:     " << colECalCluster->size()    << std::endl;;
+      std::cout << " -> #ECalPositionedHits:     " << colECalPositionedHits->size()    << std::endl;;
     }
     //Loop through the collection
-    for (auto& iecl=colECalCluster->begin(); iecl!=colECalCluster->end(); ++iecl) 
+    for (auto& iecl=colECalPositionedHits->begin(); iecl!=colECalPositionedHits->end(); ++iecl) 
         {
-          //if (verbose) std::cout << "ECal hit energy " << iehit->Core().Energy << std::endl;
-          SumE_hit_ecal += iecl->Core().Energy;
+          //if (verbose) std::cout << "ECal hit energy " << iehit->core().energy << std::endl;
+          SumE_hit_ecal += iecl->core().energy;
 	}
 
-    if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit_ecal/GeV << " total cell energy (GeV): " << SumE_hit_ecal*SF/GeV << " hit collection size: " << colECalCluster->size() << std::endl;
+    if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit_ecal/GeV << " total cell energy (GeV): " << SumE_hit_ecal*SF/GeV << " hit collection size: " << colECalPositionedHits->size() << std::endl;
 
     //Fill histograms
     histClass->h_hitEnergy->Fill(SumE_hit_ecal/GeV);
@@ -128,7 +125,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
   }
   else {
     if (verbose) {
-      std::cout << "No CaloCluster Collection!!!!!" << std::endl;
+      std::cout << "No CaloPositionedHits Collection!!!!!" << std::endl;
     }
   }
 
@@ -142,9 +139,9 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
     //Loop through the collection   
     for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
       //Fill histogram
-      histClass->h_ptGen->Fill( sqrt( pow(iparticle->Core().P4.Px,2)+
-				      pow(iparticle->Core().P4.Py,2) ) );
-      //      std::cout << std::atan2(iparticle.StartVertex.Position.Y, iparticle.StartVertex.Position.X) << std::endl;
+      histClass->h_ptGen->Fill( sqrt( pow(iparticle->core().p4.px,2)+
+				      pow(iparticle->core().p4.py,2) ) );
+      //      std::cout << "phiGen " << std::atan2(iparticle.startVertex.position.y, iparticle.startVertex.position.x) << std::endl;
     }
     
   }

@@ -3,8 +3,12 @@ install/
 *~
 *.root
 *.png
+*.gif
 *.pdf
 *.d
 *.so
 *.pcm
+*.pyc
+LICENCE
+.*
 
