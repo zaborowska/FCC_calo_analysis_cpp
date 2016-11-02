@@ -25,22 +25,22 @@ void HistogramClass_cell::Initialize_histos()
   h_cellId = new TH1F("h_cellId","", 1000, 0,5000e6);
   histVector.push_back(h_cellId);
 
-  h_ene_eta = new TH1F("h_ene_eta","", 21, -2.0,2.0);
+  h_ene_eta = new TH1F("h_ene_eta","", 400, -2.0,2.0);
   histVector.push_back(h_ene_eta);
 
-  h_ene_phi = new TH1F("h_ene_phi","", 5, -3.1416 ,3.1416);
+  h_ene_phi = new TH1F("h_ene_phi","", 628, -3.1416 ,3.1416);
   histVector.push_back(h_ene_phi);
 
-  h_ene_r = new TH1F("h_ene_r","", 116, 2700.,3400.);
+  h_ene_r = new TH1F("h_ene_r","", 10, 2700.,3400.);
   histVector.push_back(h_ene_r);
 
-  h_ene_eta_check = new TH1F("h_ene_eta_check","", 21, -2.0,2.0);
+  h_ene_eta_check = new TH1F("h_ene_eta_check","", 400, -2.0,2.0);
   histVector.push_back(h_ene_eta_check);
 
-  h_ene_phi_check = new TH1F("h_ene_phi_check","", 5, -3.1416 ,3.1416);
+  h_ene_phi_check = new TH1F("h_ene_phi_check","", 628, -3.1416 ,3.1416);
   histVector.push_back(h_ene_phi_check);
 
-  h_ene_r_check = new TH1F("h_ene_r_check","", 116, 2700.,3400.);
+  h_ene_r_check = new TH1F("h_ene_r_check","", 10, 2700.,3400.);
   histVector.push_back(h_ene_r_check);
 
 }

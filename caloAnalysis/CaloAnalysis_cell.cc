@@ -183,27 +183,19 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
   double SumE_cell_check = 0.;
   double SF = 5.4;
   //Cell collection
-  double n_noDouble = 0;
-  int n_clusters = 0;
   if (colECalPositionedHits_oldOK) {
     if (verbose) {
       std::cout << " Collections: "          << std::endl;
       std::cout << " -> #oldCaloPositionedHitss:     " << colECalPositionedHits_old->size()    << std::endl;;
     }
-    n_noDouble = (float)colECalPositionedHits_old->size()/2.;
     for (auto& iecl=colECalPositionedHits_old->begin(); iecl!=colECalPositionedHits_old->end(); ++iecl) 
       {
-	n_clusters += 1;
-	if (n_clusters>n_noDouble) break;
 	SumE_cell_check += iecl->core().energy;
 	double r = sqrt(pow(iecl->position().x,2)+pow(iecl->position().y,2));
 	TVector3 vec(iecl->position().x,iecl->position().y,iecl->position().z);
 	double phi = atan2( iecl->position().y, iecl->position().x );
 	double eta = vec.Eta();
-
-
 	//if (verbose && iecl->core().energy>2.) std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->core().energy << std::endl;
-
 	histClass->h_ene_r_check->Fill(r,iecl->core().energy*SF);
 	histClass->h_ene_phi_check->Fill(phi,iecl->core().energy*SF);
 	histClass->h_ene_eta_check->Fill(eta,iecl->core().energy*SF);
