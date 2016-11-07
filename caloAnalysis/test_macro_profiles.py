@@ -7,7 +7,8 @@ from draw_functions import draw_1histogram, draw_2histograms
 
 ENERGY = 50
 SF=5.4
-filename="../../FCCSW/output_ecalSim_e50GeV_eta0_10events.root"
+filename="../../FCCSW/output_ecalSim_e"+str(ENERGY)+"GeV_eta0_10events.root"
+#filename="root://eospublic.cern.ch//eos/fcc/users/n/novaj/newgeometry_4nov/output_e"+str(ENERGY)+"GeV_bfield0_part1_Lar4mm_Pb2mm_tracker_v2.root"
 
 print "Processing file ",filename
 ma = CaloAnalysis_profiles(SF, ENERGY)

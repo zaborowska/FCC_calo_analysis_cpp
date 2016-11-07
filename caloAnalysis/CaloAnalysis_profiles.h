@@ -28,7 +28,7 @@ class CaloAnalysis_profiles {
   double SF;               // 1/sampling_fraction
   double ENERGY;           // Beam energy
   double SumE_hit;    // Total hit energy per event
-  const double RcaloMin = 2700.;
+  const double RcaloMin = 1950.;
   const double RcaloThickness = 800.;
   const double layerThickness = 6.;
   const double EtaMax = 10.0;

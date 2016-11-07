@@ -229,6 +229,7 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
        double hitLong = directionHits*hitVector;
        double hitRadial = hitVector.Perp(directionHits); 
 
+       /*
        if ((hitEnergy>1.2)&&((hitRadial-hitRadial_particle)/X0>1)) {
 	 std::cout << "Hit info: energy " << hitEnergy << std::endl;
 	 std::cout << "Position " << hitPosition.Pt() << " " << hitPosition.Phi() << " " << hitPosition.Eta() << std::endl;
@@ -237,7 +238,7 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
 	 std::cout << "Direct p  " << directionParticle.Pt() << " " << directionParticle.Phi() << " " << directionParticle.Eta() << std::endl;
 	 std::cout << "Dir diff  " << (directionHits-directionParticle).Pt() << " "<< (directionHits-directionParticle).Phi() << " " << (directionHits-directionParticle).Eta() << std::endl;
        }
-
+       */
        //Fill longitudinal and radial profile histograms  
        histClass->h_radialProfile_particle->Fill(hitRadial_particle/X0, hitEnergy*SF/GeV);
        histClass->h_longProfile_particle->Fill(hitLong_particle/X0, hitEnergy*SF/GeV);
