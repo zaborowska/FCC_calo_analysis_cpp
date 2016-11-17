@@ -1,16 +1,13 @@
+import calo_init
+calo_init.parse_args()
+calo_init.print_config()
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
 from ROOT import CaloAnalysis_cell, TCanvas, TFile, TF1, gPad
 from draw_functions import draw_1histogram, draw_2histograms
 
-ENERGY = 50
-#SF not used in the code for cells - calibration by SF done in FCCSW 
-SF=1.0
-filename="../../FCCSW/output_ecalReco_test.root"  
-
-print "Processing file ",filename
-ma = CaloAnalysis_cell(SF, ENERGY)
-ma.loop(filename)
+ma = CaloAnalysis_cell(calo_init.sf, calo_init.energy)
+ma.loop(calo_init.filenameIn)
 print "Mean cell energy: ", ma.histClass.h_cellEnergy.GetMean()
 print "Mean cell Id: ", ma.histClass.h_cellId.GetMean()
 print "Cell Id underflow: ",ma.histClass.h_cellId.GetBinContent(0)
@@ -39,5 +36,5 @@ gPad.SetLogy(1)
 print "Original: eta bins: ", ma.histClass.h_ene_eta_check.GetNbinsX(), " underflow ", ma.histClass.h_ene_eta_check.GetBinContent(0), " overflow ", ma.histClass.h_ene_eta_check.GetBinContent( ma.histClass.h_ene_eta_check.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_eta_check.Integral()
 print "New: eta bins: ", ma.histClass.h_ene_eta.GetNbinsX(), " underflow ", ma.histClass.h_ene_eta.GetBinContent(0), " overflow ", ma.histClass.h_ene_eta.GetBinContent( ma.histClass.h_ene_eta.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_eta.Integral()
 
-closeInput = raw_input("Press ENTER to exit") 
+raw_input("Press ENTER to exit")
 #c1.SaveAs("plots_"+PARTICLE+str(ENERGY)+".gif")
