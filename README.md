@@ -1,31 +1,52 @@
-FCC_calo_analysis_cpp
+FCC_calo_analysis
 =====================
 
-C++ reader of calorimeter hits based on https://github.com/HEP-FCC/analysis-cpp
+Analysis tools for calorimetry:
+ - hits/cells/cluster read from EDM in c++
+ - setup and results of analysis (drawing etc.) handled from python
 
 # Initialization
 
-- fcc-edm and podio has to be compiled
-- Have to init FCCSW, fcc-edm and podio + FCC_analysis_cpp
+Dependencies:
+ - ROOT
+ - PODIO
+ - fcc-edm
+taken from the FCC software stack:
 
 ~~~{.sh}
-source setup.sh
+source init.sh
 ~~~
 
-#Make
+# Build
 
 ~~~{.sh}
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=../install ..
 make -j 8 install
+cd ..
 ~~~
 
 # Run analysis
 
-Baseline: CaloAnalysis_simple.cc/h, HistogramClass.cc/h
+## Example: CaloAnalysis_simple (using HistogramClass)
+
 ~~~{.sh}
-cd ../caloAnalysis
+cd scripts
 python test_macro_simple.py
+~~~
+
+## Shower profiles: CaloAnalysis_profiles (using HistogramClass_profiles)
+
+~~~{.sh}
+cd scripts
+python test_macro_profiles.py
+~~~
+
+## Cells: CaloAnalysis_cells (using HistogramClass_cells)
+
+~~~{.sh}
+cd scripts
+python test_macro_cells.py
 ~~~
 
