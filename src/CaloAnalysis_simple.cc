@@ -68,7 +68,7 @@ void CaloAnalysis_simple::loop(const std::string& aFilename) {
     reader.endOfEvent();
   }
 
-  std::cout << "Total energy: " << m_histograms.h_cellEnergy->GetMean() << std::endl;
+  std::cout << "Total energy: " << m_histograms.hCellEnergy->GetMean() << std::endl;
   std::cout << "End of loop" << std::endl;
 
   return;
@@ -101,8 +101,8 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
     if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit_ecal << " total cell energy (GeV): " << SumE_hit_ecal*m_sf << " hit collection size: " << colECalPositionedHits->size() << std::endl;
 
     //Fill histograms
-    m_histograms.h_hitEnergy->Fill(SumE_hit_ecal);
-    m_histograms.h_cellEnergy->Fill(SumE_hit_ecal*m_sf);
+    m_histograms.hHitEnergy->Fill(SumE_hit_ecal);
+    m_histograms.hCellEnergy->Fill(SumE_hit_ecal*m_sf);
   }
   else {
     if (verbose) {
@@ -119,7 +119,7 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
     //Loop through the collection
     for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
       //Fill histogram
-      m_histograms.h_ptGen->Fill( sqrt( pow(iparticle->core().p4.px,2)+
+      m_histograms.hGenPt->Fill( sqrt( pow(iparticle->core().p4.px,2)+
           pow(iparticle->core().p4.py,2) ) );
     }
   }

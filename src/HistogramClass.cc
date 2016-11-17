@@ -5,48 +5,36 @@
 #include <iostream>
 #include <bitset>
 
-HistogramClass::HistogramClass(double ENE)
-{
-  ENERGY = ENE;
+HistogramClass::HistogramClass(double aEnergy) {
+  m_energy = aEnergy;
 }
 
-HistogramClass::~HistogramClass()
-{
-}
+HistogramClass::~HistogramClass(){}
 
 
-void HistogramClass::Initialize_histos()
-{
+void HistogramClass::Initialize_histos() {
+  hHitEnergy = new TH1F("hHitEnergy","", 200, 0, m_energy);
+  hVector.push_back(hHitEnergy);
 
-  h_hitEnergy = new TH1F("h_hitEnergy","", 200, 0, ENERGY);
-  histVector.push_back(h_hitEnergy);
+  hCellEnergy = new TH1F("hCellenergy","", 100, m_energy-0.2*m_energy, m_energy+0.2*m_energy);
+  hVector.push_back(hCellEnergy);
 
-  h_cellEnergy = new TH1F("h_cellenergy","", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
-  histVector.push_back(h_cellEnergy);
-
-  h_ptGen = new TH1F("h_ptGen","", 100, ENERGY-0.2*ENERGY, ENERGY+0.2*ENERGY);
-  histVector.push_back(h_ptGen);
-
+  hGenPt = new TH1F("hGenPt","", 100, m_energy-0.2*m_energy, m_energy+0.2*m_energy);
+  hVector.push_back(hGenPt);
 }
 
 
-void HistogramClass::Reset_histos()
-{
-
-  for (auto iterator=histVector.begin(); iterator<histVector.end(); iterator++) {
+void HistogramClass::Reset_histos() {
+  for (auto iterator=hVector.begin(); iterator<hVector.end(); iterator++) {
     (*iterator)->Reset();
     (*iterator)->Sumw2();
   }
+}
 
-} 
-
-void HistogramClass::Delete_histos()
-{
-
-  for (auto iterator=histVector.begin(); iterator<histVector.end(); iterator++) {
+void HistogramClass::Delete_histos() {
+  for (auto iterator=hVector.begin(); iterator<hVector.end(); iterator++) {
     delete (*iterator);
   }
-  
-  histVector.clear();
+  hVector.clear();
 
 }

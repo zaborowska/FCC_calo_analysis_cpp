@@ -7,20 +7,20 @@
 class HistogramClass {
 
  public:
-  HistogramClass(double ENE);
+  HistogramClass(double aEnergy);
   ~HistogramClass();
 
   void Initialize_histos();
   void Delete_histos();
   void Reset_histos();
 
-  TH1F* h_hitEnergy;
-  TH1F* h_cellEnergy;
-  TH1F* h_ptGen;
-  std::vector<TH1F*> histVector;
+  TH1F* hHitEnergy;
+  TH1F* hCellEnergy;
+  TH1F* hGenPt;
+  std::vector<TH1F*> hVector;
 
  private:
-  double ENERGY;
+  double m_energy;
 
 };
 
