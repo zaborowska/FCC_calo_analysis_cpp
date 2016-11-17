@@ -14,20 +14,18 @@ namespace podio {
 class CaloAnalysis_simple {
 
  public:
-  CaloAnalysis_simple(const double sf, const double ENE);
+  CaloAnalysis_simple(const double aSf, const double aEnergy);
   ~CaloAnalysis_simple();
 
-  void loop(const std::string filename);  //Open the file in the reader and loop through the events
+  void loop(const std::string& aFilename);  //Open the file in the reader and loop through the events
   void processEvent(podio::EventStore& store, bool verbose,
 		    podio::ROOTReader& reader);
-
-  HistogramClass* histClass; 
+  inline HistogramClass& histograms() {return m_histograms;};
 
  private:
-  const double GeV=1000;
-  double SF;               // 1/sampling_fraction
-  double ENERGY;           // Beam energy
-  double SumE_hit_ecal;    // Total hit energy per event
+  double m_sf;               // 1/sampling_fraction
+  double m_energy;           // Beam energy
+  HistogramClass m_histograms;
 
 };
 
