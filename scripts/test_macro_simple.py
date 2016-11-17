@@ -1,5 +1,5 @@
 from ROOT import gSystem
-gSystem.Load("libcaloanalysis-myanalysis")
+gSystem.Load("libCaloAnalysis")
 from ROOT import CaloAnalysis_simple, TCanvas, TFile, TF1, gPad
 from draw_functions import draw_1histogram, draw_2histograms
 

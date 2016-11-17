@@ -1,6 +1,6 @@
 #Setup ROOT
 from ROOT import gSystem
-gSystem.Load("libcaloanalysis-myanalysis")
+gSystem.Load("libCaloAnalysis")
 from ROOT import CaloAnalysis_profiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
 #import draw functions
 from draw_functions import draw_1histogram, draw_2histograms

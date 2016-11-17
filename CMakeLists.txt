@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(fcccaloanalysis CXX)
+project(fccCaloAnalysis CXX)
 
 # Set up C++11
 set(CPP11FLAGS "-std=c++11")
@@ -38,24 +38,24 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-ROOT_GENERATE_DICTIONARY(caloanalysis-CaloAnalysisDict
+ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    CaloAnalysis_simple.h
    CaloAnalysis_profiles.h
    CaloAnalysis_cell.h
    LINKDEF LinkDef.h)
 
-add_library(caloanalysis-myanalysis SHARED ${sources} ${headers} caloanalysis-CaloAnalysisDict.cxx)
+add_library(CaloAnalysis SHARED ${sources} ${headers} CaloAnalysisDict.cxx)
 
-target_link_libraries(caloanalysis-myanalysis
+target_link_libraries(CaloAnalysis
    datamodel datamodelDict podio
    ${ROOT_LIBRARIES} ${ROOT_COMPONENT_LIBRARIES})
 
-install(TARGETS caloanalysis-myanalysis DESTINATION lib)
+install(TARGETS CaloAnalysis DESTINATION lib)
 
 # Install the dictionary
 if (${ROOT_VERSION} GREATER 6)
   install(FILES
-      "${PROJECT_BINARY_DIR}/caloanalysis-CaloAnalysisDict_rdict.pcm"
+      "${PROJECT_BINARY_DIR}/CaloAnalysisDict_rdict.pcm"
       DESTINATION lib COMPONENT dev)
 endif()
 
