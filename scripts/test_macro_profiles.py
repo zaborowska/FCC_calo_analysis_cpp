@@ -9,10 +9,17 @@ from ROOT import CaloAnalysis_profiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
 #import draw functions
 from draw_functions import draw_1histogram, draw_2histograms
 
-ma = CaloAnalysis_profiles(calo_init.sf, calo_init.energy)
-ma.loop(calo_init.filenameIn)
+# use this script for only 1 file
+energy = calo_init.energies[0]
+filename = calo_init.filenames[0]
+if len(calo_init.filenames) > 1:
+    print "WARNING: analysis of the first input file, ignoring the rest"
+
+
+ma = CaloAnalysis_profiles(calo_init.sf, energy)
+ma.loop(filename)
 print "Mean hit energy: ", ma.histClass.h_hitEnergy.GetMean()
-print "1/SF calculated: ", calo_init.energy/(ma.histClass.h_hitEnergy.GetMean())
+print "1/SF calculated: ", energy/(ma.histClass.h_hitEnergy.GetMean())
 
   #Longo-Sestili formula
   #http://arxiv.org/pdf/hep-ex/0001020.pdf

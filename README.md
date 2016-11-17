@@ -48,11 +48,21 @@ User may also specify any of the optional arguments.
 In particular, if user wants to analyse multiple files, for different energies of the initial particle:
 
 ~~~{.sh}
-python scripts/calo_init.py <INPUT_FILE_NAME_CONTAINING_*_CHARACTER>.root -r -e 100
+python scripts/calo_init.py <INPUT_FILE_NAME_CONTAINING_*_CHARACTER>.root -r -e 10 20 50 100
 ~~~
 
 where `-r` indicates that a regex should be used, substituting the `*` character in the input file name with the energy of the particle (specified in argument `-e`).
 
+For instance,
+~~~{.sh}
+python scripts/calo_init.py 'output_electron_*GeV.root' -r -e 10 100
+~~~
+results in:
+~~~{.sh}
+Input file: output_electron_10GeV.root
+Input file: output_electron_100GeV.root
+Energy of initial particle: [10, 100] GeV
+~~~
 
 
 ## Example: CaloAnalysis_simple (using HistogramClass)
