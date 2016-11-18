@@ -87,3 +87,34 @@ cd scripts
 python test_macro_cells.py <INPUT_FILE_NAME>.root
 ~~~
 
+
+## Reconstruction preview: CaloAnalysis_recoExample (using HistogramClass_recoExample)
+
+Preview of the reconstructed cluster.
+The first plot contains all towers, the second the centre of the cluster and the third one all the cells associated to the cluster.
+Additionally the windows used in the reconstrucion are drawn.
+
+~~~{.sh}
+cd scripts
+python scripts/plot_recoExample.py <INPUT_FILE_NAME>.root -e ENERGY
+~~~
+
+Input file name and the energy are required.
+
+List of additional options:
+~~~{.sh}
+  --windowSeed WINDOWSEED WINDOWSEED
+                        Size of the window used for seeding [eta,phi]
+  --windowPos WINDOWPOS WINDOWPOS
+                        Size of the window used for berycentre coalculation
+                        [eta,phi]
+  --windowDupl WINDOWDUPL WINDOWDUPL
+                        Size of the window used for duplicate removal
+                        [eta,phi]
+  --dEta DETA DETA      Size of the tower in eta
+  --maxEta MAXETA       Maximum eta
+  --dPhi DPHI           Size of the tower in phi
+  --numPhi NUMPHI       Number of the towers in phi
+  --zoom ZOOM ZOOM      How many bins around centre should be visible
+  --event EVENT         Number of an event to draw
+~~~

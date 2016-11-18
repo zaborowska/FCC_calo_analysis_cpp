@@ -1,13 +1,13 @@
 import calo_init
 ## add arguments relevant only for that script
-calo_init.parser.add_argument("--windowSeed", help="size of the window used for seeding [eta,phi]", type = int, nargs=2)
-calo_init.parser.add_argument("--windowPos", help="size of the window used for berycentre coalculation [eta,phi]", type = int, nargs=2)
-calo_init.parser.add_argument("--windowDupl", help="size of the window used for duplicate removal [eta,phi]", type = int, nargs=2)
-calo_init.parser.add_argument("--dEta", help="size of the tower in eta", type = float, nargs=2)
-calo_init.parser.add_argument("--maxEta", help="maximum eta", type = float)
+calo_init.parser.add_argument("--windowSeed", help="Size of the window used for seeding [eta,phi]", type = int, nargs=2)
+calo_init.parser.add_argument("--windowPos", help="Size of the window used for berycentre coalculation [eta,phi]", type = int, nargs=2)
+calo_init.parser.add_argument("--windowDupl", help="Size of the window used for duplicate removal [eta,phi]", type = int, nargs=2)
+calo_init.parser.add_argument("--dEta", help="Size of the tower in eta", type = float, nargs=2)
+calo_init.parser.add_argument("--maxEta", help="Maximum eta", type = float)
 group = calo_init.parser.add_mutually_exclusive_group()
-group.add_argument("--dPhi", help="size of the tower in phi", type = float)
-group.add_argument("--numPhi", help="number of the towers in phi", type = int)
+group.add_argument("--dPhi", help="Size of the tower in phi", type = float)
+group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
 calo_init.parser.add_argument("--zoom", help="How many bins around centre should be visible", type = int, nargs=2)
 calo_init.parser.add_argument("--event", help="Number of an event to draw", type = int)
 calo_init.parse_args()
@@ -57,7 +57,7 @@ if calo_init.args.event:
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import CaloAnalysis_recoExample, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kYellow, TColor
+from ROOT import CaloAnalysis_recoExample, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor
 from draw_functions import *
 
 # use this script for multiple files
@@ -122,7 +122,7 @@ for energy, filename in zip(calo_init.energies, calo_init.filenames):
         draw_rectangle([meanEta-etaWindowSeed/2.*dEta, meanPhi-phiWindowSeed/2.*dPhi],
                        [meanEta+etaWindowSeed/2.*dEta, meanPhi+phiWindowSeed/2.*dPhi], kRed, 4)
         draw_rectangle([meanEta-etaWindowDupl/2.*dEta, meanPhi-phiWindowDupl/2.*dPhi],
-                       [meanEta+etaWindowDupl/2.*dEta, meanPhi+phiWindowDupl/2.*dPhi], kYellow, 3)
+                       [meanEta+etaWindowDupl/2.*dEta, meanPhi+phiWindowDupl/2.*dPhi], kBlue, 3)
         draw_rectangle([meanEta-etaWindowPos/2.*dEta, meanPhi-phiWindowPos/2.*dPhi],
                        [meanEta+etaWindowPos/2.*dEta, meanPhi+phiWindowPos/2.*dPhi], kGreen, 2)
 
