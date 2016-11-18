@@ -1,7 +1,9 @@
 import argparse
 import re
+
+parser = argparse.ArgumentParser()
+
 def parse_args():
-    parser = argparse.ArgumentParser()
     ## Obligatory arguments
     parser.add_argument("inputFile", help="Input file name", type = str)
     ## Optional arguments
@@ -9,6 +11,7 @@ def parse_args():
     parser.add_argument('-r', "--inputFileRegex", action='store_true', help='Parse inputFile and insert energy in place of \'*\' character')
     parser.add_argument("-o","--output", help="Output file name", type = str)
     parser.add_argument("--sf", help="SF", type = float)
+    global args
     args = parser.parse_args()
     global filenames
     filenameIn = args.inputFile
