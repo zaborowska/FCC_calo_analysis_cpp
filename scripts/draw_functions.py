@@ -59,8 +59,12 @@ def draw_2histograms_normalized( histo1, histo2, x_axisName,y_axisName, leg1Name
    draw_2histograms( histo1, histo2, x_axisName, y_axisName, leg1Name, leg2Name)
    return
 
-def draw_hist2d(hist):
+def draw_hist2d(hist, titleX, titleY, title = ""):
     hist.Draw('colz')
+    hist.GetXaxis().SetTitle(titleX)
+    hist.GetYaxis().SetTitle(titleY)
+    if title:
+       hist.SetTitle(title)
 
 def draw_text(lines, coordinates = [0.1,0.8,0.5,0.9], colour = 36):
    text = TPaveText(coordinates[0],

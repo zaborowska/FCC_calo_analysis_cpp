@@ -7,6 +7,7 @@ def parse_args():
     ## Obligatory arguments
     parser.add_argument("inputFile", help="Input file name", type = str)
     ## Optional arguments
+    parser.add_argument('-v', "--verbose", action='store_true', help='Verbose')
     parser.add_argument("-e","--energy", help="Energy of the particle [GeV]", type = int, nargs='+')
     parser.add_argument('-r', "--inputFileRegex", action='store_true', help='Parse inputFile and insert energy in place of \'*\' character')
     parser.add_argument("-o","--output", help="Output file name", type = str)
@@ -15,6 +16,8 @@ def parse_args():
     args = parser.parse_args()
     global filenames
     filenameIn = args.inputFile
+    global verbose
+    verbose = args.verbose
     global filenameOut
     filenameOut = args.output
     global energies

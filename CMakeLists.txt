@@ -43,6 +43,7 @@ ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    CaloAnalysis_profiles.h
    CaloAnalysis_cell.h
    CaloAnalysis_recoExample.h
+   CaloAnalysis_recoMonitor.h
    LINKDEF LinkDef.h)
 
 add_library(CaloAnalysis SHARED ${sources} ${headers} CaloAnalysisDict.cxx)

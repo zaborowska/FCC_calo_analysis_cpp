@@ -9,5 +9,6 @@
 #pragma link C++ class CaloAnalysis_profiles+;
 #pragma link C++ class CaloAnalysis_cell+;
 #pragma link C++ class CaloAnalysis_recoExample+;
+#pragma link C++ class CaloAnalysis_recoMonitor+;
 
 #endif
