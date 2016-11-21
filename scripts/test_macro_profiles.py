@@ -1,7 +1,10 @@
 # configure (get file name etc.)
 import calo_init
+calo_init.add_defaults()
+calo_init.parser.add_argument("sf", help="SF", type = float)
 calo_init.parse_args()
 calo_init.print_config()
+SF = calo_init.args.sf
 #Setup ROOT
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
@@ -16,7 +19,7 @@ if len(calo_init.filenames) > 1:
     print "WARNING: analysis of the first input file, ignoring the rest"
 
 
-ma = CaloAnalysis_profiles(calo_init.sf, energy)
+ma = CaloAnalysis_profiles(SF, energy)
 ma.loop(filename)
 print "Mean hit energy: ", ma.histClass.h_hitEnergy.GetMean()
 print "1/SF calculated: ", energy/(ma.histClass.h_hitEnergy.GetMean())

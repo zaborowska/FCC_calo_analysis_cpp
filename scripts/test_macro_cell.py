@@ -1,6 +1,11 @@
 import calo_init
+calo_init.add_defaults()
+calo_init.parser.add_argument("sf", help="SF", type = float)
 calo_init.parse_args()
 calo_init.print_config()
+
+SF = calo_init.args.sf
+
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
 from ROOT import CaloAnalysis_cell, TCanvas, TFile, TF1, gPad
@@ -12,7 +17,7 @@ filename = calo_init.filenames[0]
 if len(calo_init.filenames) > 1:
     print "WARNING: analysis of the first input file, ignoring the rest"
 
-ma = CaloAnalysis_cell(calo_init.sf, energy)
+ma = CaloAnalysis_cell(SF, energy)
 ma.loop(filename)
 print "Mean cell energy: ", ma.histClass.h_cellEnergy.GetMean()
 print "Mean cell Id: ", ma.histClass.h_cellId.GetMean()

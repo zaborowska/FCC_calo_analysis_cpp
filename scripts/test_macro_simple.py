@@ -1,6 +1,9 @@
 import calo_init
+calo_init.add_defaults()
+calo_init.parser.add_argument("sf", help="SF", type = float)
 calo_init.parse_args()
 calo_init.print_config()
+SF = calo_init.args.sf
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
@@ -10,7 +13,7 @@ from draw_functions import draw_1histogram, draw_2histograms
 # use this script for multiple files
 
 for energy, filename in zip(calo_init.energies, calo_init.filenames):
-    analysis = CaloAnalysis_simple(calo_init.sf, energy)
+    analysis = CaloAnalysis_simple(SF, energy)
     analysis.loop(filename)
     histograms = analysis.histograms()
     print "Mean hit energy: ", histograms.hHitEnergy.GetMean()
