@@ -9,8 +9,6 @@ group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
 calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events", type = str)
 calo_init.parse_args()
 
-# TODO: check if inputSim also contains special character that suggests it should be replaced by regex
-
 from math import pi, floor
 # set of default parameters
 maxEta = 1.79
@@ -20,7 +18,8 @@ nEta = int(2*maxEta/dEta + 1)
 dPhi = 2*pi/nPhi
 nameClusterCollection = "caloClusters"
 nameParticlesCollection = "GenParticles"
-filenameSim = calo_init.args.inputSim
+filenamesSim, checkRegexInSimInput = calo_init.substitute(calo_init.args.inputSim)
+
 # get parameters if passed from command line
 if calo_init.args.maxEta:
     maxEta = calo_init.args.maxEta
@@ -43,6 +42,7 @@ gStyle.SetOptFit(1)
 
 for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
+    filenameSim = filenamesSim[ifile] if checkRegexInSimInput else filenamesSim[0]
     print "Initial particle energy: " + str(energy) + "GeV"
     print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename

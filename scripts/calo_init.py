@@ -25,35 +25,12 @@ def parse_args():
     global filenamesIn
     filenamesIn = []
     filenameInPattern = args.inputFile
+    global regex
     regex = args.regex
     if regex:
-        pattern = re.compile('\?')
-        checkIn = pattern.search(filenameInPattern)
-        if checkIn:
-            if len(regex) == 1 and regex[0] == 'energy':
-                for e in energies:
-                    filenamesIn.append( re.sub(pattern,str(e),filenameInPattern) )
-            else:
-                if len(energies) > 1 and len(energies) != len(regex):
-                    print("If '-r/--regex' option is used, energy must be either an integer")
-                    print("or a list of an equal size as the regex list.")
-                    exit()
-                for r in regex:
-                    filenamesIn.append( re.sub(pattern,r,filenameInPattern) )
-        else:
-            filenamesIn = [filenameInPattern]
+        filenamesIn, checkIn = substitute(filenameInPattern)
         if filenameOutPattern:
-            checkOut = pattern.search(filenameOutPattern)
-            if checkOut:
-                filenamesOut = []
-                if len(regex) == 1 and regex[0] == 'energy':
-                    for e in energies:
-                        filenamesOut.append( re.sub(pattern,str(e),filenameOutPattern) )
-                else:
-                    for r in regex:
-                        filenamesOut.append( re.sub(pattern,r,filenameOutPattern) )
-            else:
-                filenamesOut = [filenameOutPattern]
+            filenamesOut, checkOut = substitute(filenameOutPattern)
         if not(checkIn) and not(checkOut):
             print("Character '?' not found in the input file name.")
             print("Either include '?' or do not use '-r/--regex' option")
@@ -63,6 +40,25 @@ def parse_args():
         filenamesIn = [filenameInPattern]
         if filenameOutPattern:
             filenamesOut = [filenameOutPattern]
+
+def substitute(name):
+    result = []
+    pattern = re.compile('\?')
+    check = pattern.search(name)
+    if check:
+        if len(regex) == 1 and regex[0] == 'energy':
+            for e in energies:
+                result.append( re.sub(pattern,str(e),name) )
+        else:
+            if len(energies) > 1 and len(energies) != len(regex):
+                print("If '-r/--regex' option is used, energy must be either an integer")
+                print("or a list of an equal size as the regex list.")
+                exit()
+            for r in regex:
+                result.append( re.sub(pattern,r,name) )
+    else:
+        result = [name]
+    return result, check
 
 def energy(file_number):
     if len(energies) == 1:
