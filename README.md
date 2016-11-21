@@ -45,23 +45,39 @@ python scripts/calo_init.py <INPUT_FILE_NAME>.root [energy]
 
 User may also specify any of the optional arguments.
 
-In particular, if user wants to analyse multiple files, for different energies of the initial particle:
+In particular, if user wants to analyse multiple files:
 
 ~~~{.sh}
-python scripts/calo_init.py <INPUT_FILE_NAME_CONTAINING_*_CHARACTER>.root 10 20 50 100 -r
+python scripts/calo_init.py <INPUT_FILE_NAME_CONTAINING_?_CHARACTER>.root ENERGY -r [LIST_OF_SUBSTITUTIONS]
 ~~~
 
-where `-r` indicates that a regex should be used, substituting the `*` character in the input file name with the energy of the particle.
+where `-r` indicates that a regex should be used, substituting the `?` character in the input (or output) file name with the elements of the list of substitutions.
 
 For instance,
 ~~~{.sh}
-python scripts/calo_init.py 'output_electron_*GeV.root' 10 100 -r
+python scripts/calo_init.py 'output_10GeV_?.root' 10 -r firstPart secondPart
 ~~~
+
 results in:
 ~~~{.sh}
-Input file: output_electron_10GeV.root
-Input file: output_electron_100GeV.root
-Energy of initial particle: [10, 100] GeV
+Input file: output_10GeV_firstPart.root
+Input file: output_10GeV_secondPart.root
+Energy of initial particle: [10] GeV
+~~~
+
+If instead of of a list, "energy" is used after "-r" option, the '?' character gets substituted with the energy of the particles.
+
+For instance,
+~~~{.sh}
+python scripts/calo_init.py 'output_?GeV.root' 10 50 100 -r energy
+~~~
+
+results in:
+~~~{.sh}
+Input file: output_10GeV.root
+Input file: output_50GeV.root
+Input file: output_100GeV.root
+Energy of initial particle: [10, 50, 100] GeV
 ~~~
 
 
@@ -74,9 +90,8 @@ Required arguments:
 
 ~~~{.sh}
 cd scripts
-python test_macro_simple.py <INPUT_FILE_NAME>.root 50 5.4
+python test_macro_simple.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
-
 
 ## Shower profiles: CaloAnalysis_profiles (using HistogramClass_profiles)
 
@@ -89,7 +104,7 @@ Analysis is done for one file.
 
 ~~~{.sh}
 cd scripts
-python test_macro_profiles.py <INPUT_FILE_NAME>.root
+python test_macro_profiles.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
 ## Cells: CaloAnalysis_cells (using HistogramClass_cells)
@@ -103,7 +118,7 @@ Analysis is done for one file.
 
 ~~~{.sh}
 cd scripts
-python test_macro_cells.py <INPUT_FILE_NAME>.root
+python test_macro_cells.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
 
@@ -128,8 +143,9 @@ Input file name and the energy are required.
 
 List of additional options:
 ~~~{.sh}
-  -r, --inputFileRegex  Parse inputFile and insert energy in place of '*'
-                        character
+   -r REGEX [REGEX ...], --regex REGEX [REGEX ...]
+                        String to insert in place of '?' character in file
+                        names ("energy" inserts the values of energies)
   -o OUTPUT, --output OUTPUT
                         Output file name
   -v, --verbose         Verbose
@@ -165,8 +181,9 @@ The last row contains comparison to the MC particle: difference in eta distribut
 
 List of additional options:
 ~~~{.sh}
-  -r, --inputFileRegex  Parse inputFile and insert energy in place of '*'
-                        character
+   -r REGEX [REGEX ...], --regex REGEX [REGEX ...]
+                        String to insert in place of '?' character in file
+                        names ("energy" inserts the values of energies)
   -o OUTPUT, --output OUTPUT
                         Output file name
   -v, --verbose         Verbose

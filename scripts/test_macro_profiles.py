@@ -14,8 +14,8 @@ from draw_functions import draw_1histogram, draw_2histograms
 
 # use this script for only 1 file
 energy = calo_init.energies[0]
-filename = calo_init.filenames[0]
-if len(calo_init.filenames) > 1:
+filename = calo_init.filenamesIn[0]
+if len(calo_init.filenamesIn) > 1:
     print "WARNING: analysis of the first input file, ignoring the rest"
 
 

@@ -14,7 +14,7 @@ class CaloAnalysis_recoExample {
   CaloAnalysis_recoExample(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
   ~CaloAnalysis_recoExample();
   /// Open the file in the reader and loop through the events
-  void analyseEvent(const std::string& aFilename, int aNumEvent);
+  void analyseEvent(const std::string& aFilename, bool aVerbose, int aNumEvent);
   /// Event analysis
   void processEvent(podio::EventStore& store, bool verbose,
 		    podio::ROOTReader& reader);

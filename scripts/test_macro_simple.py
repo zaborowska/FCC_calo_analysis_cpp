@@ -12,10 +12,12 @@ from draw_functions import draw_1histogram, draw_2histograms
 
 # use this script for multiple files
 
-for energy, filename in zip(calo_init.energies, calo_init.filenames):
+for ifile, filename in enumerate(calo_init.filenamesIn):
+    energy = calo_init.energy(ifile)
     analysis = CaloAnalysis_simple(SF, energy)
     analysis.loop(filename)
     histograms = analysis.histograms()
+    print "Energy of the initial particle: ", energy
     print "Mean hit energy: ", histograms.hHitEnergy.GetMean()
     print "1/SF calculated: ", energy/(histograms.hHitEnergy.GetMean())
 
@@ -29,6 +31,9 @@ for energy, filename in zip(calo_init.energies, calo_init.filenames):
     histograms.hCellEnergy.Fit("gaus")
     c1.cd(3)
     draw_1histogram(histograms.hGenPt,"Generated pt [GeV]","")
-    c1.SaveAs("plots_electron_"+str(energy)+"GeV.png")
+    if calo_init.filenamesOut:
+        c1.SaveAs(calo_init.output(ifile)+".png")
+    else:
+        c1.SaveAs("plots_electron_"+str(energy)+"GeV.png")
 
 raw_input("Press ENTER to exit")

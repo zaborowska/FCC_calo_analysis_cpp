@@ -34,7 +34,7 @@ CaloAnalysis_recoExample::~CaloAnalysis_recoExample() {
   m_histograms.Delete_histos();
 }
 
-void CaloAnalysis_recoExample::analyseEvent(const std::string& aFilename, int aNumEvent) {
+void CaloAnalysis_recoExample::analyseEvent(const std::string& aFilename, bool aVerbose, int aNumEvent) {
   //Reset histograms
   m_histograms.Reset_histos();
 
@@ -52,15 +52,13 @@ void CaloAnalysis_recoExample::analyseEvent(const std::string& aFilename, int aN
   }
   store.setReader(&reader);
 
-  bool verbose = true;
-
   //Loop over all events
   unsigned nEvents = reader.getEntries();
   std::cout << "Number of events: " << nEvents << std::endl;
   for(unsigned i=0; i<nEvents; ++i) {
     if(i == aNumEvent) {
       std::cout<<"processing event "<<i<<std::endl;
-      processEvent(store, verbose, reader);
+      processEvent(store, aVerbose, reader);
     }
     store.clear();
     reader.endOfEvent();

@@ -65,7 +65,10 @@ from draw_functions import *
 # gStyle.SetPalette(56) # kInvertedDarkBodyRadiator
 gStyle.SetPalette(73) # kCMYK
 
-for energy, filename in zip(calo_init.energies, calo_init.filenames):
+for ifile, filename in enumerate(calo_init.filenamesIn):
+    energy = calo_init.energy(ifile)
+    print "Energy of the initial particle: " + str(energy)
+    print "File with reconstruction results: " + filename
     analysis = CaloAnalysis_recoExample(nameClusterCollection,
                                         namePositionedHitsCollection,
                                         energy,
@@ -74,7 +77,7 @@ for energy, filename in zip(calo_init.energies, calo_init.filenames):
                                         nPhi, # number of bins in phi
                                         dEta, # tower size in eta
                                         dPhi) # tower size in phi
-    analysis.analyseEvent(filename, eventToDraw)
+    analysis.analyseEvent(filename, calo_init.verbose, eventToDraw)
     # retrieve histograms to draw them
     histograms = analysis.histograms()
     hist = []
@@ -126,5 +129,7 @@ for energy, filename in zip(calo_init.energies, calo_init.filenames):
                        [meanEta+etaWindowDupl/2.*dEta, meanPhi+phiWindowDupl/2.*dPhi], kBlue, 3)
         draw_rectangle([meanEta-etaWindowPos/2.*dEta, meanPhi-phiWindowPos/2.*dPhi],
                        [meanEta+etaWindowPos/2.*dEta, meanPhi+phiWindowPos/2.*dPhi], kGreen, 2)
-
-    canv.Print('ECal_map_e'+str(energy)+'GeV.png')
+    if calo_init.filenamesOut:
+        canv.Print(calo_init.output(ifile)+'.png')
+    else:
+        canv.Print('ECal_map_e'+str(energy)+'GeV.png')

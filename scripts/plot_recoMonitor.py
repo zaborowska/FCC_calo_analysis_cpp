@@ -9,6 +9,8 @@ group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
 calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events", type = str)
 calo_init.parse_args()
 
+# TODO: check if inputSim also contains special character that suggests it should be replaced by regex
+
 from math import pi, floor
 # set of default parameters
 maxEta = 1.79
@@ -39,9 +41,11 @@ from draw_functions import *
 gStyle.SetPalette(73) # kCMYK
 gStyle.SetOptFit(1)
 
-for energy, filename in zip(calo_init.energies, calo_init.filenames):
-    print "File with simulation results: "+filenameSim
-    print "File with reconstruction results: "+filename
+for ifile, filename in enumerate(calo_init.filenamesIn):
+    energy = calo_init.energy(ifile)
+    print "Initial particle energy: " + str(energy) + "GeV"
+    print "File with simulation results: " + filenameSim
+    print "File with reconstruction results: " + filename
     analysis = CaloAnalysis_recoMonitor(nameClusterCollection,
                                         nameParticlesCollection,
                                         energy,
@@ -129,9 +133,9 @@ for energy, filename in zip(calo_init.energies, calo_init.filenames):
     canv.cd(12)
     draw_hist2d(hPhiFncPhi)
 
-    if calo_init.filenameOut:
-        canv.Print(calo_init.filenameOut+".png")
-        plots = TFile(calo_init.filenameOut+".root","RECREATE")
+    if calo_init.filenamesOut:
+        canv.Print(calo_init.output(ifile)+".png")
+        plots = TFile(calo_init.output(ifile)+".root","RECREATE")
     else:
         canv.Print("Reco_monitor.png")
         plots = TFile("Reco_monitor_plots.root","RECREATE")
