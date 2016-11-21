@@ -59,10 +59,12 @@ def draw_2histograms_normalized( histo1, histo2, x_axisName,y_axisName, leg1Name
    draw_2histograms( histo1, histo2, x_axisName, y_axisName, leg1Name, leg2Name)
    return
 
-def draw_hist2d(hist, titleX, titleY, title = ""):
+def draw_hist2d(hist, titleX = "", titleY = "", title = ""):
     hist.Draw('colz')
-    hist.GetXaxis().SetTitle(titleX)
-    hist.GetYaxis().SetTitle(titleY)
+    if titleX:
+       hist.GetXaxis().SetTitle(titleX)
+    if titleY:
+       hist.GetYaxis().SetTitle(titleY)
     if title:
        hist.SetTitle(title)
 
