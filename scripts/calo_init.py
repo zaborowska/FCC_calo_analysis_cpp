@@ -46,5 +46,6 @@ def print_config():
         print("Energy of initial particles: " + str(energies) + " GeV")
 
 if __name__ == "__main__":
+    add_defaults()
     parse_args()
     print_config()

@@ -1,4 +1,5 @@
 import calo_init
+calo_init.add_defaults()
 ## add arguments relevant only for that script
 calo_init.parser.add_argument("--windowSeed", help="Size of the window used for seeding [eta,phi]", type = int, nargs=2)
 calo_init.parser.add_argument("--windowPos", help="Size of the window used for berycentre coalculation [eta,phi]", type = int, nargs=2)
