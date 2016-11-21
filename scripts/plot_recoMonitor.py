@@ -133,7 +133,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     canv.cd(12)
     draw_hist2d(hPhiFncPhi)
 
-    if calo_init.filenamesOut:
+    if calo_init.output(ifile):
         canv.Print(calo_init.output(ifile)+".png")
         plots = TFile(calo_init.output(ifile)+".root","RECREATE")
     else:

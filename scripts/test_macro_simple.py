@@ -31,7 +31,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     histograms.hCellEnergy.Fit("gaus")
     c1.cd(3)
     draw_1histogram(histograms.hGenPt,"Generated pt [GeV]","")
-    if calo_init.filenamesOut:
+    if calo_init.output(ifile):
         c1.SaveAs(calo_init.output(ifile)+".png")
     else:
         c1.SaveAs("plots_electron_"+str(energy)+"GeV.png")

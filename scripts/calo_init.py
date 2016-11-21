@@ -71,6 +71,8 @@ def energy(file_number):
         return energies[file_number]
 
 def output(file_number):
+    if not(filenamesOut):
+        return
     if len(filenamesOut) == 1:
         return filenamesOut[0]
     else:

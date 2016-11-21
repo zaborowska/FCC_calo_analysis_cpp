@@ -129,7 +129,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                        [meanEta+etaWindowDupl/2.*dEta, meanPhi+phiWindowDupl/2.*dPhi], kBlue, 3)
         draw_rectangle([meanEta-etaWindowPos/2.*dEta, meanPhi-phiWindowPos/2.*dPhi],
                        [meanEta+etaWindowPos/2.*dEta, meanPhi+phiWindowPos/2.*dPhi], kGreen, 2)
-    if calo_init.filenamesOut:
+    if calo_init.output(ifile):
         canv.Print(calo_init.output(ifile)+'.png')
     else:
         canv.Print('ECal_map_e'+str(energy)+'GeV.png')
