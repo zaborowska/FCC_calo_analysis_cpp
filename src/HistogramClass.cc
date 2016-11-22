@@ -31,7 +31,7 @@ void HistogramClass::Initialize_histos() {
   m_histograms.push_back(hGenPt);
 }
 
-void HistogramClass::processEvent(podio::EventStore& store, bool verbose) {
+void HistogramClass::processEvent(podio::EventStore& store, int aEventId, bool verbose) {
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
   const fcc::PositionedCaloHitCollection*     colECalPositionedHits(nullptr);

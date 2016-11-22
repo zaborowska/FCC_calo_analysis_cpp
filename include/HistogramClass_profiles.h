@@ -17,7 +17,7 @@ class HistogramClass_profiles: public BaseAnalysis {
   HistogramClass_profiles(double aEnergy, double aSf);
   ~HistogramClass_profiles();
 
-  virtual void processEvent(podio::EventStore& store, bool verbose) final;
+  virtual void processEvent(podio::EventStore& store, int aEventId, bool verbose) final;
   virtual void finishLoop(int aNumEvents, bool aVerbose) final;
 
   /// Hit energy

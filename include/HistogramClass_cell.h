@@ -16,7 +16,7 @@ class HistogramClass_cell: public BaseAnalysis  {
   HistogramClass_cell(double aEnergy, double aSf);
   ~HistogramClass_cell();
 
-  virtual void processEvent(podio::EventStore& store, bool aVerbose) final;
+  virtual void processEvent(podio::EventStore& store, int aEventId, bool aVerbose) final;
   virtual void finishLoop(int aNumEvents, bool aVerbose) final;
 
   void Initialize_histos();

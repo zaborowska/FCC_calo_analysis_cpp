@@ -49,7 +49,7 @@ void HistogramClass_cell::Initialize_histos() {
   m_histograms.push_back(h_ene_r_check);
 }
 
-void HistogramClass_cell::processEvent(podio::EventStore& aStore, bool verbose) {
+void HistogramClass_cell::processEvent(podio::EventStore& aStore, int aEventId, bool verbose) {
   //Get the collections
   const fcc::CaloHitCollection*     colECalCell(nullptr);
   const fcc::PositionedCaloHitCollection*     colECalPositionedHits_new(nullptr);

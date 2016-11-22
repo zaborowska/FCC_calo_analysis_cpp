@@ -1,6 +1,8 @@
 import calo_init
 ## add arguments relevant only for that script
 calo_init.add_defaults()
+calo_init.parser.add_argument("--particleColl", help="Name of the MC particle collection (fcc::MCParticleCollection)", type = str)
+calo_init.parser.add_argument("--clusterColl", help="Name of the clusters collection (fcc::CaloClusterCollection)", type = str)
 calo_init.parser.add_argument("--dEta", help="Size of the tower in eta", type = float, nargs=2)
 calo_init.parser.add_argument("--maxEta", help="Maximum eta", type = float)
 group = calo_init.parser.add_mutually_exclusive_group()
@@ -29,10 +31,14 @@ if calo_init.args.numPhi:
 if calo_init.args.dPhi:
     dPhi = calo_init.args.dPhi
     nPhi = int(dPhi*2*pi)
+if calo_init.args.clusterColl:
+    nameClusterCollection = calo_init.args.clusterColl
+if calo_init.args.particleColl:
+    nameParticlesCollection = calo_init.args.particleColl
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import CaloAnalysis_recoMonitor, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
+from ROOT import HistogramClass_recoMonitor, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
 from draw_functions import *
 
 # use this script for multiple files
@@ -46,7 +52,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     print "Initial particle energy: " + str(energy) + "GeV"
     print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename
-    analysis = CaloAnalysis_recoMonitor(nameClusterCollection,
+    analysis = HistogramClass_recoMonitor(nameClusterCollection,
                                         nameParticlesCollection,
                                         energy,
                                         maxEta, # max eta
@@ -54,21 +60,20 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                         nPhi, # number of bins in phi
                                         dEta, # tower size in eta
                                         dPhi) # tower size in phi
-    analysis.loop(filenameSim, filename,calo_init.verbose)
+    analysis.loop(filenameSim, filename, calo_init.verbose)
     # retrieve histograms to draw them
-    histograms = analysis.histograms()
-    hEn = histograms.hEn
-    hEnFncPhi = histograms.hEnFncPhi
-    hEta = histograms.hEta
-    hPhi = histograms.hPhi
-    hPhiFncPhi = histograms.hPhiFncPhi
-    hEtaFncEta = histograms.hEtaFncEta
-    hNo = histograms.hNo
-    hNoFncPhi = histograms.hNoFncPhi
-    hEnDiffMoreClu = histograms.hEnDiffMoreClu
-    hEtaDiffMoreClu = histograms.hEtaDiffMoreClu
-    hPhiDiffMoreClu = histograms.hPhiDiffMoreClu
-    hRDiffMoreClu = histograms.hRDiffMoreClu
+    hEn = analysis.hEn
+    hEnFncPhi = analysis.hEnFncPhi
+    hEta = analysis.hEta
+    hPhi = analysis.hPhi
+    hPhiFncPhi = analysis.hPhiFncPhi
+    hEtaFncEta = analysis.hEtaFncEta
+    hNo = analysis.hNo
+    hNoFncPhi = analysis.hNoFncPhi
+    hEnDiffMoreClu = analysis.hEnDiffMoreClu
+    hEtaDiffMoreClu = analysis.hEtaDiffMoreClu
+    hPhiDiffMoreClu = analysis.hPhiDiffMoreClu
+    hRDiffMoreClu = analysis.hRDiffMoreClu
     h1dset1 = [hEn, hEta, hPhi, hNo]
     for h in h1dset1:
         h.SetMarkerColor(kBlue+1)

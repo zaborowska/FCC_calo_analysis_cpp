@@ -1,18 +1,23 @@
 #ifndef HISTOGRAMCLASS_RECOMONITOR_H
 #define HISTOGRAMCLASS_RECOMONITOR_H
 
+#include "TwoFileAnalysis.h"
+
 #include "TObject.h"
 #include "TH2F.h"
 
-class HistogramClass_recoMonitor {
+namespace podio {
+  class EventStore;
+  class ROOTReader;
+}
+
+class HistogramClass_recoMonitor: public TwoFileAnalysis {
 
  public:
-  HistogramClass_recoMonitor(double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
+  HistogramClass_recoMonitor(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
   ~HistogramClass_recoMonitor();
 
   void Initialize_histos();
-  void Delete_histos();
-  void Reset_histos();
 
   // energy
   TH1F* hEn;
@@ -30,9 +35,12 @@ class HistogramClass_recoMonitor {
   TH1F* hPhiDiffMoreClu;
   TH1F* hRDiffMoreClu;
 
-  std::vector<TH1*> hVector;
 
  private:
+  virtual void processEvent(podio::EventStore& store1, podio::EventStore& store2,int aEventId, bool verbose) final;
+  virtual void finishLoop(int aNumEvents, bool aVerbose) final;
+  std::string m_clusterCollName;
+  std::string m_particleCollName;
   double m_energy;
   double m_etaMax;
   int m_noEta;

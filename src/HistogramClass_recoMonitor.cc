@@ -1,13 +1,24 @@
 #include "HistogramClass_recoMonitor.h"
 
+// podio specific includes
+#include "podio/EventStore.h"
+#include "podio/ROOTReader.h"
+
+#include "datamodel/MCParticleCollection.h"
+#include "datamodel/CaloClusterCollection.h"
+
+#include "TVector3.h"
+
 // STL
 #include <vector>
 #include <iostream>
 #include <bitset>
 #include <cmath>
 
-HistogramClass_recoMonitor::HistogramClass_recoMonitor(double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
-  m_energy(aEnergy), m_etaMax(aEtaMax), m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi) {}
+HistogramClass_recoMonitor::HistogramClass_recoMonitor(const std::string& aClusterCollName, const std::string& aParticleCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
+  m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax), m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi) {
+  Initialize_histos();
+}
 
 HistogramClass_recoMonitor::~HistogramClass_recoMonitor(){}
 
@@ -55,32 +66,103 @@ void HistogramClass_recoMonitor::Initialize_histos() {
     ("#Delta R for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta R;number of events").c_str(),
     101,-50*m_dPhi,50*m_dPhi);
 
-  hVector.push_back(hEn);
-  hVector.push_back(hEnFncPhi);
-  hVector.push_back(hEta);
-  hVector.push_back(hPhi);
-  hVector.push_back(hEtaFncEta);
-  hVector.push_back(hPhiFncPhi);
-  hVector.push_back(hNo);
-  hVector.push_back(hNoFncPhi);
-  hVector.push_back(hEnDiffMoreClu);
-  hVector.push_back(hEtaDiffMoreClu);
-  hVector.push_back(hPhiDiffMoreClu);
-  hVector.push_back(hRDiffMoreClu);
+  m_histograms.push_back(hEn);
+  m_histograms.push_back(hEnFncPhi);
+  m_histograms.push_back(hEta);
+  m_histograms.push_back(hPhi);
+  m_histograms.push_back(hEtaFncEta);
+  m_histograms.push_back(hPhiFncPhi);
+  m_histograms.push_back(hNo);
+  m_histograms.push_back(hNoFncPhi);
+  m_histograms.push_back(hEnDiffMoreClu);
+  m_histograms.push_back(hEtaDiffMoreClu);
+  m_histograms.push_back(hPhiDiffMoreClu);
+  m_histograms.push_back(hRDiffMoreClu);
 }
 
+void HistogramClass_recoMonitor::processEvent(podio::EventStore& aStoreSim, podio::EventStore& aStoreRec, int aEventId, bool aVerbose) {
+  // Get the collections
+  const fcc::CaloClusterCollection* clusters(nullptr);
+  const fcc::MCParticleCollection* particles(nullptr);
 
-void HistogramClass_recoMonitor::Reset_histos() {
-  for (auto iterator=hVector.begin(); iterator<hVector.end(); iterator++) {
-    (*iterator)->Reset();
-    (*iterator)->Sumw2();
+  bool testParticles = aStoreSim.get(m_particleCollName, particles);
+  bool testClusters = aStoreRec.get(m_clusterCollName, clusters);
+
+  TVector3 momentum;
+
+  // Get generated particles - assuming single particle events
+  if (testParticles) {
+    if (particles->size() > 1) {
+      std::cout << "This is not a single particle event! Number of particles: " << particles->size() << std::endl;
+    }
+    //Loop through the collection
+    for (const auto ipart = particles->begin(); ipart != particles->end(); ++ipart) {
+      if (aVerbose) {
+        std::cout << "Particle at " << ipart->core().vertex.x
+                  << " , " <<  ipart->core().vertex.y
+                  << " , " <<  ipart->core().vertex.z
+                  << "  with momentum " << ipart->core().p4.px
+                  << " , " <<  ipart->core().p4.py
+                  << " , " <<  ipart->core().p4.pz
+                  << "  and mass " <<  ipart->core().p4.mass << " GeV" << std::endl;
+      }
+      momentum = TVector3(ipart->core().p4.px, ipart->core().p4.py, ipart->core().p4.pz);
+    }
+  } else {
+    std::cout << "No MC Particle Collection in the event." << std::endl;
+    return;
+  }
+
+  // Get clusters reconstructed in an event
+  if (testClusters) {
+    if (aVerbose) {
+      std::cout << "Number of clusters: " << clusters->size() << std::endl;
+    }
+    double maxEnergy = 0;
+    double phiAtMaxEnergy = 0;
+    double etaAtMaxEnergy = 0;
+    //Loop through the collection
+    for (const auto iclu = clusters->begin(); iclu != clusters->end(); ++iclu) {
+      if (aVerbose) {
+        std::cout << "Cluster reconstructed at " << iclu->core().position.x
+                  << " , " <<  iclu->core().position.y
+                  << " , " <<  iclu->core().position.z
+                  << "  with energy " <<  iclu->core().energy << " GeV" << std::endl;
+      }
+      TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
+      float phi = pos.Phi();
+      float eta = pos.Eta();
+      hEta->Fill(eta-momentum.Eta(), iclu->core().energy);
+      hPhi->Fill(phi-momentum.Phi(), iclu->core().energy);
+      hEtaFncEta->Fill(momentum.Eta(), eta-momentum.Eta(), iclu->core().energy);
+      hPhiFncPhi->Fill(momentum.Phi(), phi-momentum.Phi(), iclu->core().energy);
+      hEn->Fill(iclu->core().energy);
+      hEnFncPhi->Fill(momentum.Phi(), iclu->core().energy);
+      if(maxEnergy < iclu->core().energy) {
+        maxEnergy = iclu->core().energy;
+        phiAtMaxEnergy = phi;
+        etaAtMaxEnergy = eta;
+      }
+    }
+    hNoFncPhi->Fill(phiAtMaxEnergy, clusters->size());
+    hNo->Fill(clusters->size());
+    if(clusters->size() > 1) {
+      for (const auto iclu = clusters->begin(); iclu != clusters->end(); ++iclu) {
+        if(iclu->core().energy < maxEnergy) {
+          TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
+          float phi = pos.Phi();
+          float eta = pos.Eta();
+          hEnDiffMoreClu->Fill( (maxEnergy - iclu->core().energy)/m_energy );
+          hEtaDiffMoreClu->Fill( etaAtMaxEnergy - eta );
+          hPhiDiffMoreClu->Fill( phiAtMaxEnergy - phi );
+          hRDiffMoreClu->Fill( sqrt(pow(phiAtMaxEnergy,2)+pow(etaAtMaxEnergy,2))
+            - sqrt(pow(phi,2)+pow(eta,2)) );
+        }
+      }
+    }
+  } else {
+    std::cout << "No Cluster Collection in the event." << std::endl;
   }
 }
 
-void HistogramClass_recoMonitor::Delete_histos() {
-  for (auto iterator=hVector.begin(); iterator<hVector.end(); iterator++) {
-    delete (*iterator);
-  }
-  hVector.clear();
-
-}
+void HistogramClass_recoMonitor::finishLoop(int aNumEvents, bool aVerbose) {}

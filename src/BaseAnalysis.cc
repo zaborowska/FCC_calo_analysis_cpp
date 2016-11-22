@@ -40,7 +40,7 @@ void BaseAnalysis::loop(const std::string& aFilename, bool aVerbose) {
     if(i%1000==0) std::cout<<"reading event "<<i<<std::endl;
     if(i>11) aVerbose = false;
 
-    processEvent(store, aVerbose);
+    processEvent(store, i, aVerbose);
 
     store.clear();
     reader.endOfEvent();

@@ -51,7 +51,7 @@ void HistogramClass_profiles::Initialize_histos()
 }
 
 
-void HistogramClass_profiles::processEvent(podio::EventStore& aStore, bool aVerbose) {
+void HistogramClass_profiles::processEvent(podio::EventStore& aStore, int aEventId, bool aVerbose) {
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
   const fcc::PositionedCaloHitCollection*     colECalPositionedHits(nullptr);

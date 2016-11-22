@@ -8,7 +8,7 @@
 #pragma link C++ class HistogramClass+;
 #pragma link C++ class HistogramClass_profiles+;
 #pragma link C++ class HistogramClass_cell+;
-#pragma link C++ class CaloAnalysis_recoExample+;
-#pragma link C++ class CaloAnalysis_recoMonitor+;
+#pragma link C++ class HistogramClass_recoExample+;
+#pragma link C++ class HistogramClass_recoMonitor+;
 
 #endif

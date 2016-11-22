@@ -1,6 +1,8 @@
 import calo_init
 calo_init.add_defaults()
 ## add arguments relevant only for that script
+calo_init.parser.add_argument("--clusterColl", help="Name of the clusters collection (fcc::CaloClusterCollection)", type = str)
+calo_init.parser.add_argument("--positionColl", help="Name of the positioned cells collection (fcc::PositionedCaloHitCollection)", type = str)
 calo_init.parser.add_argument("--windowSeed", help="Size of the window used for seeding [eta,phi]", type = int, nargs=2)
 calo_init.parser.add_argument("--windowPos", help="Size of the window used for berycentre coalculation [eta,phi]", type = int, nargs=2)
 calo_init.parser.add_argument("--windowDupl", help="Size of the window used for duplicate removal [eta,phi]", type = int, nargs=2)
@@ -33,6 +35,10 @@ phiWindowPos = 3
 etaWindowDupl = 5
 phiWindowDupl = 5
 # get parameters if passed from command line
+if calo_init.args.clusterColl:
+    nameClusterCollection = calo_init.args.clusterColl
+if calo_init.args.particleColl:
+    namePositionedHitsCollection = calo_init.args.positionColl
 if calo_init.args.maxEta:
     maxEta = calo_init.args.maxEta
 if calo_init.args.numPhi:
@@ -58,7 +64,7 @@ if calo_init.args.event:
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import CaloAnalysis_recoExample, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor
+from ROOT import HistogramClass_recoExample, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor
 from draw_functions import *
 
 # use this script for multiple files
@@ -69,21 +75,21 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
     print "Energy of the initial particle: " + str(energy)
     print "File with reconstruction results: " + filename
-    analysis = CaloAnalysis_recoExample(nameClusterCollection,
+    analysis = HistogramClass_recoExample(nameClusterCollection,
                                         namePositionedHitsCollection,
+                                        eventToDraw,
                                         energy,
                                         maxEta, # max eta
                                         nEta, # number of bins in eta
                                         nPhi, # number of bins in phi
                                         dEta, # tower size in eta
                                         dPhi) # tower size in phi
-    analysis.analyseEvent(filename, calo_init.verbose, eventToDraw)
+    analysis.loop(filename, calo_init.verbose)
     # retrieve histograms to draw them
-    histograms = analysis.histograms()
     hist = []
-    hist.append(histograms.hAllCellEnergy)
-    hist.append(histograms.hClusterEnergy)
-    hist.append(histograms.hClusterCellEnergy)
+    hist.append(analysis.hAllCellEnergy)
+    hist.append(analysis.hClusterEnergy)
+    hist.append(analysis.hClusterCellEnergy)
 
     ## Calculate some parameters
     enTotal = hist[0].Integral()
