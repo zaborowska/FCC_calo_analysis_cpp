@@ -15,11 +15,11 @@ public:
   virtual ~BaseAnalysis();
 
   void loop(const std::string& aFilename, bool aVerbose = false);  //Open the file in the reader and loop through the events
-
-  virtual void processEvent(podio::EventStore& aStore, bool aVerbose = false) = 0;
 protected:
-  std::vector<TH1*> hVector;
+  std::vector<TH1*> m_histograms;
 private:
+  virtual void processEvent(podio::EventStore& aStore, bool aVerbose = false) = 0;
+  virtual void finishLoop(int aNumEvents, bool aVerbose) = 0;
   virtual void Delete_histos();
   virtual void Reset_histos();
 };

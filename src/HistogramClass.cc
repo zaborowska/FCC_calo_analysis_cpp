@@ -13,27 +13,22 @@
 // STL
 #include <iostream>
 
-HistogramClass::HistogramClass(): m_energy(0), m_sf(0), hHitEnergy(nullptr),
-                                  hCellEnergy(nullptr), hGenPt(nullptr) {
-  Initialize_histos();
-}
 HistogramClass::HistogramClass(double aEnergy, double aSf):
-  m_energy(aEnergy), m_sf(aSf),hHitEnergy(nullptr), hCellEnergy(nullptr), hGenPt(nullptr)  {
+  m_energy(aEnergy), m_sf(aSf), hHitEnergy(nullptr), hCellEnergy(nullptr), hGenPt(nullptr)  {
   Initialize_histos();
 }
 HistogramClass::~HistogramClass(){}
 
 
 void HistogramClass::Initialize_histos() {
-  TH1::AddDirectory(kFALSE);
   hHitEnergy = new TH1F("hHitEnergy","", 200, 0, m_energy);
-  hVector.push_back(hHitEnergy);
+  m_histograms.push_back(hHitEnergy);
 
   hCellEnergy = new TH1F("hCellenergy","", 100, m_energy-0.2*m_energy, m_energy+0.2*m_energy);
-  hVector.push_back(hCellEnergy);
+  m_histograms.push_back(hCellEnergy);
 
   hGenPt = new TH1F("hGenPt","", 100, m_energy-0.2*m_energy, m_energy+0.2*m_energy);
-  hVector.push_back(hGenPt);
+  m_histograms.push_back(hGenPt);
 }
 
 void HistogramClass::processEvent(podio::EventStore& store, bool verbose) {
@@ -89,5 +84,8 @@ void HistogramClass::processEvent(podio::EventStore& store, bool verbose) {
       std::cout << "No MCTruth info available" << std::endl;
     }
   }
+}
 
+void HistogramClass::finishLoop(int aNumEvents, bool aVerbose) {
+  std::cout << "Total energy: " << hCellEnergy->GetMean() << std::endl;
 }

@@ -13,11 +13,11 @@ namespace podio {
 class HistogramClass: public BaseAnalysis {
 
  public:
-  HistogramClass();
   HistogramClass(double aEnergy, double aSf);
   ~HistogramClass();
 
   virtual void processEvent(podio::EventStore& store, bool verbose) final;
+  virtual void finishLoop(int aNumEvents, bool aVerbose) final;
 
   void Initialize_histos();
 

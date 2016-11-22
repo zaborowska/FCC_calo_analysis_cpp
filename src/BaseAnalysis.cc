@@ -8,7 +8,9 @@
 #include <vector>
 #include <iostream>
 
-BaseAnalysis::BaseAnalysis() {}
+BaseAnalysis::BaseAnalysis() {
+  TH1::AddDirectory(kFALSE);
+}
 
 BaseAnalysis::~BaseAnalysis() {
   Delete_histos();
@@ -44,23 +46,22 @@ void BaseAnalysis::loop(const std::string& aFilename, bool aVerbose) {
     reader.endOfEvent();
   }
 
-  std::cout << "End of loop" << std::endl;
+  finishLoop(nEvents, aVerbose);
 
+  std::cout << "End of loop" << std::endl;
   return;
 }
 
 void BaseAnalysis::Reset_histos() {
-  std::cout<<"RESET"<<std::endl;
-  for (auto iterator=hVector.begin(); iterator<hVector.end(); iterator++) {
+  for (auto iterator=m_histograms.begin(); iterator<m_histograms.end(); iterator++) {
     (*iterator)->Reset();
     (*iterator)->Sumw2();
   }
 }
 
 void BaseAnalysis::Delete_histos() {
-  std::cout<<"DELETE"<<std::endl;
-  for (auto iterator=hVector.begin(); iterator<hVector.end(); iterator++) {
+  for (auto iterator=m_histograms.begin(); iterator<m_histograms.end(); iterator++) {
     delete (*iterator);
   }
-  hVector.clear();
+  m_histograms.clear();
 }

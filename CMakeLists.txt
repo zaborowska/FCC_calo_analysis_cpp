@@ -41,7 +41,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    HistogramClass.h
    CaloAnalysis_profiles.h
-   CaloAnalysis_cell.h
+   HistogramClass_cell.h
    CaloAnalysis_recoExample.h
    CaloAnalysis_recoMonitor.h
    LINKDEF LinkDef.h)
