@@ -1,4 +1,4 @@
-#include "TwoFileAnalysis.h"
+#include "BaseTwoFileAnalysis.h"
 
 // podio specific includes
 #include "podio/EventStore.h"
@@ -8,15 +8,15 @@
 #include <vector>
 #include <iostream>
 
-TwoFileAnalysis::TwoFileAnalysis() {
+BaseTwoFileAnalysis::BaseTwoFileAnalysis() {
   TH1::AddDirectory(kFALSE);
 }
 
-TwoFileAnalysis::~TwoFileAnalysis() {
+BaseTwoFileAnalysis::~BaseTwoFileAnalysis() {
   Delete_histos();
 }
 
-void TwoFileAnalysis::loop(const std::string& aFilenameSim, const std::string& aFilenameRec, bool aVerbose) {
+void BaseTwoFileAnalysis::loop(const std::string& aFilenameSim, const std::string& aFilenameRec, bool aVerbose) {
   //Reset histograms
   Reset_histos();
 
@@ -66,14 +66,14 @@ void TwoFileAnalysis::loop(const std::string& aFilenameSim, const std::string& a
   return;
 }
 
-void TwoFileAnalysis::Reset_histos() {
+void BaseTwoFileAnalysis::Reset_histos() {
   for (auto iterator=m_histograms.begin(); iterator<m_histograms.end(); iterator++) {
     (*iterator)->Reset();
     (*iterator)->Sumw2();
   }
 }
 
-void TwoFileAnalysis::Delete_histos() {
+void BaseTwoFileAnalysis::Delete_histos() {
   for (auto iterator=m_histograms.begin(); iterator<m_histograms.end(); iterator++) {
     delete (*iterator);
   }

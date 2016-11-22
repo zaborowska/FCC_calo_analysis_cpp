@@ -1,5 +1,5 @@
-#ifndef TWOFILEANALYSIS_H
-#define TWOFILEANALYSIS_H
+#ifndef BASETWOFILEANALYSIS_H
+#define BASETWOFILEANALYSIS_H
 
 #include "TObject.h"
 #include "TH1.h"
@@ -9,10 +9,10 @@ namespace podio {
   class ROOTReader;
 }
 
-class TwoFileAnalysis {
+class BaseTwoFileAnalysis {
 public:
-  TwoFileAnalysis();
-  virtual ~TwoFileAnalysis();
+  BaseTwoFileAnalysis();
+  virtual ~BaseTwoFileAnalysis();
 
   void loop(const std::string& aFilenameSim ,const std::string& aFilenameRec, bool aVerbose = false);  //Open the file in the reader and loop through the events
 protected:
@@ -24,4 +24,4 @@ private:
   virtual void Reset_histos();
 };
 
-#endif /* TWOFILEANALYSIS_H */
+#endif /* BASETWOFILEANALYSIS_H */
