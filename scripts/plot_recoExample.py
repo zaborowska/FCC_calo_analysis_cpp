@@ -37,7 +37,7 @@ phiWindowDupl = 5
 # get parameters if passed from command line
 if calo_init.args.clusterColl:
     nameClusterCollection = calo_init.args.clusterColl
-if calo_init.args.particleColl:
+if calo_init.args.positionColl:
     namePositionedHitsCollection = calo_init.args.positionColl
 if calo_init.args.maxEta:
     maxEta = calo_init.args.maxEta

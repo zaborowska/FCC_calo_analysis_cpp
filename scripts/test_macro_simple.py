@@ -7,14 +7,14 @@ SF = calo_init.args.sf
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import HistogramClass, TCanvas, TFile, TF1, gPad
+from ROOT import SimpleAnalysis, TCanvas, TFile, TF1, gPad
 from draw_functions import draw_1histogram, draw_2histograms
 
 # use this script for multiple files
 
 for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
-    analysis = HistogramClass(energy, SF)
+    analysis = SimpleAnalysis(energy, SF)
     analysis.loop(filename, calo_init.verbose)
     print "Energy of the initial particle: ", energy
     print "Mean hit energy: ", analysis.hHitEnergy.GetMean()

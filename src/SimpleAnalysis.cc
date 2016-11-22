@@ -1,4 +1,4 @@
-#include "HistogramClass.h"
+#include "SimpleAnalysis.h"
 
 #include "podio/EventStore.h"
 #include "podio/ROOTReader.h"
@@ -13,14 +13,14 @@
 // STL
 #include <iostream>
 
-HistogramClass::HistogramClass(double aEnergy, double aSf):
+SimpleAnalysis::SimpleAnalysis(double aEnergy, double aSf):
   m_energy(aEnergy), m_sf(aSf), hHitEnergy(nullptr), hCellEnergy(nullptr), hGenPt(nullptr)  {
   Initialize_histos();
 }
-HistogramClass::~HistogramClass(){}
+SimpleAnalysis::~SimpleAnalysis(){}
 
 
-void HistogramClass::Initialize_histos() {
+void SimpleAnalysis::Initialize_histos() {
   hHitEnergy = new TH1F("hHitEnergy","", 200, 0, m_energy);
   m_histograms.push_back(hHitEnergy);
 
@@ -31,7 +31,7 @@ void HistogramClass::Initialize_histos() {
   m_histograms.push_back(hGenPt);
 }
 
-void HistogramClass::processEvent(podio::EventStore& store, int aEventId, bool verbose) {
+void SimpleAnalysis::processEvent(podio::EventStore& store, int aEventId, bool verbose) {
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
   const fcc::PositionedCaloHitCollection*     colECalPositionedHits(nullptr);
@@ -86,6 +86,6 @@ void HistogramClass::processEvent(podio::EventStore& store, int aEventId, bool v
   }
 }
 
-void HistogramClass::finishLoop(int aNumEvents, bool aVerbose) {
+void SimpleAnalysis::finishLoop(int aNumEvents, bool aVerbose) {
   std::cout << "Total energy: " << hCellEnergy->GetMean() << std::endl;
 }
