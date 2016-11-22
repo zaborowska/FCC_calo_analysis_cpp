@@ -8,7 +8,7 @@ SF = calo_init.args.sf
 #Setup ROOT
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import CaloAnalysis_profiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
+from ROOT import HistogramClass_profiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
 #import draw functions
 from draw_functions import draw_1histogram, draw_2histograms
 
@@ -19,10 +19,10 @@ if len(calo_init.filenamesIn) > 1:
     print "WARNING: analysis of the first input file, ignoring the rest"
 
 
-ma = CaloAnalysis_profiles(SF, energy)
-ma.loop(filename)
-print "Mean hit energy: ", ma.histClass.h_hitEnergy.GetMean()
-print "1/SF calculated: ", energy/(ma.histClass.h_hitEnergy.GetMean())
+ma = HistogramClass_profiles(energy, SF)
+ma.loop(filename, calo_init.verbose)
+print "Mean hit energy: ", ma.h_hitEnergy.GetMean()
+print "1/SF calculated: ", energy/(ma.h_hitEnergy.GetMean())
 
   #Longo-Sestili formula
   #http://arxiv.org/pdf/hep-ex/0001020.pdf
@@ -36,21 +36,21 @@ gStyle.SetOptStat("emr");
 c1 = TCanvas("c1","c1",1000,1000)
 c1.Divide(3,2)
 c1.cd(1)
-draw_1histogram(ma.histClass.h_ptGen, "p_{T}^{gen} [GeV]","")
+draw_1histogram(ma.h_ptGen, "p_{T}^{gen} [GeV]","")
 c1.cd(2)
-draw_1histogram(ma.histClass.h_pdgGen, "PDG code","")
+draw_1histogram(ma.h_pdgGen, "PDG code","")
 c1.cd(4)
-ma.histClass.h_cellEnergy.Rebin(2)
-draw_1histogram(ma.histClass.h_cellEnergy, "Total cell energy [GeV]","")
-if (ma.histClass.h_cellEnergy.GetEntries()>50):
-    ma.histClass.h_cellEnergy.Fit("gaus")
+ma.h_cellEnergy.Rebin(2)
+draw_1histogram(ma.h_cellEnergy, "Total cell energy [GeV]","")
+if (ma.h_cellEnergy.GetEntries()>50):
+    ma.h_cellEnergy.Fit("gaus")
 c1.cd(5)
-draw_2histograms(ma.histClass.h_longProfile_particle, ma.histClass.h_longProfile, "Longitudinal distance/X0", "Energy [GeV]", "Particle dir.", "Hits in 1st layer")
+draw_2histograms(ma.h_longProfile_particle, ma.h_longProfile, "Longitudinal distance/X0", "Energy [GeV]", "Particle dir.", "Hits in 1st layer")
 fit.SetParameters(100, 8.15/1.15,1.0/1.15);
-ma.histClass.h_longProfile.Fit("fit")
+ma.h_longProfile.Fit("fit")
 gPad.SetLogy(1)
 c1.cd(6)
-draw_2histograms(ma.histClass.h_radialProfile_particle, ma.histClass.h_radialProfile, "Radial distance/X0", "Energy [GeV]", "Particle dir.", "Hits in 1st layer")
+draw_2histograms(ma.h_radialProfile_particle, ma.h_radialProfile, "Radial distance/X0", "Energy [GeV]", "Particle dir.", "Hits in 1st layer")
 
 raw_input("Press ENTER to exit")
 #c1.SaveAs("plots_"+PARTICLE+str(ENERGY)+".gif")

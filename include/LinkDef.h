@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class HistogramClass+;
-#pragma link C++ class CaloAnalysis_profiles+;
+#pragma link C++ class HistogramClass_profiles+;
 #pragma link C++ class HistogramClass_cell+;
 #pragma link C++ class CaloAnalysis_recoExample+;
 #pragma link C++ class CaloAnalysis_recoMonitor+;

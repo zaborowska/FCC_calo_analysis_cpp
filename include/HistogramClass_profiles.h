@@ -1,18 +1,25 @@
 #ifndef __HISTOGRAMCLASS_PROFILES_H__
 #define __HISTOGRAMCLASS_PROFILES_H__
 
+#include "BaseAnalysis.h"
+
 #include "TObject.h"
 #include "TH1F.h"
 
-class HistogramClass_profiles {
+namespace podio {
+  class EventStore;
+  class ROOTReader;
+}
+
+class HistogramClass_profiles: public BaseAnalysis {
 
  public:
-  HistogramClass_profiles(double ENE);
+  HistogramClass_profiles(double aEnergy, double aSf);
   ~HistogramClass_profiles();
 
-  void Initialize_histos();
-  void Delete_histos();
-  void Reset_histos();
+  virtual void processEvent(podio::EventStore& store, bool verbose) final;
+  virtual void finishLoop(int aNumEvents, bool aVerbose) final;
+
   /// Hit energy
   TH1F* h_hitEnergy;
   /// Calibrated hit energy (SF)
@@ -30,11 +37,16 @@ class HistogramClass_profiles {
   /// PDG code of the generated particle
   TH1F* h_pdgGen;
 
-  // vector of all TH1F histograms (for easier manipulation)
-  std::vector<TH1F*> histVector;
-
-private:
-  double ENERGY;
+ private:
+  void Initialize_histos();
+  double m_energy;
+  double m_sf;
+  double SumE_hit;    // Total hit energy per event
+  const double RcaloMin = 1950.;
+  const double RcaloThickness = 800.;
+  const double layerThickness = 6.;
+  const double EtaMax = 10.0;
+  const double X0 = 15.586; //average X0 for 4 mm Lar + 2 mm Pb
 
 };
 
