@@ -1,4 +1,4 @@
-#include "HistogramClass_recoExample.h"
+#include "ReconstructionExample.h"
 
 // podio specific includes
 #include "podio/EventStore.h"
@@ -14,15 +14,15 @@
 #include <iostream>
 #include <cmath>
 
-HistogramClass_recoExample::HistogramClass_recoExample(const std::string& aCluserCollName, const std::string& aPosHitCollName, int aEventToAnalyse, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
+ReconstructionExample::ReconstructionExample(const std::string& aCluserCollName, const std::string& aPosHitCollName, int aEventToAnalyse, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
   m_clusterCollName(aCluserCollName), m_posHitCollName(aPosHitCollName), m_eventToAnalyse(aEventToAnalyse), m_energy(aEnergy), m_etaMax(aEtaMax), m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi) {
   Initialize_histos();
 }
 
-HistogramClass_recoExample::~HistogramClass_recoExample(){}
+ReconstructionExample::~ReconstructionExample(){}
 
 
-void HistogramClass_recoExample::Initialize_histos() {
+void ReconstructionExample::Initialize_histos() {
   hAllCellEnergy = new TH2F("all cells","calo towers (50 GeV e^{-})",m_noEta,-m_etaMax,m_etaMax,m_noPhi,-M_PI-0.5*m_dPhi,M_PI+0.5*m_dPhi);
   hClusterEnergy = new TH2F("cluster","cluster seeds (50 GeV e^{-})",m_noEta,-m_etaMax,m_etaMax,m_noPhi,-M_PI-0.5*m_dPhi,M_PI+0.5*m_dPhi);
   hClusterCellEnergy = new TH2F("cells associated to clusters","cells in reconstructed cluster (50 GeV e^{-})",m_noEta,-m_etaMax,m_etaMax,m_noPhi,-M_PI-0.5*m_dPhi,M_PI+0.5*m_dPhi);
@@ -31,7 +31,7 @@ void HistogramClass_recoExample::Initialize_histos() {
   m_histograms.push_back(hClusterEnergy);
 }
 
-void HistogramClass_recoExample::processEvent(podio::EventStore& aStore, int aEventId, bool aVerbose) {
+void ReconstructionExample::processEvent(podio::EventStore& aStore, int aEventId, bool aVerbose) {
   if (aEventId != m_eventToAnalyse) {
     return;
   }
@@ -98,4 +98,4 @@ void HistogramClass_recoExample::processEvent(podio::EventStore& aStore, int aEv
   }
 }
 
-void HistogramClass_recoExample::finishLoop(int aNumEvents, bool aVerbose) {}
+void ReconstructionExample::finishLoop(int aNumEvents, bool aVerbose) {}

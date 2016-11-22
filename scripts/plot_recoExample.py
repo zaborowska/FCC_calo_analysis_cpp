@@ -64,7 +64,7 @@ if calo_init.args.event:
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import HistogramClass_recoExample, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor
+from ROOT import ReconstructionExample, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor
 from draw_functions import *
 
 # use this script for multiple files
@@ -75,7 +75,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
     print "Energy of the initial particle: " + str(energy)
     print "File with reconstruction results: " + filename
-    analysis = HistogramClass_recoExample(nameClusterCollection,
+    analysis = ReconstructionExample(nameClusterCollection,
                                         namePositionedHitsCollection,
                                         eventToDraw,
                                         energy,

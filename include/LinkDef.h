@@ -8,7 +8,7 @@
 #pragma link C++ class SimpleAnalysis+;
 #pragma link C++ class ShowerProfiles+;
 #pragma link C++ class CellAnalysis+;
-#pragma link C++ class HistogramClass_recoExample+;
+#pragma link C++ class ReconstructionExample+;
 #pragma link C++ class HistogramClass_recoMonitor+;
 
 #endif

@@ -122,7 +122,7 @@ python test_macro_cells.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
 
-## Reconstruction preview: CaloAnalysis_recoExample (using HistogramClass_recoExample)
+## Reconstruction preview: CaloAnalysis_recoExample (using ReconstructionExample)
 
 Preview of the reconstructed cluster.
 The first plot contains all towers, the second the centre of the cluster and the third one all the cells associated to the cluster.

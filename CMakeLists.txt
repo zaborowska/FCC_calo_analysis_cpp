@@ -42,7 +42,7 @@ ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    SimpleAnalysis.h
    ShowerProfiles.h
    CellAnalysis.h
-   HistogramClass_recoExample.h
+   ReconstructionExample.h
    HistogramClass_recoMonitor.h
    LINKDEF LinkDef.h)
 

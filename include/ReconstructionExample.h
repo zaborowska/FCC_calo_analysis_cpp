@@ -1,5 +1,5 @@
-#ifndef __HISTOGRAMCLASS_RECOEXAMPLE_H__
-#define __HISTOGRAMCLASS_RECOEXAMPLE_H__
+#ifndef RECONSTRUCTIONEXAMPLE_H
+#define RECONSTRUCTIONEXAMPLE_H
 
 #include "BaseAnalysis.h"
 
@@ -11,11 +11,11 @@ namespace podio {
   class ROOTReader;
 }
 
-class HistogramClass_recoExample: public BaseAnalysis {
+class ReconstructionExample: public BaseAnalysis {
 
  public:
-  HistogramClass_recoExample(const std::string& aCluserCollName, const std::string& aPosHitCollName, int aEventToAnalyse, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
-  ~HistogramClass_recoExample();
+  ReconstructionExample(const std::string& aCluserCollName, const std::string& aPosHitCollName, int aEventToAnalyse, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
+  ~ReconstructionExample();
 
   void Initialize_histos();
 
@@ -40,4 +40,4 @@ class HistogramClass_recoExample: public BaseAnalysis {
 
 };
 
-#endif
+#endif /* RECONSTRUCTIONEXAMPLE_H */
