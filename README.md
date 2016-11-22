@@ -81,19 +81,31 @@ Energy of initial particle: [10, 50, 100] GeV
 ~~~
 
 
-## Example: CaloAnalysis_simple (using HistogramClass)
+## Example: `SimpleAnalysis`
 
 Required arguments:
  - input file name
  - energy
- - sf
+ - sampling factor
 
 ~~~{.sh}
-cd scripts
-python test_macro_simple.py <INPUT_FILE_NAME>.root ENERGY SF
+python scripts/test_macro_simple.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
-## Shower profiles: CaloAnalysis_profiles (using ShowerProfiles)
+## Shower profiles: `ShowerProfiles`
+
+Required arguments:
+ - input file name
+ - energy
+ - sampling factor
+
+Analysis is done for one file.
+
+~~~{.sh}
+python scripts/test_macro_profiles.py <INPUT_FILE_NAME>.root ENERGY SF
+~~~
+
+## Cells: `CellAnalysis`
 
 Required arguments:
  - input file name
@@ -103,26 +115,10 @@ Required arguments:
 Analysis is done for one file.
 
 ~~~{.sh}
-cd scripts
-python test_macro_profiles.py <INPUT_FILE_NAME>.root ENERGY SF
+python scripts/test_macro_cells.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
-## Cells: CaloAnalysis_cells (using CellAnalysiss)
-
-Required arguments:
- - input file name
- - energy
- - sf
-
-Analysis is done for one file.
-
-~~~{.sh}
-cd scripts
-python test_macro_cells.py <INPUT_FILE_NAME>.root ENERGY SF
-~~~
-
-
-## Reconstruction preview: CaloAnalysis_recoExample (using ReconstructionExample)
+## Reconstructed event preview: `ReconstructionExample`
 
 Preview of the reconstructed cluster.
 The first plot contains all towers, the second the centre of the cluster and the third one all the cells associated to the cluster.
@@ -135,7 +131,6 @@ Required arguments:
 Analysis is done for all the files (all energies), but for one event from each (default: first event).
 
 ~~~{.sh}
-cd scripts
 python scripts/plot_recoExample.py <INPUT_FILE_NAME>.root ENERGY
 ~~~
 
@@ -149,6 +144,12 @@ List of additional options:
   -o OUTPUT, --output OUTPUT
                         Output file name
   -v, --verbose         Verbose
+    --clusterColl CLUSTERCOLL
+                        Name of the clusters collection
+                        (fcc::CaloClusterCollection)
+  --positionColl POSITIONCOLL
+                        Name of the positioned cells collection
+                        (fcc::PositionedCaloHitCollection)
   --windowSeed WINDOWSEED WINDOWSEED
                         Size of the window used for seeding [eta,phi]
   --windowPos WINDOWPOS WINDOWPOS
@@ -165,28 +166,33 @@ List of additional options:
   --event EVENT         Number of an event to draw
 ~~~
 
-## Reconstruction monitor: CaloAnalysis_recoMonitor (using SingleParticleRecoMonitors)
+## Reconstruction monitor: `SingleParticleRecoMonitors`
 
 Monitor plots of the reconstruction procedure.
 The plots are created based on the clusters and generated particles (for single particle events only).
 
 ~~~{.sh}
-cd scripts
-python scripts/plot_recoExample.py <INPUT_FILE_NAME>.root ENERGY <INPUT_FILE_WITH_MC_INFORMATION>.root
+python scripts/plot_recoMonitor.py <INPUT_FILE_NAME>.root ENERGY <INPUT_FILE_WITH_MC_INFORMATION>.root
 ~~~
 
-The plots are saved to root file and in png. The first row includes the energy distribution, energy distribution as a function of phi, number of reconstructed clusters and the number of reconstructed clusters as a function of phi.
+The plots are saved to root file and as a png. The first row includes the energy distribution, energy distribution as a function of phi, number of reconstructed clusters and the number of reconstructed clusters as a function of phi.
 The second row contains information about any reconstructed duplicates (difference of energy, eta, phi and R=sqrt(eta^2+phi^2) with respect to the most energetic cluster).
 The last row contains comparison to the MC particle: difference in eta distribution, difference in eta as a function of eta, difference in phi distribution and difference in phi as a function of phi.
 
 List of additional options:
 ~~~{.sh}
-   -r REGEX [REGEX ...], --regex REGEX [REGEX ...]
+  -r REGEX [REGEX ...], --regex REGEX [REGEX ...]
                         String to insert in place of '?' character in file
                         names ("energy" inserts the values of energies)
   -o OUTPUT, --output OUTPUT
                         Output file name
   -v, --verbose         Verbose
+  --particleColl PARTICLECOLL
+                        Name of the MC particle collection
+                        (fcc::MCParticleCollection)
+  --clusterColl CLUSTERCOLL
+                        Name of the clusters collection
+                        (fcc::CaloClusterCollection)
   --dEta DETA DETA      Size of the tower in eta
   --maxEta MAXETA       Maximum eta
   --dPhi DPHI           Size of the tower in phi
