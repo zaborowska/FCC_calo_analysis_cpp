@@ -1,5 +1,5 @@
-#ifndef HISTOGRAMCLASS_RECOMONITOR_H
-#define HISTOGRAMCLASS_RECOMONITOR_H
+#ifndef SINGLEPARTICLERECOMONITORS_H
+#define SINGLEPARTICLERECOMONITORS_H
 
 #include "BaseTwoFileAnalysis.h"
 
@@ -11,11 +11,11 @@ namespace podio {
   class ROOTReader;
 }
 
-class HistogramClass_recoMonitor: public BaseTwoFileAnalysis {
+class SingleParticleRecoMonitors: public BaseTwoFileAnalysis {
 
  public:
-  HistogramClass_recoMonitor(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
-  ~HistogramClass_recoMonitor();
+  SingleParticleRecoMonitors(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
+  ~SingleParticleRecoMonitors();
 
   void Initialize_histos();
 
@@ -50,4 +50,4 @@ class HistogramClass_recoMonitor: public BaseTwoFileAnalysis {
 
 };
 
-#endif
+#endif /* SINGLEPARTICLERECOMONITORS_H */

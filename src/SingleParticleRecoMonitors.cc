@@ -1,4 +1,4 @@
-#include "HistogramClass_recoMonitor.h"
+#include "SingleParticleRecoMonitors.h"
 
 // podio specific includes
 #include "podio/EventStore.h"
@@ -15,15 +15,15 @@
 #include <bitset>
 #include <cmath>
 
-HistogramClass_recoMonitor::HistogramClass_recoMonitor(const std::string& aClusterCollName, const std::string& aParticleCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
+SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax), m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi) {
   Initialize_histos();
 }
 
-HistogramClass_recoMonitor::~HistogramClass_recoMonitor(){}
+SingleParticleRecoMonitors::~SingleParticleRecoMonitors(){}
 
 
-void HistogramClass_recoMonitor::Initialize_histos() {
+void SingleParticleRecoMonitors::Initialize_histos() {
 
   hEn = new TH1F("energy",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
@@ -80,7 +80,7 @@ void HistogramClass_recoMonitor::Initialize_histos() {
   m_histograms.push_back(hRDiffMoreClu);
 }
 
-void HistogramClass_recoMonitor::processEvent(podio::EventStore& aStoreSim, podio::EventStore& aStoreRec, int aEventId, bool aVerbose) {
+void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podio::EventStore& aStoreRec, int aEventId, bool aVerbose) {
   // Get the collections
   const fcc::CaloClusterCollection* clusters(nullptr);
   const fcc::MCParticleCollection* particles(nullptr);
@@ -165,4 +165,4 @@ void HistogramClass_recoMonitor::processEvent(podio::EventStore& aStoreSim, podi
   }
 }
 
-void HistogramClass_recoMonitor::finishLoop(int aNumEvents, bool aVerbose) {}
+void SingleParticleRecoMonitors::finishLoop(int aNumEvents, bool aVerbose) {}

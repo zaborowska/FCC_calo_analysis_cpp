@@ -38,7 +38,7 @@ if calo_init.args.particleColl:
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import HistogramClass_recoMonitor, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
+from ROOT import SingleParticleRecoMonitors, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
 from draw_functions import *
 
 # use this script for multiple files
@@ -52,7 +52,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     print "Initial particle energy: " + str(energy) + "GeV"
     print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename
-    analysis = HistogramClass_recoMonitor(nameClusterCollection,
+    analysis = SingleParticleRecoMonitors(nameClusterCollection,
                                         nameParticlesCollection,
                                         energy,
                                         maxEta, # max eta

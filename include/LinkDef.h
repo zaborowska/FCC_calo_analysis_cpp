@@ -9,6 +9,6 @@
 #pragma link C++ class ShowerProfiles+;
 #pragma link C++ class CellAnalysis+;
 #pragma link C++ class ReconstructionExample+;
-#pragma link C++ class HistogramClass_recoMonitor+;
+#pragma link C++ class SingleParticleRecoMonitors+;
 
 #endif

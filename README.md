@@ -165,7 +165,7 @@ List of additional options:
   --event EVENT         Number of an event to draw
 ~~~
 
-## Reconstruction monitor: CaloAnalysis_recoMonitor (using HistogramClass_recoMonitor)
+## Reconstruction monitor: CaloAnalysis_recoMonitor (using SingleParticleRecoMonitors)
 
 Monitor plots of the reconstruction procedure.
 The plots are created based on the clusters and generated particles (for single particle events only).
