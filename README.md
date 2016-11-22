@@ -107,7 +107,7 @@ cd scripts
 python test_macro_profiles.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
-## Cells: CaloAnalysis_cells (using HistogramClass_cells)
+## Cells: CaloAnalysis_cells (using CellAnalysiss)
 
 Required arguments:
  - input file name

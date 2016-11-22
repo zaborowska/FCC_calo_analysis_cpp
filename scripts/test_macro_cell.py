@@ -8,7 +8,7 @@ SF = calo_init.args.sf
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import HistogramClass_cell, TCanvas, TFile, TF1, gPad
+from ROOT import CellAnalysis, TCanvas, TFile, TF1, gPad
 from draw_functions import draw_1histogram, draw_2histograms
 
 # use this script for only 1 file
@@ -17,7 +17,7 @@ filename = calo_init.filenamesIn[0]
 if len(calo_init.filenamesIn) > 1:
     print "WARNING: analysis of the first input file, ignoring the rest"
 
-ma = HistogramClass_cell(energy, SF)
+ma = CellAnalysis(energy, SF)
 ma.loop(filename, calo_init.verbose)
 print "Mean cell energy: ", ma.h_cellEnergy.GetMean()
 print "Mean cell Id: ", ma.h_cellId.GetMean()

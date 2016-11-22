@@ -7,7 +7,7 @@
 
 #pragma link C++ class SimpleAnalysis+;
 #pragma link C++ class HistogramClass_profiles+;
-#pragma link C++ class HistogramClass_cell+;
+#pragma link C++ class CellAnalysis+;
 #pragma link C++ class HistogramClass_recoExample+;
 #pragma link C++ class HistogramClass_recoMonitor+;
 

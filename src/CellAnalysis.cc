@@ -1,4 +1,4 @@
-#include "HistogramClass_cell.h"
+#include "CellAnalysis.h"
 
 // FCC-EDM
 #include "datamodel/CaloHitCollection.h"
@@ -14,14 +14,14 @@
 // STL
 #include <iostream>
 
-HistogramClass_cell::HistogramClass_cell(double aEnergy, double aSf) : m_energy(aEnergy), m_sf(aSf), SumE_cell(0), h_cellEnergy(nullptr) {
+CellAnalysis::CellAnalysis(double aEnergy, double aSf) : m_energy(aEnergy), m_sf(aSf), SumE_cell(0), h_cellEnergy(nullptr) {
   Initialize_histos();
 }
 
-HistogramClass_cell::~HistogramClass_cell() {}
+CellAnalysis::~CellAnalysis() {}
 
 
-void HistogramClass_cell::Initialize_histos() {
+void CellAnalysis::Initialize_histos() {
   h_cellEnergy = new TH1F("h_cellEnergy","", 100, m_energy-0.2*m_energy, m_energy+0.2*m_energy);
   m_histograms.push_back(h_cellEnergy);
   h_cellEnergy_check = new TH1F("h_cellEnergy_check","", 100, m_energy-0.2*m_energy, m_energy+0.2*m_energy);
@@ -49,7 +49,7 @@ void HistogramClass_cell::Initialize_histos() {
   m_histograms.push_back(h_ene_r_check);
 }
 
-void HistogramClass_cell::processEvent(podio::EventStore& aStore, int aEventId, bool verbose) {
+void CellAnalysis::processEvent(podio::EventStore& aStore, int aEventId, bool verbose) {
   //Get the collections
   const fcc::CaloHitCollection*     colECalCell(nullptr);
   const fcc::PositionedCaloHitCollection*     colECalPositionedHits_new(nullptr);
@@ -154,7 +154,7 @@ void HistogramClass_cell::processEvent(podio::EventStore& aStore, int aEventId, 
 
 }
 
-void HistogramClass_cell::finishLoop(int aNumEvents, bool aVerbose) {
+void CellAnalysis::finishLoop(int aNumEvents, bool aVerbose) {
   std::cout << "Total energy: " << h_cellEnergy->GetMean() << " check " <<  h_cellEnergy_check->GetMean() << std::endl;
 
   h_ene_r->Scale(1./(float)aNumEvents);

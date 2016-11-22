@@ -1,5 +1,5 @@
-#ifndef __HISTOGRAMCLASS_CELL_H__
-#define __HISTOGRAMCLASS_CELL_H__
+#ifndef CELLANALYSIS_H
+#define CELLANALYSIS_H
 
 #include "BaseAnalysis.h"
 #include "TObject.h"
@@ -10,16 +10,11 @@ namespace podio {
   class ROOTReader;
 }
 
-class HistogramClass_cell: public BaseAnalysis  {
+class CellAnalysis: public BaseAnalysis  {
 
  public:
-  HistogramClass_cell(double aEnergy, double aSf);
-  ~HistogramClass_cell();
-
-  virtual void processEvent(podio::EventStore& store, int aEventId, bool aVerbose) final;
-  virtual void finishLoop(int aNumEvents, bool aVerbose) final;
-
-  void Initialize_histos();
+  CellAnalysis(double aEnergy, double aSf);
+  ~CellAnalysis();
 
   TH1F* h_cellEnergy;
   TH1F* h_cellId;
@@ -34,9 +29,12 @@ class HistogramClass_cell: public BaseAnalysis  {
   TH1F* h_ene_r_check;
 
  private:
+  virtual void processEvent(podio::EventStore& store, int aEventId, bool aVerbose) final;
+  virtual void finishLoop(int aNumEvents, bool aVerbose) final;
+  void Initialize_histos();
   double m_energy;
   double m_sf;
   double SumE_cell;    // Total hit energy per event
 };
 
-#endif
+#endif /* CELLANALYSIS_H */
