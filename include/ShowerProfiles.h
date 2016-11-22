@@ -1,5 +1,5 @@
-#ifndef __HISTOGRAMCLASS_PROFILES_H__
-#define __HISTOGRAMCLASS_PROFILES_H__
+#ifndef SHOWERPROFILES_H
+#define SHOWERPROFILES_H
 
 #include "BaseAnalysis.h"
 
@@ -11,11 +11,11 @@ namespace podio {
   class ROOTReader;
 }
 
-class HistogramClass_profiles: public BaseAnalysis {
+class ShowerProfiles: public BaseAnalysis {
 
  public:
-  HistogramClass_profiles(double aEnergy, double aSf);
-  ~HistogramClass_profiles();
+  ShowerProfiles(double aEnergy, double aSf);
+  ~ShowerProfiles();
 
   virtual void processEvent(podio::EventStore& store, int aEventId, bool verbose) final;
   virtual void finishLoop(int aNumEvents, bool aVerbose) final;
@@ -50,4 +50,4 @@ class HistogramClass_profiles: public BaseAnalysis {
 
 };
 
-#endif
+#endif /* SHOWERPROFILES_H */

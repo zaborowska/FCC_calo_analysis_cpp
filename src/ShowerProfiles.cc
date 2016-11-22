@@ -1,4 +1,4 @@
-#include "HistogramClass_profiles.h"
+#include "ShowerProfiles.h"
 
 #include "podio/EventStore.h"
 #include "podio/ROOTReader.h"
@@ -14,15 +14,15 @@
 #include <vector>
 #include <iostream>
 
-HistogramClass_profiles::HistogramClass_profiles(double aEnergy, double aSf):
+ShowerProfiles::ShowerProfiles(double aEnergy, double aSf):
   m_energy(aEnergy), m_sf(aSf) {
   Initialize_histos();
 }
 
-HistogramClass_profiles::~HistogramClass_profiles() {}
+ShowerProfiles::~ShowerProfiles() {}
 
 
-void HistogramClass_profiles::Initialize_histos()
+void ShowerProfiles::Initialize_histos()
 {
 
   h_hitEnergy = new TH1F("h_hitEnergy","", 200, 0, m_energy);
@@ -51,7 +51,7 @@ void HistogramClass_profiles::Initialize_histos()
 }
 
 
-void HistogramClass_profiles::processEvent(podio::EventStore& aStore, int aEventId, bool aVerbose) {
+void ShowerProfiles::processEvent(podio::EventStore& aStore, int aEventId, bool aVerbose) {
   //Get the collections
   const fcc::MCParticleCollection*  colMCParticles(nullptr);
   const fcc::PositionedCaloHitCollection*     colECalPositionedHits(nullptr);
@@ -206,7 +206,7 @@ void HistogramClass_profiles::processEvent(podio::EventStore& aStore, int aEvent
   }
 }
 
-void HistogramClass_profiles::finishLoop(int aNumEvents, bool aVerbose) {
+void ShowerProfiles::finishLoop(int aNumEvents, bool aVerbose) {
   h_radialProfile->Scale(1./(double)aNumEvents);
   h_longProfile->Scale(1./(double)aNumEvents);
   h_radialProfile_particle->Scale(1./(double)aNumEvents);

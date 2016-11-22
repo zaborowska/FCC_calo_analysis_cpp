@@ -40,7 +40,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    SimpleAnalysis.h
-   HistogramClass_profiles.h
+   ShowerProfiles.h
    CellAnalysis.h
    HistogramClass_recoExample.h
    HistogramClass_recoMonitor.h

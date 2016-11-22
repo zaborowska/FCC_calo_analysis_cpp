@@ -93,7 +93,7 @@ cd scripts
 python test_macro_simple.py <INPUT_FILE_NAME>.root ENERGY SF
 ~~~
 
-## Shower profiles: CaloAnalysis_profiles (using HistogramClass_profiles)
+## Shower profiles: CaloAnalysis_profiles (using ShowerProfiles)
 
 Required arguments:
  - input file name

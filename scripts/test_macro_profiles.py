@@ -8,7 +8,7 @@ SF = calo_init.args.sf
 #Setup ROOT
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import HistogramClass_profiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
+from ROOT import ShowerProfiles, gStyle, TCanvas, TFile, TF1, gPad, TMath
 #import draw functions
 from draw_functions import draw_1histogram, draw_2histograms
 
@@ -19,7 +19,7 @@ if len(calo_init.filenamesIn) > 1:
     print "WARNING: analysis of the first input file, ignoring the rest"
 
 
-ma = HistogramClass_profiles(energy, SF)
+ma = ShowerProfiles(energy, SF)
 ma.loop(filename, calo_init.verbose)
 print "Mean hit energy: ", ma.h_hitEnergy.GetMean()
 print "1/SF calculated: ", energy/(ma.h_hitEnergy.GetMean())
