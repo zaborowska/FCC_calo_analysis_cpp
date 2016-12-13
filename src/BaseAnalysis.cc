@@ -37,8 +37,8 @@ void BaseAnalysis::loop(const std::string& aFilename, bool aVerbose) {
   unsigned nEvents = reader.getEntries();
   std::cout << "Number of events: " << nEvents << std::endl;
   for(unsigned i=0; i<nEvents; ++i) {
-    if(i%1000==0) std::cout<<"reading event "<<i<<std::endl;
-    if(i>11) aVerbose = false;
+    if(i%100==0) std::cout<<"reading event "<<i<<std::endl;
+    if(i>1) aVerbose = false;
 
     processEvent(store, i, aVerbose);
 

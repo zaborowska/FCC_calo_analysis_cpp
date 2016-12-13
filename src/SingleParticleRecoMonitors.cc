@@ -25,47 +25,64 @@ SingleParticleRecoMonitors::~SingleParticleRecoMonitors(){}
 
 void SingleParticleRecoMonitors::Initialize_histos() {
 
+  hEnTotal = new TH1F("energyTotal",
+    ("Energy of all clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
+    99,0.,1.5*m_energy);
   hEn = new TH1F("energy",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
-    101,0.8*m_energy,1.2*m_energy);
+    99,0.,1.5*m_energy);
   hEnFncPhi = new TH2F("energy_phi",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;energy (GeV)").c_str(),
     m_noPhi,-M_PI,M_PI,
-    11,0.8*m_energy,1.2*m_energy);
+    99,0.5*m_energy,1.5*m_energy);
   hEta = new TH1F("eta",
     ("#Delta #eta (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#eta;fraction of events").c_str()
     ,101,-10*m_dEta,10*m_dEta);
   hPhi = new TH1F("phi",
     ("#Delta #varphi (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#varphi;fraction of events").c_str(),
-    101,-10*m_dPhi,10*m_dPhi);
+    909,-100*m_dPhi,100*m_dPhi);
   hPhiFncPhi = new TH2F("phi_phi",
     ("#Delta #varphi (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;#Delta#varphi").c_str(),
     m_noPhi,-M_PI,M_PI,
-    101,-10*m_dPhi,10*m_dPhi);
+    909,-100*m_dPhi,100*m_dPhi);
   hEtaFncEta = new TH2F("eta_eta",
     ("#Delta #eta (e^{-}, "+std::to_string(int(m_energy))+" GeV);#eta;#Delta#eta").c_str(),
     m_noEta,-1.8,1.8,
     101,-10*m_dEta,10*m_dEta);
   hNo = new TH1F("clusters",
     ("Number of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);fraction of events;number of clusters per event").c_str(),
-    5,-0.5,4.5);
+    7,-0.5,6.5);
   hNoFncPhi = new TH2F("clusters_phi",
     ("Number of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;number of clusters per event").c_str(),
     m_noPhi,-M_PI,M_PI,
-    5,-0.5,4.5);
+    7,-0.5,7.5);
+  hNoFncEta = new TH2F("clusters_eta",
+    ("Number of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#eta;number of clusters per event").c_str(),
+    m_noEta,-m_etaMax,m_etaMax,
+    7,-0.5,7.5);
+  hEnMoreClu = new TH1F("energy_duplicates",
+    ("Energy of cluster duplicates (e^{-}, "+std::to_string(int(m_energy))+" GeV);E (GeV);number of clusters").c_str(),
+    99,0.,1.5*m_energy);
   hEnDiffMoreClu = new TH1F("energy_diff",
-    ("#DeltaE/E for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta E / E;number of events").c_str(),
+    ("#DeltaE/E for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta E / E;number of clusters").c_str(),
     101,0,1);
+  hEtaMoreClu = new TH1F("eta_duplicates",
+    ("#eta of cluster duplicates (e^{-}, "+std::to_string(int(m_energy))+" GeV);#eta;number of clusters").c_str(),
+    m_noEta,-m_etaMax, m_etaMax);
   hEtaDiffMoreClu = new TH1F("eta_diff",
-    ("#Delta#eta for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#eta;number of events").c_str(),
+    ("#Delta#eta for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#eta;number of clusters").c_str(),
     101,-10*m_dEta,10*m_dEta);
+  hPhiMoreClu = new TH1F("phi_duplicates",
+    ("#varphi fof cluster duplicates (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;number of clusters").c_str(),
+    m_noPhi,-M_PI,M_PI);
   hPhiDiffMoreClu = new TH1F("phi_diff",
-    ("#Delta#varphi for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#varphi;number of events").c_str(),
+    ("#Delta#varphi for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#varphi;number of clusters").c_str(),
     101,-2.1*M_PI,2.1*M_PI);
   hRDiffMoreClu = new TH1F("R_diff",
-    ("#Delta R for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta R;number of events").c_str(),
-    101,-50*m_dPhi,50*m_dPhi);
+    ("#Delta R for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta R;number of clusters").c_str(),
+    101,-200*m_dPhi,200*m_dPhi);
 
+  m_histograms.push_back(hEnTotal);
   m_histograms.push_back(hEn);
   m_histograms.push_back(hEnFncPhi);
   m_histograms.push_back(hEta);
@@ -74,8 +91,12 @@ void SingleParticleRecoMonitors::Initialize_histos() {
   m_histograms.push_back(hPhiFncPhi);
   m_histograms.push_back(hNo);
   m_histograms.push_back(hNoFncPhi);
+  m_histograms.push_back(hNoFncEta);
+  m_histograms.push_back(hEnMoreClu);
   m_histograms.push_back(hEnDiffMoreClu);
+  m_histograms.push_back(hEtaMoreClu);
   m_histograms.push_back(hEtaDiffMoreClu);
+  m_histograms.push_back(hPhiMoreClu);
   m_histograms.push_back(hPhiDiffMoreClu);
   m_histograms.push_back(hRDiffMoreClu);
 }
@@ -132,12 +153,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
       TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
       float phi = pos.Phi();
       float eta = pos.Eta();
-      hEta->Fill(eta-momentum.Eta(), iclu->core().energy);
-      hPhi->Fill(phi-momentum.Phi(), iclu->core().energy);
-      hEtaFncEta->Fill(momentum.Eta(), eta-momentum.Eta(), iclu->core().energy);
-      hPhiFncPhi->Fill(momentum.Phi(), phi-momentum.Phi(), iclu->core().energy);
       hEn->Fill(iclu->core().energy);
-      hEnFncPhi->Fill(momentum.Phi(), iclu->core().energy);
       if(maxEnergy < iclu->core().energy) {
         maxEnergy = iclu->core().energy;
         phiAtMaxEnergy = phi;
@@ -145,19 +161,28 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
       }
     }
     hNoFncPhi->Fill(phiAtMaxEnergy, clusters->size());
+    hNoFncEta->Fill(etaAtMaxEnergy, clusters->size());
     hNo->Fill(clusters->size());
-    if(clusters->size() > 1) {
-      for (const auto iclu = clusters->begin(); iclu != clusters->end(); ++iclu) {
-        if(iclu->core().energy < maxEnergy) {
-          TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
-          float phi = pos.Phi();
-          float eta = pos.Eta();
-          hEnDiffMoreClu->Fill( (maxEnergy - iclu->core().energy)/m_energy );
-          hEtaDiffMoreClu->Fill( etaAtMaxEnergy - eta );
-          hPhiDiffMoreClu->Fill( phiAtMaxEnergy - phi );
-          hRDiffMoreClu->Fill( sqrt(pow(phiAtMaxEnergy,2)+pow(etaAtMaxEnergy,2))
-            - sqrt(pow(phi,2)+pow(eta,2)) );
-        }
+    for (const auto iclu = clusters->begin(); iclu != clusters->end(); ++iclu) {
+      if(iclu->core().energy < maxEnergy) {
+        TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
+        float phi = pos.Phi();
+        float eta = pos.Eta();
+        hEnDiffMoreClu->Fill( (maxEnergy - iclu->core().energy)/m_energy );
+        hEnMoreClu->Fill( iclu->core().energy );
+        hEtaMoreClu->Fill( eta );
+        hEtaDiffMoreClu->Fill( etaAtMaxEnergy - eta );
+        hPhiMoreClu->Fill( phi );
+        hPhiDiffMoreClu->Fill( phiAtMaxEnergy - phi );
+        hRDiffMoreClu->Fill( sqrt(pow(phiAtMaxEnergy,2)+pow(etaAtMaxEnergy,2))
+          - sqrt(pow(phi,2)+pow(eta,2)) );
+      } else {
+        hEta->Fill(etaAtMaxEnergy-momentum.Eta(), maxEnergy);
+        hPhi->Fill(phiAtMaxEnergy-momentum.Phi(), maxEnergy);
+        hEtaFncEta->Fill(momentum.Eta(), etaAtMaxEnergy-momentum.Eta(), maxEnergy);
+        hPhiFncPhi->Fill(momentum.Phi(), phiAtMaxEnergy-momentum.Phi(), maxEnergy);
+        hEn->Fill(maxEnergy);
+        hEnFncPhi->Fill(momentum.Phi(), maxEnergy);
       }
     }
   } else {
@@ -165,4 +190,16 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
   }
 }
 
-void SingleParticleRecoMonitors::finishLoop(int aNumEvents, bool aVerbose) {}
+void SingleParticleRecoMonitors::finishLoop(int aNumEvents, bool aVerbose) {
+  int numClusters = hEn->GetEntries();
+  hEnTotal->Scale(1./aNumEvents);
+  hEn->Scale(1./numClusters);
+  hEnFncPhi->Scale(1./numClusters);
+  hEta->Scale(1./numClusters);
+  hPhi->Scale(1./numClusters);
+  hPhiFncPhi->Scale(1./numClusters);
+  hEtaFncEta->Scale(1./numClusters);
+  hNo->Scale(1./aNumEvents);
+  hNoFncPhi->Scale(1./aNumEvents);
+  hNoFncEta->Scale(1./aNumEvents);
+}

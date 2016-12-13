@@ -70,11 +70,15 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hEtaFncEta = analysis.hEtaFncEta
     hNo = analysis.hNo
     hNoFncPhi = analysis.hNoFncPhi
+    hNoFncEta = analysis.hNoFncEta
+    hEnMoreClu = analysis.hEnMoreClu
     hEnDiffMoreClu = analysis.hEnDiffMoreClu
+    hEtaMoreClu = analysis.hEtaMoreClu
     hEtaDiffMoreClu = analysis.hEtaDiffMoreClu
+    hPhiMoreClu = analysis.hPhiMoreClu
     hPhiDiffMoreClu = analysis.hPhiDiffMoreClu
     hRDiffMoreClu = analysis.hRDiffMoreClu
-    h1dset1 = [hEn, hEta, hPhi, hNo]
+    h1dset1 = [hEn, hEta, hPhi, hNo, hEnMoreClu, hEtaMoreClu, hPhiMoreClu]
     for h in h1dset1:
         h.SetMarkerColor(kBlue+1)
         h.SetFillColor(39)
@@ -86,13 +90,16 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
         h.SetMarkerStyle(21)
         h.SetLineColor(39)
         h.SetMarkerSize(1.5)
-    h2d = [hEnFncPhi, hPhiFncPhi, hEtaFncEta, hNoFncPhi]
-    hNo.GetXaxis().SetNdivisions(5)
-    hEta.GetXaxis().SetRangeUser(-dEta,dEta)
-    hEtaFncEta.GetXaxis().SetRangeUser(-0.1,0.1)
-    hEtaFncEta.GetYaxis().SetRangeUser(-dEta,dEta)
-    hPhi.GetXaxis().SetRangeUser(-2*dPhi,2*dPhi)
-    hPhiFncPhi.GetYaxis().SetRangeUser(-2*dPhi,2*dPhi)
+    h2d = [hEnFncPhi, hPhiFncPhi, hEtaFncEta, hNoFncPhi, hNoFncEta]
+    hNo.GetXaxis().SetNdivisions(7)
+    hNoFncPhi.GetYaxis().SetNdivisions(7)
+    hNoFncEta.GetYaxis().SetNdivisions(7)
+    # hEn.Rebin(3)
+    # hEta.GetXaxis().SetRangeUser(-dEta,dEta)
+    # hEtaFncEta.GetXaxis().SetRangeUser(-0.1,0.1)
+    # hEtaFncEta.GetYaxis().SetRangeUser(-dEta,dEta)
+    hPhi.GetXaxis().SetRangeUser(-50*dPhi,50*dPhi)
+    hPhiFncPhi.GetYaxis().SetRangeUser(-50*dPhi,50*dPhi)
 
     # fit functions
     fitEnergy = TF1('fitEnergy','gaus',0.8*energy,1.2*energy)
@@ -106,37 +113,45 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     resPhi = hPhi.Fit('fitPhi','S')
 
 
-    canv = TCanvas('ECal_monitor_plots_e'+str(energy)+'GeV', 'ECal', 1600, 1400 )
-    canv.Divide(4,3)
+    canv = TCanvas('ECal_monitor_plots_e'+str(energy)+'GeV', 'ECal', 2000, 1600 )
+    canv.Divide(4,4)
     canv.cd(1)
     hEn.Draw('bar')
     draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
                "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
                "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
-              [0.6,0.2,0.9,0.4])
+              [0.1,0.6,0.4,0.9])
     canv.cd(2)
     draw_hist2d(hEnFncPhi)
-    canv.cd(3)
+    canv.cd(5)
+    hEta.Draw('bar')
+    canv.cd(6)
+    draw_hist2d(hEtaFncEta)
+    canv.cd(9)
+    hPhi.Draw('bar')
+    canv.cd(10)
+    draw_hist2d(hPhiFncPhi)
+    canv.cd(13)
     hNo.Draw('hist')
     hNo.Draw('text0 same')
-    canv.cd(4)
+    canv.cd(14)
     draw_hist2d(hNoFncPhi)
-    canv.cd(5)
-    hEnDiffMoreClu.Draw()
-    canv.cd(6)
-    hEtaDiffMoreClu.Draw('bar')
+    canv.cd(15)
+    draw_hist2d(hNoFncEta)
+    canv.cd(3)
+    hEnMoreClu.Draw('bar')
     canv.cd(7)
-    hPhiDiffMoreClu.Draw()
-    canv.cd(8)
-    hRDiffMoreClu.Draw()
-    canv.cd(9)
-    hEta.Draw('bar')
-    canv.cd(10)
-    draw_hist2d(hEtaFncEta)
+    hEtaMoreClu.Draw('bar')
     canv.cd(11)
-    hPhi.Draw('bar')
+    hPhiMoreClu.Draw('bar')
+    canv.cd(4)
+    hEnDiffMoreClu.Draw()
+    canv.cd(8)
+    hEtaDiffMoreClu.Draw()
     canv.cd(12)
-    draw_hist2d(hPhiFncPhi)
+    hPhiDiffMoreClu.Draw()
+    canv.cd(16)
+    hRDiffMoreClu.Draw()
 
     if calo_init.output(ifile):
         canv.Print(calo_init.output(ifile)+".png")

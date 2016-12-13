@@ -1,6 +1,6 @@
 # Setup ROOT
 import ROOT
-from ROOT import TH1F, TLegend, gPad, TCanvas, SetOwnership, TPaveText, TLine
+from ROOT import TH1F, TLegend, gPad, TCanvas, SetOwnership, TPaveText, TLine, kRed, TPad, kGray
 
 def draw_1histogram( histo, x_axisName, y_axisName ):
    histo.GetXaxis().SetTitle(x_axisName)
@@ -22,7 +22,7 @@ def draw_2histograms( histo1, histo2, x_axisName, y_axisName, leg1Name, leg2Name
       histo1.GetYaxis().SetTitle(y_axisName)
 
    histo2.SetLineColor(2)
-   
+
    if (leg1Name!=""):
       histo1.SetStats(0)
       histo2.SetStats(0)

@@ -19,7 +19,7 @@ calo_init.print_config()
 from math import pi, floor
 # set of default parameters
 eventToDraw = 0
-maxEta = 1.79
+maxEta = 1.8
 nPhi = 629 # artificially increase by 1 (odd number) - to make plots look OK
 dEta = 0.01
 nEta = int(2*maxEta/dEta + 1)
@@ -136,6 +136,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
         draw_rectangle([meanEta-etaWindowPos/2.*dEta, meanPhi-phiWindowPos/2.*dPhi],
                        [meanEta+etaWindowPos/2.*dEta, meanPhi+phiWindowPos/2.*dPhi], kGreen, 2)
     if calo_init.output(ifile):
+        canv.Print(calo_init.output(ifile)+'.root')
         canv.Print(calo_init.output(ifile)+'.png')
     else:
         canv.Print('ECal_map_e'+str(energy)+'GeV.png')

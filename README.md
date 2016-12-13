@@ -198,3 +198,15 @@ List of additional options:
   --dPhi DPHI           Size of the tower in phi
   --numPhi NUMPHI       Number of the towers in phi
 ~~~
+
+
+# How to create own analysis
+
+1. Create Class deriving from `BaseAnalysis` or `BaseTwoFileAnalysis`. Include:
+  - histograms (push back to m_histograms)
+  - processEvent method
+  - finishLoop method
+2. Add class to `include/LinkDef.h` and `CMakeLists.txt` so it can be accessed from ROOT.
+3. Create analysis script:
+  - add command line arguments
+  - retrieve histograms after analysis is done

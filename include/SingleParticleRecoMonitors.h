@@ -20,6 +20,7 @@ class SingleParticleRecoMonitors: public BaseTwoFileAnalysis {
   void Initialize_histos();
 
   // energy
+  TH1F* hEnTotal;
   TH1F* hEn;
   TH2F* hEnFncPhi;
   // space
@@ -30,8 +31,12 @@ class SingleParticleRecoMonitors: public BaseTwoFileAnalysis {
   // number of clusters
   TH1F* hNo;
   TH2F* hNoFncPhi;
+  TH2F* hNoFncEta;
+  TH1F* hEnMoreClu;
   TH1F* hEnDiffMoreClu;
+  TH1F* hEtaMoreClu;
   TH1F* hEtaDiffMoreClu;
+  TH1F* hPhiMoreClu;
   TH1F* hPhiDiffMoreClu;
   TH1F* hRDiffMoreClu;
 

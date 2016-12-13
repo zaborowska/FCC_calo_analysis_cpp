@@ -43,7 +43,7 @@ void ReconstructionExample::processEvent(podio::EventStore& aStore, int aEventId
   bool testCells = aStore.get(m_posHitCollName, cells);
 
   // cells associated to the reconstructed cluster
-  std::vector<long long> cellIds;
+  std::vector<uint64_t> cellIds;
 
   // Get clusters reconstructed in an event
   if (testClusters) {
@@ -80,7 +80,7 @@ void ReconstructionExample::processEvent(podio::EventStore& aStore, int aEventId
     //Loop through the collection
     for (const auto icell = cells->begin(); icell != cells->end(); ++icell) {
       if (aVerbose) {
-        std::cout << "Cell at " << icell->position().x
+        std::cout << "Cell id: " << icell->core().cellId << " at " << icell->position().x
                   << " , " <<  icell->position().y
                   << " , " <<  icell->position().z
                   << "  with energy " <<  icell->core().energy << " GeV" << std::endl;
@@ -94,7 +94,7 @@ void ReconstructionExample::processEvent(podio::EventStore& aStore, int aEventId
       }
     }
   } else {
-    std::cout << "No Cluster Collection in the event." << std::endl;
+    std::cout << "No Cell Collection in the event." << std::endl;
   }
 }
 
