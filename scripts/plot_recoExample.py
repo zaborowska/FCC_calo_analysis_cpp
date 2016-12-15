@@ -90,11 +90,13 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hist.append(analysis.hAllCellEnergy)
     hist.append(analysis.hClusterEnergy)
     hist.append(analysis.hClusterCellEnergy)
-
+    print analysis.hClusterEnergy.GetEntries()
+    print analysis.hClusterCellEnergy.GetEntries()
     ## Calculate some parameters
     enTotal = hist[0].Integral()
-    meanEta = hist[0].ProjectionX().GetMean()
-    meanPhi = hist[0].ProjectionY().GetMean()
+    meanEta = hist[1].ProjectionX().GetMean()
+    meanPhi = hist[1].ProjectionY().GetMean()
+    hist[2].SetMinimum(0)
 
     ## Set drawing options
     for h in hist:

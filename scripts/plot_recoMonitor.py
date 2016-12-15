@@ -63,6 +63,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     analysis.loop(filenameSim, filename, calo_init.verbose)
     # retrieve histograms to draw them
     hEn = analysis.hEn
+    hEnTotal = analysis.hEnTotal
     hEnFncPhi = analysis.hEnFncPhi
     hEta = analysis.hEta
     hPhi = analysis.hPhi
@@ -78,9 +79,9 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hPhiMoreClu = analysis.hPhiMoreClu
     hPhiDiffMoreClu = analysis.hPhiDiffMoreClu
     hRDiffMoreClu = analysis.hRDiffMoreClu
-    h1dset1 = [hEn, hEta, hPhi, hNo, hEnMoreClu, hEtaMoreClu, hPhiMoreClu]
+    h1dset1 = [hEn, hEnTotal, hEta, hPhi, hNo, hEnMoreClu, hEtaMoreClu, hPhiMoreClu]
     for h in h1dset1:
-        h.SetMarkerColor(kBlue+1)
+        h.SetMarkerColor(kBlue+3)
         h.SetFillColor(39)
         h.SetLineColor(39)
         h.SetMarkerSize(2.2)
@@ -94,10 +95,6 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hNo.GetXaxis().SetNdivisions(7)
     hNoFncPhi.GetYaxis().SetNdivisions(7)
     hNoFncEta.GetYaxis().SetNdivisions(7)
-    # hEn.Rebin(3)
-    # hEta.GetXaxis().SetRangeUser(-dEta,dEta)
-    # hEtaFncEta.GetXaxis().SetRangeUser(-0.1,0.1)
-    # hEtaFncEta.GetYaxis().SetRangeUser(-dEta,dEta)
     hPhi.GetXaxis().SetRangeUser(-50*dPhi,50*dPhi)
     hPhiFncPhi.GetYaxis().SetRangeUser(-50*dPhi,50*dPhi)
 

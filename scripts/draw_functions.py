@@ -68,12 +68,13 @@ def draw_hist2d(hist, titleX = "", titleY = "", title = ""):
     if title:
        hist.SetTitle(title)
 
-def draw_text(lines, coordinates = [0.1,0.8,0.5,0.9], colour = 36):
+def draw_text(lines, coordinates = [0.1,0.8,0.5,0.9], colour = 36, border = 1):
    text = TPaveText(coordinates[0],
                     coordinates[1],
                     coordinates[2],
                     coordinates[3],"brNDC")
    text.SetFillColorAlpha(0,1)
+   text.SetBorderSize(border)
    for line in lines:
       text.AddText("#color["+str(colour)+"]{"+line+"}")
       print(line)

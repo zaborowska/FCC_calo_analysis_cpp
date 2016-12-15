@@ -139,6 +139,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
     if (aVerbose) {
       std::cout << "Number of clusters: " << clusters->size() << std::endl;
     }
+    double sumEnergy = 0;
     double maxEnergy = 0;
     double phiAtMaxEnergy = 0;
     double etaAtMaxEnergy = 0;
@@ -153,13 +154,14 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
       TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
       float phi = pos.Phi();
       float eta = pos.Eta();
-      hEn->Fill(iclu->core().energy);
+      sumEnergy += iclu->core().energy;
       if(maxEnergy < iclu->core().energy) {
         maxEnergy = iclu->core().energy;
         phiAtMaxEnergy = phi;
         etaAtMaxEnergy = eta;
       }
     }
+    hEnTotal->Fill(sumEnergy);
     hNoFncPhi->Fill(phiAtMaxEnergy, clusters->size());
     hNoFncEta->Fill(etaAtMaxEnergy, clusters->size());
     hNo->Fill(clusters->size());
