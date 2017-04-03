@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(fccanalysiscpp CXX)
+project(fccCaloAnalysis CXX)
 
 # Set up C++11
 set(CPP11FLAGS "-std=c++11")
@@ -14,29 +14,50 @@ set(CMAKE_PREFIX_PATH $ENV{PODIO} $ENV{FCCEDM})
 
 find_package(podio REQUIRED HINTS $ENV{PODIO})
 message(STATUS "Found podio: ${podio_DIR}")
-# Make sure the library is found.
-# Not the case if LD_LIBRARY_PATH is wrong
+
 find_library(PODIOLIB podio)
 if (NOT PODIOLIB)
     message(FATAL_ERROR "libpodio.so(dylib) cannot be found dynamically. Make sure you have sourced PODIO init*.sh file to set up your environment to use PODIO")
 endif()
 link_directories(${podio_LIBRARY_DIR})
 
-
 find_package(fccedm REQUIRED)
 message(STATUS "Found fcc-edm: ${fccedm_DIR}")
-# find_library(FCCEDMLIB datamodel HINTS ${fccedm_LIBRARIES})
-# message("FCCEDM ${FCCEDMLIB}")
 
 find_package(ROOT REQUIRED)
+message(STATUS "Found ROOT: ${ROOT_DIR}")
 
 # set up include-directories
-include_directories(
-  "${ROOT_INCLUDE_DIR}"
-  "${podio_INCLUDE_DIRS}"
-  "${FCCEDM_INCLUDE_DIRS}"
+include_directories(${PROJECT_SOURCE_DIR}/include/
+  ${ROOT_INCLUDE_DIR}
+  ${podio_INCLUDE_DIRS}
+  ${FCCEDM_INCLUDE_DIRS}
   )
 
-# Add sub-directories
-add_subdirectory(caloAnalysis)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
+   SimpleAnalysis.h
+   ShowerProfiles.h
+   CellAnalysis.h
+   ReconstructionExample.h
+   SingleParticleRecoMonitors.h
+   LINKDEF LinkDef.h)
+
+add_library(CaloAnalysis SHARED ${sources} ${headers} CaloAnalysisDict.cxx)
+
+target_link_libraries(CaloAnalysis
+   datamodel datamodelDict podio
+   ${ROOT_LIBRARIES} ${ROOT_COMPONENT_LIBRARIES})
+
+install(TARGETS CaloAnalysis DESTINATION lib)
+
+# Install the dictionary
+if (${ROOT_VERSION} GREATER 6)
+  install(FILES
+      "${PROJECT_BINARY_DIR}/CaloAnalysisDict_rdict.pcm"
+      DESTINATION lib COMPONENT dev)
+endif()
 
