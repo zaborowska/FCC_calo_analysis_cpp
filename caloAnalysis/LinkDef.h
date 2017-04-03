@@ -8,5 +8,6 @@
 #pragma link C++ class CaloAnalysis_simple+;
 #pragma link C++ class CaloAnalysis_profiles+;
 #pragma link C++ class CaloAnalysis_cell+;
+#pragma link C++ class CaloAnalysis_noise+;
 
 #endif

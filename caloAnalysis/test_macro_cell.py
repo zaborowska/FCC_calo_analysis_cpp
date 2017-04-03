@@ -6,7 +6,8 @@ from draw_functions import draw_1histogram, draw_2histograms
 ENERGY = 50
 #SF not used in the code for cells - calibration by SF done in FCCSW 
 SF=1.0
-filename="../../FCCSW/output_ecalReco_test.root"  
+filename="../../FCCSW/output_ecalReco_flatNoise_test.root"  
+#filename="../../FCCSW/output_ecalReco_minbias.root"
 
 print "Processing file ",filename
 ma = CaloAnalysis_cell(SF, ENERGY)
@@ -25,17 +26,18 @@ ma.histClass.h_cellEnergy_check.Rebin(2)
 ma.histClass.h_cellEnergy.Fit("gaus")
 c1.cd(2)
 draw_2histograms(ma.histClass.h_ene_r, ma.histClass.h_ene_r_check,"rCell [mm]","Energy per bin [GeV]", "FCCSW cells", "Hits in cells")
-gPad.SetLogy(1)
+#draw_1histogram(ma.histClass.h_ene_r,"rCell [mm]","Energy per bin [GeV]")
+#gPad.SetLogy(1)
 print "Original: r bins: ", ma.histClass.h_ene_r_check.GetNbinsX(), " underflow ", ma.histClass.h_ene_r_check.GetBinContent(0), " overflow ", ma.histClass.h_ene_r_check.GetBinContent( ma.histClass.h_ene_r_check.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_r_check.Integral()
 print "New: r bins: ", ma.histClass.h_ene_r.GetNbinsX(), " underflow ", ma.histClass.h_ene_r.GetBinContent(0), " overflow ", ma.histClass.h_ene_r.GetBinContent( ma.histClass.h_ene_r.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_r.Integral()
 c1.cd(3)
 draw_2histograms(ma.histClass.h_ene_phi, ma.histClass.h_ene_phi_check,"#phi","Energy per bin [GeV]", "FCCSW cells", "Hits in cells")
-gPad.SetLogy(1)
+#gPad.SetLogy(1)
 print "Original: phi bins: ", ma.histClass.h_ene_phi_check.GetNbinsX(), " underflow ", ma.histClass.h_ene_phi_check.GetBinContent(0), " overflow ", ma.histClass.h_ene_phi_check.GetBinContent( ma.histClass.h_ene_phi_check.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_phi_check.Integral()
 print "New: phi bins: ", ma.histClass.h_ene_phi.GetNbinsX(), " underflow ", ma.histClass.h_ene_phi.GetBinContent(0), " overflow ", ma.histClass.h_ene_phi.GetBinContent( ma.histClass.h_ene_phi.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_phi.Integral()
 c1.cd(4)
 draw_2histograms(ma.histClass.h_ene_eta, ma.histClass.h_ene_eta_check,"#eta","Energy per bin [GeV]", "FCCSW cells", "Hits in cells")
-gPad.SetLogy(1)
+#gPad.SetLogy(1)
 print "Original: eta bins: ", ma.histClass.h_ene_eta_check.GetNbinsX(), " underflow ", ma.histClass.h_ene_eta_check.GetBinContent(0), " overflow ", ma.histClass.h_ene_eta_check.GetBinContent( ma.histClass.h_ene_eta_check.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_eta_check.Integral()
 print "New: eta bins: ", ma.histClass.h_ene_eta.GetNbinsX(), " underflow ", ma.histClass.h_ene_eta.GetBinContent(0), " overflow ", ma.histClass.h_ene_eta.GetBinContent( ma.histClass.h_ene_eta.GetNbinsX()+1 ), " integral ", ma.histClass.h_ene_eta.Integral()
 

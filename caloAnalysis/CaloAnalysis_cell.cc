@@ -132,7 +132,7 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 	histClass->h_cellId->Fill(iecl->core().cellId);
       }
     //Fill histograms
-    //histClass->h_cellEnergy->Fill(SumE_cell/GeV);
+    //histClass->h_cellEnergy->Fill(SumE_cell);
     
   }
   else {
@@ -141,7 +141,7 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
     }
   }
 
-  std::cout << "Total energy 1: " << SumE_cell/GeV << std::endl;
+  if (verbose) std::cout << "Total energy 1: " << SumE_cell << std::endl;
 
 
   SumE_cell = 0.;
@@ -157,21 +157,24 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 	  //if (verbose) std::cout << "ECal cell energy " << iecl->core().energy << std::endl;
 	  SumE_cell += iecl->core().energy;
 	  //if (iecl->core().energy>0.005) {
-	    double r = sqrt(pow(iecl->position().x,2)+pow(iecl->position().y,2));
+	  double r = sqrt(pow(iecl->position().x,2)+pow(iecl->position().y,2));
+	  //std::cout << " r " << r << std::endl;
 	//if (verbose) std::cout << " x " << iecl->position().x << " y " << iecl->position().y << std::endl;
 	    TVector3 vec(iecl->position().x,iecl->position().y,iecl->position().z);
 	    double phi = atan2( iecl->position().y, iecl->position().x );
 	    double eta = vec.Eta();
-	  //if (verbose && iecl->core().energy>2.) std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->core().energy << std::endl;
+	    if (verbose && iecl->core().energy>10.) {
+	      std::cout << " eta " << eta << " phi " << phi << " energy " << iecl->core().energy << std::endl;
+	    }
 	    histClass->h_ene_r->Fill(r,iecl->core().energy);
 	    histClass->h_ene_phi->Fill(phi,iecl->core().energy);
 	    histClass->h_ene_eta->Fill(eta,iecl->core().energy);
 	    //	  }
       }
   
-    std::cout << "Total energy 2: " << SumE_cell/GeV << std::endl;
+    if (verbose) std::cout << "Total energy 2: " << SumE_cell << std::endl;
     //Fill histograms
-    histClass->h_cellEnergy->Fill(SumE_cell/GeV);
+    histClass->h_cellEnergy->Fill(SumE_cell);
   }
   else {
     if (verbose) {
@@ -200,8 +203,8 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
 	histClass->h_ene_phi_check->Fill(phi,iecl->core().energy*SF);
 	histClass->h_ene_eta_check->Fill(eta,iecl->core().energy*SF);
       }
-    std::cout << "Total energy 3: " << SumE_cell_check*SF/GeV << std::endl;
-    histClass->h_cellEnergy_check->Fill(SumE_cell_check*SF/GeV);
+    if (verbose) std::cout << "Total energy 3: " << SumE_cell_check*SF << std::endl;
+    histClass->h_cellEnergy_check->Fill(SumE_cell_check*SF);
   }
   else {
     if (verbose) {
@@ -209,5 +212,4 @@ void CaloAnalysis_cell::processEvent(podio::EventStore& store, bool verbose,
     }
   }
  
-
 }

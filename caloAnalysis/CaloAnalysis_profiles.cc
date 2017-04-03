@@ -171,8 +171,8 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
       }
          
     //Fill histograms
-    histClass->h_hitEnergy->Fill(SumE_hit/GeV);
-    histClass->h_cellEnergy->Fill(SumE_hit*SF/GeV);
+    histClass->h_hitEnergy->Fill(SumE_hit);
+    histClass->h_cellEnergy->Fill(SumE_hit*SF);
 
     TVector3 meanFirstLayer_vector;
     /*
@@ -240,13 +240,13 @@ void CaloAnalysis_profiles::processEvent(podio::EventStore& store, bool verbose,
        }
        */
        //Fill longitudinal and radial profile histograms  
-       histClass->h_radialProfile_particle->Fill(hitRadial_particle/X0, hitEnergy*SF/GeV);
-       histClass->h_longProfile_particle->Fill(hitLong_particle/X0, hitEnergy*SF/GeV);
-       histClass->h_radialProfile->Fill(hitRadial/X0, hitEnergy*SF/GeV);
-       histClass->h_longProfile->Fill(hitLong/X0, hitEnergy*SF/GeV);
+       histClass->h_radialProfile_particle->Fill(hitRadial_particle/X0, hitEnergy*SF);
+       histClass->h_longProfile_particle->Fill(hitLong_particle/X0, hitEnergy*SF);
+       histClass->h_radialProfile->Fill(hitRadial/X0, hitEnergy*SF);
+       histClass->h_longProfile->Fill(hitLong/X0, hitEnergy*SF);
       
      }
-   if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit/GeV << " total cell energy (GeV): " << SumE_hit*SF/GeV << " hit collection size: " << colECalPositionedHits->size() << std::endl;
+   if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit << " total cell energy (GeV): " << SumE_hit*SF << " hit collection size: " << colECalPositionedHits->size() << std::endl;
 
   }
   else {

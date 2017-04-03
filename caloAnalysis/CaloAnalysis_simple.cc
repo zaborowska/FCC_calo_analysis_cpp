@@ -20,6 +20,7 @@
 #include "TMath.h"
 #include "TROOT.h"
 #include "TLorentzVector.h"
+#include "TVector3.h"
 
 // STL
 #include <vector>
@@ -99,10 +100,40 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
  
   bool colMCParticlesOK = store.get("GenParticles", colMCParticles);
   bool colECalPositionedHitsOK     = store.get("ECalPositionedHits" , colECalPositionedHits);
+
+
+  double phiGen, etaGen;
+  //MCParticle and Vertices collection 
+  if (colMCParticlesOK) {
+    if (verbose) {
+      std::cout << " Collections: "          << std::endl;
+      std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
+    } 
+    //Loop through the collection   
+    for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
+      //Fill histogram
+      TVector3 pGen(iparticle->core().p4.px,iparticle->core().p4.py,iparticle->core().p4.pz);
+      //      std::cout << "phiGen " << std::atan2(iparticle.startVertex.position.y, iparticle.startVertex.position.x) << std::endl;
+      phiGen = pGen.Phi();
+      etaGen = pGen.Eta();
+      if (verbose) {
+	std::cout << "etaGen " << etaGen << " phiGen " << phiGen << std::endl;
+      }
+      histClass->h_ptGen->Fill( pGen.Pt() );
+      histClass->h_phiGen->Fill( pGen.Phi() );
+      histClass->h_etaGen->Fill( pGen.Eta() );
+    }
+  }
+  else {
+    if (verbose) {
+      std::cout << "No MCTruth info available" << std::endl;
+    }
+  }
  
   //Total hit energy per event
   SumE_hit_ecal = 0.;
-  
+  histClass->h_phiHit->Reset();
+  histClass->h_etaHit->Reset();
   //PositionedHits collection
   if (colECalPositionedHitsOK) {
     if (verbose) {
@@ -114,41 +145,29 @@ void CaloAnalysis_simple::processEvent(podio::EventStore& store, bool verbose,
         {
           //if (verbose) std::cout << "ECal hit energy " << iehit->core().energy << std::endl;
           SumE_hit_ecal += iecl->core().energy;
+
+	  TVector3 pHit(iecl->position().x,iecl->position().y,iecl->position().z);
+	  histClass->h_phiHit->Fill(pHit.Phi(),iecl->core().energy*SF);
+	  histClass->h_etaHit->Fill(pHit.Eta(),iecl->core().energy*SF);
 	}
 
-    if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit_ecal/GeV << " total cell energy (GeV): " << SumE_hit_ecal*SF/GeV << " hit collection size: " << colECalPositionedHits->size() << std::endl;
+    if (verbose) std::cout << "Total hit energy (GeV): " << SumE_hit_ecal << " total cell energy (GeV): " << SumE_hit_ecal*SF << " hit collection size: " << colECalPositionedHits->size() << std::endl;
 
     //Fill histograms
-    histClass->h_hitEnergy->Fill(SumE_hit_ecal/GeV);
-    histClass->h_cellEnergy->Fill(SumE_hit_ecal*SF/GeV);
+    histClass->h_hitEnergy->Fill(SumE_hit_ecal);
+    histClass->h_cellEnergy->Fill(SumE_hit_ecal*SF);
 
+    double phiHit = histClass->h_phiHit->GetMean();
+    double etaHit = histClass->h_etaHit->GetMean();
+    if (verbose) {
+      std::cout << "etaHit " << etaHit << " phiHit " << phiHit << std::endl;
+    }
+    histClass->h_deltaPhi->Fill(phiHit-phiGen);
+    histClass->h_deltaEta->Fill(etaHit-etaGen);
   }
   else {
     if (verbose) {
       std::cout << "No CaloPositionedHits Collection!!!!!" << std::endl;
     }
   }
-
- 
-  //MCParticle and Vertices collection 
-  if (colMCParticlesOK) {
-    if (verbose) {
-      std::cout << " Collections: "          << std::endl;
-      std::cout << " -> #MCTruthParticles:     " << colMCParticles->size()    << std::endl;
-    }
-    //Loop through the collection   
-    for (auto& iparticle=colMCParticles->begin(); iparticle!=colMCParticles->end(); ++iparticle) {
-      //Fill histogram
-      histClass->h_ptGen->Fill( sqrt( pow(iparticle->core().p4.px,2)+
-				      pow(iparticle->core().p4.py,2) ) );
-      //      std::cout << "phiGen " << std::atan2(iparticle.startVertex.position.y, iparticle.startVertex.position.x) << std::endl;
-    }
-    
-  }
-  else {
-    if (verbose) {
-      std::cout << "No MCTruth info available" << std::endl;
-    }
-  }
-
 }
