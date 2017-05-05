@@ -53,13 +53,17 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename
     analysis = SingleParticleRecoMonitors(nameClusterCollection,
-                                        nameParticlesCollection,
-                                        energy,
-                                        maxEta, # max eta
-                                        nEta, # number of bins in eta
-                                        nPhi, # number of bins in phi
-                                        dEta, # tower size in eta
-                                        dPhi) # tower size in phi
+                                          nameParticlesCollection,
+                                          energy,
+                                          maxEta, # max eta
+                                          nEta, # number of bins in eta
+                                          nPhi, # number of bins in phi
+                                          dEta, # tower size in eta
+                                          dPhi, # tower size in phi
+                                          0.1369,
+                                          0.004587,
+                                          0.1692,
+                                          0.6769)
     analysis.loop(filenameSim, filename, calo_init.verbose)
     # retrieve histograms to draw them
     hEn = analysis.hEn
