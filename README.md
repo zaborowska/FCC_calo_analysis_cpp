@@ -200,6 +200,16 @@ List of additional options:
 ~~~
 
 
+## Energy resolution
+
+Input files: ROOT files with energy distribution saved with name "energy". Each ROOT file should contain distribution for one energy. Such input files may be obtained e.g. by `plot_recoMonitor.py` macro.
+Energy distributions are fitted twice with Gaussian, and the energy resolution plot is fitted with p0+p1/sqrt(E) function.
+
+~~~{.sh}
+python scripts/plot_enResolution.py energy?GeV.root 20 50 100 200 500 1000 -r energy
+~~~
+
+
 # How to create own analysis
 
 1. Create Class deriving from `BaseAnalysis` or `BaseTwoFileAnalysis`. Include:
