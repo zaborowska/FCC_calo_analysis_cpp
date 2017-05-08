@@ -19,16 +19,17 @@
 SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
   double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax),
-  m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi), m_ifCorrectForUpstream(false) {
+  m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi), m_ifCorrectForUpstream(false),
+  m_cellCollName(""), m_decoder("") {
   Initialize_histos();
 }
 
 SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
   double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
-  double aP0p0, double aP0p1, double aP1p0, double aP1p1):
+  const std::string& aCellCollName, double aP0p0, double aP0p1, double aP1p0, double aP1p1):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi),
-  m_ifCorrectForUpstream(true), m_P0p0(aP0p0), m_P0p1(aP0p1), m_P1p0(aP1p0), m_P1p1(aP1p1) {
+  m_ifCorrectForUpstream(true), m_cellCollName(aCellCollName), m_P0p0(aP0p0), m_P0p1(aP0p1), m_P1p0(aP1p0), m_P1p1(aP1p1), m_decoder("system:4,cryo:1,module:11,type:3,subtype:3,cell:6,eta:9") {
   Initialize_histos();
 }
 
@@ -46,6 +47,12 @@ void SingleParticleRecoMonitors::Initialize_histos() {
   hEnCorr = new TH1F("energyCorrected",
     ("Energy of clusters corrected for upstrem energy (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
     99,0.,1.5*m_energy);
+  hEnFirstLayer = new TH1F("energyFirstLayer",
+    ("Energy of cells within cluster in the first layer (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
+    999,0.,0.2*m_energy);
+  hEnUpstream = new TH1F("energyUpstream",
+    ("Upstream energy (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
+    999,0.,0.2*m_energy);
   hEnFncPhi = new TH2F("energy_phi",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;energy (GeV)").c_str(),
     m_noPhi,-M_PI,M_PI,
@@ -100,6 +107,8 @@ void SingleParticleRecoMonitors::Initialize_histos() {
   m_histograms.push_back(hEnTotal);
   m_histograms.push_back(hEn);
   m_histograms.push_back(hEnCorr);
+  m_histograms.push_back(hEnFirstLayer);
+  m_histograms.push_back(hEnUpstream);
   m_histograms.push_back(hEnFncPhi);
   m_histograms.push_back(hEta);
   m_histograms.push_back(hPhi);
@@ -150,28 +159,27 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
     return;
   }
 
-  double EfirstLayer = 0;
+  double EfirstLayer = 0.;
   if( m_ifCorrectForUpstream ) {
     // few hardcoded things to move out.... later ;)
     uint maxIdOfFirstLayer = 4; // our first layer consists now of 4 smaller, 2cm layers
     uint idOfFirstLayer = 1; // our first layer consists now of 4 smaller, 2cm layers
-    m_readout = "system:4,cryo:1,module:11,type:3,subtype:3,cell:6,eta:9";
-    m_cellCollName = "ECalPositionedHits";
+    std::string fieldName = "cell";
     // get cells to calculate energy deposited in first layer
     const fcc::CaloHitCollection* cells(nullptr);
-    bool testCells = aStoreSim.get(m_cellCollName, cells);
+    bool testCells = aStoreRec.get(m_cellCollName, cells);
     if (testCells) {
       if (aVerbose) {
         std::cout << "Number of cells: " << cells->size() << std::endl;
       }
       uint verb=0;
       for (const auto icell = cells->begin(); icell != cells->end(); ++icell) {
-        if(cellId(icell->core().cellId) < (maxIdOfFirstLayer + idOfFirstLayer) ) {
+        uint layerId = m_decoder.value(fieldName,icell->core().cellId);
+        uint etaId = m_decoder.value("eta",icell->core().cellId);
+        uint phiId = m_decoder.value("phi",icell->core().cellId);
+        if( layerId < (maxIdOfFirstLayer + idOfFirstLayer) ) {
+          // TODO  make additional check on eta & phi position: within window
           EfirstLayer += icell->core().energy;
-          verb++;
-          if(verb<10) {
-            std::cout << "No Cell Collection in the event." << std::endl;
-          }
         }
       }
     } else {
@@ -242,6 +250,8 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
           double EupstreamP1 = m_P0p0 + m_P0p1 / sqrt( maxEnergy );
           double Eupstream = EupstreamP0 + EupstreamP1 * EfirstLayer;
           hEnCorr->Fill(maxEnergy + Eupstream);
+          hEnFirstLayer->Fill(EfirstLayer);
+          hEnUpstream->Fill(Eupstream);
         }
       }
     }
@@ -256,6 +266,8 @@ void SingleParticleRecoMonitors::finishLoop(int aNumEvents, bool aVerbose) {
   hEnTotal->Scale(1./aNumEvents);
   hEn->Scale(1./numClusters);
   hEnCorr->Scale(1./numClusters);
+  hEnFirstLayer->Scale(1./numClusters);
+  hEnUpstream->Scale(1./numClusters);
   hEnFncPhi->Scale(1./numClusters);
   hEta->Scale(1./numClusters);
   hPhi->Scale(1./numClusters);
@@ -264,10 +276,4 @@ void SingleParticleRecoMonitors::finishLoop(int aNumEvents, bool aVerbose) {
   hNo->Scale(1./aNumEvents);
   hNoFncPhi->Scale(1./aNumEvents);
   hNoFncEta->Scale(1./aNumEvents);
-}
-
-uint SingleParticleRecoMonitors::cellId(long long aId) {
-  int Id = 10;
-  // here implement encoding of aId based on m_readout
-  return Id;
 }

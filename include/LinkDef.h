@@ -10,5 +10,6 @@
 #pragma link C++ class CellAnalysis+;
 #pragma link C++ class ReconstructionExample+;
 #pragma link C++ class SingleParticleRecoMonitors+;
+#pragma link C++ class Decoder+;
 
 #endif

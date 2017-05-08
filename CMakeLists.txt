@@ -15,6 +15,8 @@ set(CMAKE_PREFIX_PATH $ENV{PODIO} $ENV{FCCEDM})
 find_package(podio REQUIRED HINTS $ENV{PODIO})
 message(STATUS "Found podio: ${podio_DIR}")
 
+find_package(Boost)
+
 find_library(PODIOLIB podio)
 if (NOT PODIOLIB)
     message(FATAL_ERROR "libpodio.so(dylib) cannot be found dynamically. Make sure you have sourced PODIO init*.sh file to set up your environment to use PODIO")
@@ -33,6 +35,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include/
   ${podio_INCLUDE_DIRS}
   ${FCCEDM_INCLUDE_DIRS}
   )
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.h)
@@ -44,13 +49,18 @@ ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    CellAnalysis.h
    ReconstructionExample.h
    SingleParticleRecoMonitors.h
+   Decoder.h
    LINKDEF LinkDef.h)
 
 add_library(CaloAnalysis SHARED ${sources} ${headers} CaloAnalysisDict.cxx)
 
 target_link_libraries(CaloAnalysis
    datamodel datamodelDict podio
-   ${ROOT_LIBRARIES} ${ROOT_COMPONENT_LIBRARIES})
+  ${ROOT_LIBRARIES} ${ROOT_COMPONENT_LIBRARIES})
+
+if(Boost_FOUND)
+  target_link_libraries(foo ${Boost_LIBRARIES})
+endif()
 
 install(TARGETS CaloAnalysis DESTINATION lib)
 

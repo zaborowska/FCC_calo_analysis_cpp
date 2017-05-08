@@ -9,6 +9,8 @@ group = calo_init.parser.add_mutually_exclusive_group()
 group.add_argument("--dPhi", help="Size of the tower in phi", type = float)
 group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
 calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events", type = str)
+calo_init.parser.add_argument("--cellColl", help="Name of the cells collection (fcc::CaloHitCollection)", type = str)
+calo_init.parser.add_argument("--correctionParams", help="Parameters for the correction for the material in front", type = float, nargs=4)
 calo_init.parse_args()
 
 from math import pi, floor
@@ -35,6 +37,15 @@ if calo_init.args.clusterColl:
     nameClusterCollection = calo_init.args.clusterColl
 if calo_init.args.particleColl:
     nameParticlesCollection = calo_init.args.particleColl
+if calo_init.args.correctionParams and calo_init.args.cellColl:
+    nameCellCollection = calo_init.args.cellColl
+    doMaterialInFrontCorrection = True
+    par00 = calo_init.args.correctionParams[0]
+    par01 = calo_init.args.correctionParams[1]
+    par10 = calo_init.args.correctionParams[2]
+    par11 = calo_init.args.correctionParams[3]
+else:
+    doMaterialInFrontCorrection = False
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
@@ -52,22 +63,36 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     print "Initial particle energy: " + str(energy) + "GeV"
     print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename
-    analysis = SingleParticleRecoMonitors(nameClusterCollection,
-                                          nameParticlesCollection,
-                                          energy,
-                                          maxEta, # max eta
-                                          nEta, # number of bins in eta
-                                          nPhi, # number of bins in phi
-                                          dEta, # tower size in eta
-                                          dPhi, # tower size in phi
-                                          0.1369,
-                                          0.004587,
-                                          0.1692,
-                                          0.6769)
+    if doMaterialInFrontCorrection:
+        analysis = SingleParticleRecoMonitors(nameClusterCollection,
+                                              nameParticlesCollection,
+                                              energy,
+                                              maxEta, # max eta
+                                              nEta, # number of bins in eta
+                                              nPhi, # number of bins in phi
+                                              dEta, # tower size in eta
+                                              dPhi, # tower size in phi
+                                              nameCellCollection,
+                                              par00,
+                                              par01,
+                                              par10,
+                                              par11)
+    else:
+        analysis = SingleParticleRecoMonitors(nameClusterCollection,
+                                              nameParticlesCollection,
+                                              energy,
+                                              maxEta, # max eta
+                                              nEta, # number of bins in eta
+                                              nPhi, # number of bins in phi
+                                              dEta, # tower size in eta
+                                              dPhi)# tower size in phi
     analysis.loop(filenameSim, filename, calo_init.verbose)
     # retrieve histograms to draw them
     hEn = analysis.hEn
     hEnTotal = analysis.hEnTotal
+    hEnCorrected = analysis.hEnCorr
+    hEnFirstLayer = analysis.hEnFirstLayer
+    hEnUpstream = analysis.hEnUpstream
     hEnFncPhi = analysis.hEnFncPhi
     hEta = analysis.hEta
     hPhi = analysis.hPhi
@@ -83,7 +108,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hPhiMoreClu = analysis.hPhiMoreClu
     hPhiDiffMoreClu = analysis.hPhiDiffMoreClu
     hRDiffMoreClu = analysis.hRDiffMoreClu
-    h1dset1 = [hEn, hEnTotal, hEta, hPhi, hNo, hEnMoreClu, hEtaMoreClu, hPhiMoreClu]
+    h1dset1 = [hEn, hEnCorrected,  hEnFirstLayer, hEnUpstream, hEnTotal, hEta, hPhi, hNo, hEnMoreClu, hEtaMoreClu, hPhiMoreClu]
     for h in h1dset1:
         h.SetMarkerColor(kBlue+3)
         h.SetFillColor(39)
@@ -105,9 +130,13 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     # fit functions
     fitEnergy = TF1('fitEnergy','gaus',0.8*energy,1.2*energy)
     resultFitEn = hEn.Fit('fitEnergy','S')
+    resultFitEnCorr = hEnCorrected.Fit('fitEnergy','S')
     fitEnergy2 = TF1('fitEnergy2','gaus',resultFitEn.Get().Parameter(1)-2.*resultFitEn.Get().Parameter(2),
                      resultFitEn.Get().Parameter(1)+2.*resultFitEn.Get().Parameter(2))
     resultFitEn2 = hEn.Fit('fitEnergy2','SR')
+    fitEnergy2Corr = TF1('fitEnergy2Corr','gaus',resultFitEnCorr.Get().Parameter(1)-2.*resultFitEnCorr.Get().Parameter(2),
+                     resultFitEnCorr.Get().Parameter(1)+2.*resultFitEnCorr.Get().Parameter(2))
+    resultFitEn2Corr = hEnCorrected.Fit('fitEnergy2Corr','SR')
     fitEta = TF1('fitEta','gaus',-10*dEta,10*dEta)
     resEta = hEta.Fit('fitEta','S')
     fitPhi = TF1('fitPhi','gaus',-10*dPhi,10*dPhi)
@@ -117,11 +146,18 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     canv = TCanvas('ECal_monitor_plots_e'+str(energy)+'GeV', 'ECal', 2000, 1600 )
     canv.Divide(4,4)
     canv.cd(1)
-    hEn.Draw('bar')
-    draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
-               "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
-               "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
-              [0.1,0.6,0.4,0.9])
+    if doMaterialInFrontCorrection:
+        hEnCorrected.Draw('bar')
+        draw_text(["energy: "+str(round(resultFitEn2Corr.Get().Parameter(1),1))+" GeV",
+                   "           "+str(round(resultFitEn2Corr.Get().Parameter(1),1)/energy*100.)+" %",
+                   "resolution: "+str(round(resultFitEn2Corr.Get().Parameter(2)/resultFitEn2Corr.Get().Parameter(1)*100,1))+" %"],
+                  [0.1,0.6,0.4,0.9])
+    else:
+        hEn.Draw('bar')
+        draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
+                   "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
+                   "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
+                  [0.1,0.6,0.4,0.9])
     canv.cd(2)
     draw_hist2d(hEnFncPhi)
     canv.cd(5)
