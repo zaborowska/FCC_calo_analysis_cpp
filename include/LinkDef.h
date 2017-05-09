@@ -8,7 +8,10 @@
 #pragma link C++ class SimpleAnalysis+;
 #pragma link C++ class ShowerProfiles+;
 #pragma link C++ class CellAnalysis+;
+#pragma link C++ class CellCombCaloAnalysis+;
 #pragma link C++ class ReconstructionExample+;
 #pragma link C++ class SingleParticleRecoMonitors+;
+#pragma link C++ class ClustersAnalysis+;
+#pragma link C++ class SimpleClusters+;
 
 #endif
