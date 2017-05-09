@@ -5,7 +5,7 @@ calo_init.print_config()
 
 from ROOT import gSystem, gROOT, TCanvas, TGraphErrors, TF1, gStyle, kRed, TFile, TTree
 from draw_functions import draw_1histogram, draw_text
-import numpy
+import numpy, math
 
 gRes = TGraphErrors()
 
@@ -21,7 +21,8 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                 resultPre.Get().Parameter(1) + 2. * resultPre.Get().Parameter(2) )
     result = htotal.Fit(myfun, "SRQ")
     resolution = result.Get().Parameter(2) / result.Get().Parameter(1)
-    resolutionError = result.Get().Error(2) / result.Get().Parameter(1) + result.Get().Error(1) * result.Get().Parameter(2) / ( result.Get().Parameter(1) ** 2)
+    #resolutionError = result.Get().Error(2) / result.Get().Parameter(1) + result.Get().Error(1) * result.Get().Parameter(2) / ( result.Get().Parameter(1) ** 2)
+    resolutionError = result.Get().Parameter(2) / result.Get().Parameter(1) * math.sqrt( pow( result.Get().Error(1) / result.Get().Parameter(1), 2) + pow( result.Get().Error(2) / result.Get().Parameter(2), 2) )             
     gRes.SetPoint(ifile, energy, resolution)
     gRes.SetPointError(ifile, 0, resolutionError)
 

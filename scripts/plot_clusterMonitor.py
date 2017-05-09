@@ -8,11 +8,11 @@ calo_init.parser.add_argument("--maxEta", help="Maximum eta", type = float)
 group = calo_init.parser.add_mutually_exclusive_group()
 group.add_argument("--dPhi", help="Size of the tower in phi", type = float)
 group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
-calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events (to get MC particle phi,eta,E)", type = str)
 calo_init.parser.add_argument("--cellColl", help="Name of the cells collection (fcc::CaloHitCollection) for the upstream energy correction", type = str)
 calo_init.parser.add_argument("--correctionParams", help="Parameters for the upstream energy correction", type = float, nargs=4)
 calo_init.parser.add_argument("--bitfield", help="Bitfield used to encode the IDs (from DD4hep xml, e.g. \"system:4,x:4,y:4\"", type = str)
 calo_init.parse_args()
+calo_init.print_config()
 
 from math import pi, floor
 # set of default parameters
@@ -23,7 +23,6 @@ nEta = int(2*maxEta/dEta + 1)
 dPhi = 2*pi/nPhi
 nameClusterCollection = "caloClusters"
 nameParticlesCollection = "GenParticles"
-filenamesSim, checkRegexInSimInput = calo_init.substitute(calo_init.args.inputSim)
 
 # get parameters if passed from command line
 if calo_init.args.maxEta:
@@ -51,7 +50,7 @@ else:
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import SingleParticleRecoMonitors, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
+from ROOT import ClustersAnalysis, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
 from draw_functions import *
 
 # use this script for multiple files
@@ -61,12 +60,10 @@ gStyle.SetOptFit(1)
 
 for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
-    filenameSim = filenamesSim[ifile] if checkRegexInSimInput else filenamesSim[0]
     print "Initial particle energy: " + str(energy) + "GeV"
-    print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename
     if doMaterialInFrontCorrection:
-        analysis = SingleParticleRecoMonitors(nameClusterCollection,
+        analysis = ClustersAnalysis(nameClusterCollection,
                                               nameParticlesCollection,
                                               energy,
                                               maxEta, # max eta
@@ -85,7 +82,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               par10,
                                               par11)
     else:
-        analysis = SingleParticleRecoMonitors(nameClusterCollection,
+        analysis = ClustersAnalysis(nameClusterCollection,
                                               nameParticlesCollection,
                                               energy,
                                               maxEta, # max eta
@@ -93,7 +90,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               nPhi, # number of bins in phi
                                               dEta, # tower size in eta
                                               dPhi)# tower size in phi
-    analysis.loop(filenameSim, filename, calo_init.verbose)
+    analysis.loop(filename, calo_init.verbose)
     # retrieve histograms to draw them
     hEn = analysis.hEn
     hEnTotal = analysis.hEnTotal

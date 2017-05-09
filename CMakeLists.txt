@@ -47,7 +47,6 @@ ROOT_GENERATE_DICTIONARY(CaloAnalysisDict
    SimpleAnalysis.h
    ShowerProfiles.h
    CellAnalysis.h
-   CellCombCaloAnalysis.h
    ReconstructionExample.h
    SingleParticleRecoMonitors.h
    ClustersAnalysis.h
