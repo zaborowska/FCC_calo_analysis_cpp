@@ -17,7 +17,8 @@ class SingleParticleRecoMonitors: public BaseTwoFileAnalysis {
  public:
   SingleParticleRecoMonitors(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
   SingleParticleRecoMonitors(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
-  const std::string& aCellCollName, double aP0p0, double aP0p1, double aP1p0, double aP1p1);
+    const std::string& aCellCollName,  const std::string& aBitfield, const std::string& aLayerField, int aLayerFirst, int aLayerLast, double aFirstLayerSF,
+    double aP0p0, double aP0p1, double aP1p0, double aP1p1);
   ~SingleParticleRecoMonitors();
 
   void Initialize_histos();
@@ -62,11 +63,15 @@ class SingleParticleRecoMonitors: public BaseTwoFileAnalysis {
   double m_dPhi;
   bool m_ifCorrectForUpstream;
   std::string m_cellCollName;
+  Decoder m_decoder;
+  std::string m_layerFieldName;
+  int m_firstLayerFirstId;
+  int m_firstLayerLastId;
+  double m_firstLayerSF;
   double m_P0p0;
   double m_P0p1;
   double m_P1p0;
   double m_P1p1;
-  Decoder m_decoder;
 
 };
 
