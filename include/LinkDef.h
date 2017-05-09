@@ -13,5 +13,6 @@
 #pragma link C++ class SingleParticleRecoMonitors+;
 #pragma link C++ class ClustersAnalysis+;
 #pragma link C++ class SimpleClusters+;
+#pragma link C++ class Decoder+;
 
 #endif
