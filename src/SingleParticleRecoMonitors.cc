@@ -20,16 +20,19 @@ SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClust
   double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi), m_ifCorrectForUpstream(false),
-  m_cellCollName(""), m_decoder("") {
+  m_cellCollName(""), m_decoder("") , m_layerFieldName(""), m_firstLayerFirstId(0), m_firstLayerLastId(0), m_firstLayerSF(0),
+  m_P0p0(0), m_P0p1(0), m_P1p0(0), m_P1p1(0){
   Initialize_histos();
 }
 
 SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
   double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
-  const std::string& aCellCollName, double aP0p0, double aP0p1, double aP1p0, double aP1p1):
+  const std::string& aCellCollName, const std::string& aBitfield, const std::string& aLayerField, int aLayerFirst, int aLayerLast, double aFirstLayerSF,
+  double aP0p0, double aP0p1, double aP1p0, double aP1p1):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi),
-  m_ifCorrectForUpstream(true), m_cellCollName(aCellCollName), m_P0p0(aP0p0), m_P0p1(aP0p1), m_P1p0(aP1p0), m_P1p1(aP1p1), m_decoder("system:4,cryo:1,module:11,type:3,subtype:3,cell:6,eta:9") {
+  m_ifCorrectForUpstream(true), m_cellCollName(aCellCollName),  m_decoder(aBitfield), m_layerFieldName(aLayerField), m_firstLayerFirstId(aLayerFirst), m_firstLayerLastId(aLayerLast), m_firstLayerSF(aFirstLayerSF),
+  m_P0p0(aP0p0), m_P0p1(aP0p1), m_P1p0(aP1p0), m_P1p1(aP1p1) {
   Initialize_histos();
 }
 
@@ -161,10 +164,6 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
 
   double EfirstLayer = 0.;
   if( m_ifCorrectForUpstream ) {
-    // few hardcoded things to move out.... later ;)
-    uint maxIdOfFirstLayer = 4; // our first layer consists now of 4 smaller, 2cm layers
-    uint idOfFirstLayer = 1; // our first layer consists now of 4 smaller, 2cm layers
-    std::string fieldName = "cell";
     // get cells to calculate energy deposited in first layer
     const fcc::CaloHitCollection* cells(nullptr);
     bool testCells = aStoreRec.get(m_cellCollName, cells);
@@ -174,14 +173,16 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
       }
       uint verb=0;
       for (const auto icell = cells->begin(); icell != cells->end(); ++icell) {
-        uint layerId = m_decoder.value(fieldName,icell->core().cellId);
-        uint etaId = m_decoder.value("eta",icell->core().cellId);
-        uint phiId = m_decoder.value("phi",icell->core().cellId);
-        if( layerId < (maxIdOfFirstLayer + idOfFirstLayer) ) {
+        int layerId = m_decoder.value(m_layerFieldName,icell->core().cellId);
+        int etaId = m_decoder.value("eta",icell->core().cellId);
+        int phiId = m_decoder.value("phi",icell->core().cellId);
+        if( layerId >= m_firstLayerFirstId && layerId <= m_firstLayerLastId ) {
           // TODO  make additional check on eta & phi position: within window
           EfirstLayer += icell->core().energy;
         }
       }
+      // if cells were already calibrated to EM scale, scale them back
+      EfirstLayer *= m_firstLayerSF;
     } else {
       std::cout << "No Cell Collection in the event." << std::endl;
       return;

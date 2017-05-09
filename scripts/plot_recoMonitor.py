@@ -8,9 +8,10 @@ calo_init.parser.add_argument("--maxEta", help="Maximum eta", type = float)
 group = calo_init.parser.add_mutually_exclusive_group()
 group.add_argument("--dPhi", help="Size of the tower in phi", type = float)
 group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
-calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events", type = str)
-calo_init.parser.add_argument("--cellColl", help="Name of the cells collection (fcc::CaloHitCollection)", type = str)
-calo_init.parser.add_argument("--correctionParams", help="Parameters for the correction for the material in front", type = float, nargs=4)
+calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events (to get MC particle phi,eta,E)", type = str)
+calo_init.parser.add_argument("--cellColl", help="Name of the cells collection (fcc::CaloHitCollection) for the upstream energy correction", type = str)
+calo_init.parser.add_argument("--correctionParams", help="Parameters for the upstream energy correction", type = float, nargs=4)
+calo_init.parser.add_argument("--bitfield", help="Bitfield used to encode the IDs (from DD4hep xml, e.g. \"system:4,x:4,y:4\"", type = str)
 calo_init.parse_args()
 
 from math import pi, floor
@@ -37,8 +38,9 @@ if calo_init.args.clusterColl:
     nameClusterCollection = calo_init.args.clusterColl
 if calo_init.args.particleColl:
     nameParticlesCollection = calo_init.args.particleColl
-if calo_init.args.correctionParams and calo_init.args.cellColl:
+if calo_init.args.correctionParams and calo_init.args.cellColl and calo_init.args.bitfield:
     nameCellCollection = calo_init.args.cellColl
+    bitfield = calo_init.args.bitfield
     doMaterialInFrontCorrection = True
     par00 = calo_init.args.correctionParams[0]
     par01 = calo_init.args.correctionParams[1]
@@ -73,6 +75,11 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               dEta, # tower size in eta
                                               dPhi, # tower size in phi
                                               nameCellCollection,
+                                              bitfield,
+                                              "cell", # layer field name in the bitfield
+                                              1, # Id of first layer
+                                              4, # Id of last layer that counts as first (= 4*2cm = 8cm layer)
+                                              0.168, # sampling fraction of the first layer, if calibrated cells were given
                                               par00,
                                               par01,
                                               par10,
