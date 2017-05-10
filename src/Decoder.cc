@@ -61,3 +61,7 @@ unsigned long long Decoder::value(const std::string& aName, long long aValue) co
 void Decoder::setValue(long long aValue) {
   m_currentValue = aValue;
 }
+
+double  Decoder::segmentationPosition(long long aCellValue, double aCellSize, double aCellOffset) const {
+  return (aCellValue * aCellSize + aCellOffset);
+}
