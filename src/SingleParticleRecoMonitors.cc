@@ -215,7 +215,8 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
           if( layerId >= m_firstLayerFirstId && layerId <= m_firstLayerLastId ) {
             // Check on eta & phi position: if within window
             // Check is on position, but cluster position and cell position are centres of cells - no need to check ID
-            if ((fabs(etaPos - etaAtMaxEnergy) < m_noEta * m_dEta) && (fabs(phiPos - phiAtMaxEnergy) < m_noPhi * m_dPhi)) {
+            if ((fabs(etaPos - etaAtMaxEnergy) < m_noEta * m_dEta) &&
+              ((fabs(phiPos - phiAtMaxEnergy) < m_noPhi * m_dPhi) || (fabs(phiPos - phiAtMaxEnergy) > 2 * M_PI - m_noPhi * m_dPhi)  )) {
               EfirstLayer += icell->core().energy;
             }
           }
