@@ -1,9 +1,14 @@
 import calo_init
 calo_init.add_defaults()
+calo_init.parser.add_argument("-t","--title", default="Energy resolution", help="Graph title", type=str)
+calo_init.parser.add_argument("-n","--histogramName", default="energy", help="Name of the histogram containing the energy distribution", type = str)
+calo_init.parser.add_argument("-m","--axisMax", help="Maximum of the axis", type = float)
 calo_init.parse_args()
 calo_init.print_config()
 
-from ROOT import gSystem, gROOT, TCanvas, TGraphErrors, TF1, gStyle, kRed, TFile, TTree
+histName = calo_init.args.histogramName
+
+from ROOT import gSystem, gROOT, TCanvas, TGraphErrors, TF1, gStyle, kRed, kBlue, TFile, TTree
 from draw_functions import draw_1histogram, draw_text
 import numpy
 
@@ -13,13 +18,13 @@ gRes = TGraphErrors()
 for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
     f = TFile(filename, "READ")
-    htotal = f.Get('energy')
+    htotal = f.Get(histName)
     myfunPre = TF1("firstGaus","gaus", htotal.GetMean() - 2. * htotal.GetRMS(),
                    htotal.GetMean() + 2. * htotal.GetRMS())
     resultPre = htotal.Fit(myfunPre, "SRQN")
     myfun = TF1("finalGaus", "gaus", resultPre.Get().Parameter(1) - 2. * resultPre.Get().Parameter(2),
                 resultPre.Get().Parameter(1) + 2. * resultPre.Get().Parameter(2) )
-    result = htotal.Fit(myfun, "SRQ")
+    result = htotal.Fit(myfun, "SRQN")
     resolution = result.Get().Parameter(2) / result.Get().Parameter(1)
     resolutionError = result.Get().Error(2) / result.Get().Parameter(1) + result.Get().Error(1) * result.Get().Parameter(2) / ( result.Get().Parameter(1) ** 2)
     gRes.SetPoint(ifile, energy, resolution)
@@ -27,10 +32,10 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
 
 # Set properties of the graph
 if filename.find("Bfield0") > 0:
-    colour = 9 # blue colour if no B field
+    colour = kRed + 1 # red colour if no B field
 else:
-    colour = kRed + 1 # red otherwise
-gRes.SetTitle("Energy resolution;particle energy (GeV);energy resolution")
+    colour = kBlue + 1 # blue otherwise (default)
+gRes.SetTitle(calo_init.args.title+";particle energy (GeV);energy resolution")
 gRes.SetName("resolution")
 gRes.SetMarkerStyle(21)
 gRes.SetMarkerSize(1.2)
@@ -49,6 +54,8 @@ fitResult = gRes.Fit(fRes, 'S')
 # Draw
 cRes = TCanvas("resolution","Energy resolution",1200,900)
 gRes.Draw("ape")
+if calo_init.args.axisMax:
+    gRes.GetYaxis().SetRangeUser(0, calo_init.args.axisMax)
 formula = str(round(fitResult.Get().Parameter(0),4))+" #oplus #frac{"+str(round(fitResult.Get().Parameter(1),4))+"}{#sqrt{E}}"
 constString = "const: "+str(round(fitResult.Get().Parameter(0),4))+" #pm "+str(round(fitResult.Get().Error(0),4))
 samplingString = "sampl: "+str(round(fitResult.Get().Parameter(1),4))+" #pm "+str(round(fitResult.Get().Error(1),4))
@@ -81,4 +88,4 @@ t.Fill()
 plots.Write()
 plots.Close()
 
-input("Press ENTER to exit")
+raw_input("Press ENTER to exit")
