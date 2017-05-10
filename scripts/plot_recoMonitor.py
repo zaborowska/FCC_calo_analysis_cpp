@@ -16,7 +16,8 @@ calo_init.parse_args()
 
 from math import pi, floor
 # set of default parameters
-maxEta = 1.79
+maxEta = 1.716
+maxPhi = pi-(pi/512.)
 nPhi = 629 # artificially increase by 1 (odd number) - to make plots look OK
 dEta = 0.01
 nEta = int(2*maxEta/dEta + 1)
@@ -70,6 +71,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               nameParticlesCollection,
                                               energy,
                                               maxEta, # max eta
+                                              maxPhi,
                                               nEta, # number of bins in eta
                                               nPhi, # number of bins in phi
                                               dEta, # tower size in eta
@@ -89,6 +91,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               nameParticlesCollection,
                                               energy,
                                               maxEta, # max eta
+                                              maxPhi,
                                               nEta, # number of bins in eta
                                               nPhi, # number of bins in phi
                                               dEta, # tower size in eta

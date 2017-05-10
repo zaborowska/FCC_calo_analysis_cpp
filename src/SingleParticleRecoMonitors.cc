@@ -17,8 +17,8 @@
 #include <cmath>
 
 SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
-  double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
-  m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax),
+  double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
+  m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax), m_phiMax(aPhiMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi), m_ifCorrectForUpstream(false),
   m_cellCollName(""), m_decoder("") , m_layerFieldName(""), m_firstLayerFirstId(0), m_firstLayerLastId(0), m_firstLayerSF(0),
   m_P0p0(0), m_P0p1(0), m_P1p0(0), m_P1p1(0){
@@ -26,10 +26,10 @@ SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClust
 }
 
 SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
-  double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
+  double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
   const std::string& aCellCollName, const std::string& aBitfield, const std::string& aLayerField, int aLayerFirst, int aLayerLast, double aFirstLayerSF,
   double aP0p0, double aP0p1, double aP1p0, double aP1p1):
-  m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax),
+  m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax), m_phiMax(aPhiMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi),
   m_ifCorrectForUpstream(true), m_cellCollName(aCellCollName),  m_decoder(aBitfield), m_layerFieldName(aLayerField), m_firstLayerFirstId(aLayerFirst), m_firstLayerLastId(aLayerLast), m_firstLayerSF(aFirstLayerSF),
   m_P0p0(aP0p0), m_P0p1(aP0p1), m_P1p0(aP1p0), m_P1p1(aP1p1) {
@@ -58,7 +58,7 @@ void SingleParticleRecoMonitors::Initialize_histos() {
     999,0.,0.2*m_energy);
   hEnFncPhi = new TH2F("energy_phi",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;energy (GeV)").c_str(),
-    m_noPhi,-M_PI,M_PI,
+    m_noPhi,-m_phiMax,m_phiMax,
     99,0.5*m_energy,1.5*m_energy);
   hEta = new TH1F("eta",
     ("#Delta #eta (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#eta;fraction of events").c_str()
@@ -68,7 +68,7 @@ void SingleParticleRecoMonitors::Initialize_histos() {
     909,-100*m_dPhi,100*m_dPhi);
   hPhiFncPhi = new TH2F("phi_phi",
     ("#Delta #varphi (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;#Delta#varphi").c_str(),
-    m_noPhi,-M_PI,M_PI,
+    m_noPhi,-m_phiMax,m_phiMax,
     909,-100*m_dPhi,100*m_dPhi);
   hEtaFncEta = new TH2F("eta_eta",
     ("#Delta #eta (e^{-}, "+std::to_string(int(m_energy))+" GeV);#eta;#Delta#eta").c_str(),
@@ -79,7 +79,7 @@ void SingleParticleRecoMonitors::Initialize_histos() {
     7,-0.5,6.5);
   hNoFncPhi = new TH2F("clusters_phi",
     ("Number of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;number of clusters per event").c_str(),
-    m_noPhi,-M_PI,M_PI,
+    m_noPhi,-m_phiMax,m_phiMax,
     7,-0.5,7.5);
   hNoFncEta = new TH2F("clusters_eta",
     ("Number of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);#eta;number of clusters per event").c_str(),
@@ -99,10 +99,10 @@ void SingleParticleRecoMonitors::Initialize_histos() {
     101,-10*m_dEta,10*m_dEta);
   hPhiMoreClu = new TH1F("phi_duplicates",
     ("#varphi fof cluster duplicates (e^{-}, "+std::to_string(int(m_energy))+" GeV);#varphi;number of clusters").c_str(),
-    m_noPhi,-M_PI,M_PI);
+    m_noPhi,-m_phiMax,m_phiMax);
   hPhiDiffMoreClu = new TH1F("phi_diff",
     ("#Delta#varphi for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta#varphi;number of clusters").c_str(),
-    101,-2.1*M_PI,2.1*M_PI);
+    101,-2.1*m_phiMax,2.1*m_phiMax);
   hRDiffMoreClu = new TH1F("R_diff",
     ("#Delta R for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta R;number of clusters").c_str(),
     101,-200*m_dPhi,200*m_dPhi);
@@ -162,33 +162,6 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
     return;
   }
 
-  double EfirstLayer = 0.;
-  if( m_ifCorrectForUpstream ) {
-    // get cells to calculate energy deposited in first layer
-    const fcc::CaloHitCollection* cells(nullptr);
-    bool testCells = aStoreRec.get(m_cellCollName, cells);
-    if (testCells) {
-      if (aVerbose) {
-        std::cout << "Number of cells: " << cells->size() << std::endl;
-      }
-      uint verb=0;
-      for (const auto icell = cells->begin(); icell != cells->end(); ++icell) {
-        int layerId = m_decoder.value(m_layerFieldName,icell->core().cellId);
-        int etaId = m_decoder.value("eta",icell->core().cellId);
-        int phiId = m_decoder.value("phi",icell->core().cellId);
-        if( layerId >= m_firstLayerFirstId && layerId <= m_firstLayerLastId ) {
-          // TODO  make additional check on eta & phi position: within window
-          EfirstLayer += icell->core().energy;
-        }
-      }
-      // if cells were already calibrated to EM scale, scale them back
-      EfirstLayer *= m_firstLayerSF;
-    } else {
-      std::cout << "No Cell Collection in the event." << std::endl;
-      return;
-    }
-  }
-
   // Get clusters reconstructed in an event
   if (testClusters) {
     if (aVerbose) {
@@ -207,8 +180,8 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
                   << "  with energy " <<  iclu->core().energy << " GeV" << std::endl;
       }
       TVector3 pos (iclu->core().position.x, iclu->core().position.y, iclu->core().position.z);
-      float phi = pos.Phi();
-      float eta = pos.Eta();
+      double phi = pos.Phi();
+      double eta = pos.Eta();
       sumEnergy += iclu->core().energy;
       if(maxEnergy < iclu->core().energy) {
         maxEnergy = iclu->core().energy;
@@ -221,6 +194,41 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
     hNoFncPhi->Fill(phiAtMaxEnergy, clusters->size());
     hNoFncEta->Fill(etaAtMaxEnergy, clusters->size());
     hNo->Fill(clusters->size());
+
+    // Get energy in the first layer, within the reconstructed cluster
+    double EfirstLayer = 0.;
+    if( m_ifCorrectForUpstream ) {
+      // get cells to calculate energy deposited in first layer
+      const fcc::CaloHitCollection* cells(nullptr);
+      bool testCells = aStoreRec.get(m_cellCollName, cells);
+      if (testCells) {
+        if (aVerbose) {
+          std::cout << "Number of cells: " << cells->size() << std::endl;
+        }
+        uint verb=0;
+        for (const auto icell = cells->begin(); icell != cells->end(); ++icell) {
+          int layerId = m_decoder.value(m_layerFieldName,icell->core().cellId);
+          int etaId = m_decoder.value("eta",icell->core().cellId);
+          int phiId = m_decoder.value("phi",icell->core().cellId);
+          double etaPos = m_decoder.segmentationPosition(etaId, m_dEta, -fabs(m_etaMax));
+          double phiPos = m_decoder.segmentationPosition(phiId, m_dPhi, -fabs(m_phiMax));
+          if( layerId >= m_firstLayerFirstId && layerId <= m_firstLayerLastId ) {
+            // Check on eta & phi position: if within window
+            // Check is on position, but cluster position and cell position are centres of cells - no need to check ID
+            if ((fabs(etaPos - etaAtMaxEnergy) < m_noEta * m_dEta) &&
+              ((fabs(phiPos - phiAtMaxEnergy) < m_noPhi * m_dPhi) || (fabs(phiPos - phiAtMaxEnergy) > 2 * M_PI - m_noPhi * m_dPhi)  )) {
+              EfirstLayer += icell->core().energy;
+            }
+          }
+        }
+        // if cells were already calibrated to EM scale, scale them back
+        EfirstLayer *= m_firstLayerSF;
+      } else {
+        std::cout << "No Cell Collection in the event." << std::endl;
+        return;
+      }
+    }
+
     // distinguish between cluster = reconstructed particle and duplicates
     for (const auto iclu = clusters->begin(); iclu != clusters->end(); ++iclu) {
       // duplicates

@@ -20,6 +20,7 @@ public:
   unsigned long long operator[](const std::string& aName) const;
   unsigned long long value(const std::string& aName) const;
   unsigned long long value(const std::string& aName, long long aVal) const;
+  double segmentationPosition(long long aVal, double aSize, double aOffset) const;
   void setValue(long long aVal);
 private:
   std::string m_description;
