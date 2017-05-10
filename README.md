@@ -179,6 +179,11 @@ The plots are saved to root file and as a png. The first row includes the energy
 The second row contains information about any reconstructed duplicates (difference of energy, eta, phi and R=sqrt(eta^2+phi^2) with respect to the most energetic cluster).
 The last row contains comparison to the MC particle: difference in eta distribution, difference in eta as a function of eta, difference in phi distribution and difference in phi as a function of phi.
 
+
+## Reconstruction monitor with upstream energy correction
+
+python scripts/plot_recoMonitor.py root://eospublic.cern.ch//eos/fcc/users/n/novaj/combCaloForBerlin/output_combCalo_reconstructionSW_e50GeV_part1.root 50 root://eospublic.cern.ch//eos/fcc/users/n/novaj/combCaloForBerlin/output_combCalo_e50GeV_part1_v3.root --clusterColl EcalClusters --correctionParams 0.1369 0.004587 0.1692 0.6769 --cellColl ECalCellsForSW --bitfield system:4,cryo:1,type:3,subtype:3,cell:6,eta:9,phi:10
+
 List of additional options:
 ~~~{.sh}
   -r REGEX [REGEX ...], --regex REGEX [REGEX ...]
