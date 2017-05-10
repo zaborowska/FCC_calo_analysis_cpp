@@ -238,10 +238,10 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
           - sqrt(pow(phi,2)+pow(eta,2)) );
       } else {
         // reconstructed particle
-        hEta->Fill(etaAtMaxEnergy-momentum.Eta(), maxEnergy);
-        hPhi->Fill(phiAtMaxEnergy-momentum.Phi(), maxEnergy);
-        hEtaFncEta->Fill(momentum.Eta(), etaAtMaxEnergy-momentum.Eta(), maxEnergy);
-        hPhiFncPhi->Fill(momentum.Phi(), phiAtMaxEnergy-momentum.Phi(), maxEnergy);
+        hEta->Fill(etaAtMaxEnergy-momentum.Eta());
+        hPhi->Fill(phiAtMaxEnergy-momentum.Phi());
+        hEtaFncEta->Fill(momentum.Eta(), etaAtMaxEnergy-momentum.Eta());
+        hPhiFncPhi->Fill(momentum.Phi(), phiAtMaxEnergy-momentum.Phi());
         hEn->Fill(maxEnergy);
         hEnFncPhi->Fill(momentum.Phi(), maxEnergy);
         if( m_ifCorrectForUpstream ) {
