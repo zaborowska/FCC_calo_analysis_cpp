@@ -133,15 +133,8 @@ void ClustersAnalysis::processEvent(podio::EventStore& aStore, int aEventId, boo
   const fcc::CaloClusterCollection* clusters(nullptr);
   const fcc::MCParticleCollection* particles(nullptr);
 
-  std::cout << "collection" << std::endl;
-
   bool testParticles = aStore.get(m_particleCollName, particles);
-
-  std::cout << "retrieve collection1" << std::endl;
-
   bool testClusters = aStore.get(m_clusterCollName, clusters);
-
-  std::cout << "retrieve collection2" << std::endl;
 
   TVector3 momentum;
 

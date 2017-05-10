@@ -134,7 +134,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
   const fcc::CaloClusterCollection* clusters(nullptr);
   const fcc::MCParticleCollection* particles(nullptr);
 
-  bool testParticles = aStoreSim.get(m_particleCollName, particles);
+  bool testParticles = aStoreSim.get(m_particleCollName, particles);       
   bool testClusters = aStoreRec.get(m_clusterCollName, clusters);
 
   TVector3 momentum;
