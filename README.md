@@ -227,7 +227,7 @@ Will produce a plot comparing two resolutions, from files
 Example of use of additional parameters:
 
 ~~~{.sh}
-python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l '?'
+python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l '?' --sequentialColours
 python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l 'no B field: c1+a1/#sqrt{E}' 'B = 4 T: c2+a2/#sqrt{E}'
 ~~~
 
