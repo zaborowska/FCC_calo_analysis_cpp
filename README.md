@@ -224,6 +224,10 @@ python scripts/plot_enResolution.py combCalo_?GeV_bfield1_eta0.root 20 50 100 50
 -n: name of the histogram
 
 
+## Compare resolutions
+ python scripts/plot_compareResolutions_jana.py resolution_?_bfield1.root 0 -r corrected notCorrected -t 'Electrons SW, 1.2X_{0}, B= 4T' -l 'Upstream correction: 0.0047 #oplus 0.0764/#sqrt{E}' 'No upstream correction: 0.0047 #oplus 0.0848/#sqrt{E}' -m 0.04
+
+
 # How to create own analysis
 
 1. Create Class deriving from `BaseAnalysis` or `BaseTwoFileAnalysis`. Include:
