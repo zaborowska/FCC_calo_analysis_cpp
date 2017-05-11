@@ -214,7 +214,7 @@ List of additional options:
 
 ## Energy resolution
 
-Input files: ROOT files with energy distribution saved with name "energy". Each ROOT file should contain distribution for one energy. Such input files may be obtained e.g. by `plot_recoMonitor.py` macro.
+Input files: ROOT files with energy distribution saved under name "energy" (can be changed using option `-n`). Each ROOT file should contain distribution for one energy. Such input files may be obtained e.g. by `plot_recoMonitor.py` macro.
 Energy distributions are fitted twice with Gaussian, and the energy resolution plot is fitted with p0+p1/sqrt(E) function.
 
 ~~~{.sh}
@@ -223,6 +223,27 @@ python scripts/plot_enResolution.py energy?GeV.root 20 50 100 200 500 1000 -r en
 python scripts/plot_enResolution.py combCalo_?GeV_bfield1_eta0.root 20 50 100 500 -n 'energyCorrected' -o resolution_bfield1 -r energy
 -n: name of the histogram
 
+## Energy resolution - comparison
+
+Input files: ROOT files produced by `plot_enResolution.py`.
+
+~~~{.sh}
+python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield
+~~~
+
+Will produce a plot comparing two resolutions, from files
+
+~~~{.sh}
+./noBfield/energy_resolution_plots.root
+./withBfield/energy_resolution_plots.root
+~~~
+
+Example of use of additional parameters:
+
+~~~{.sh}
+python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l '?' --sequentialColours
+python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l 'no B field: c1+a1/#sqrt{E}' 'B = 4 T: c2+a2/#sqrt{E}'
+~~~
 
 # How to create own analysis
 
