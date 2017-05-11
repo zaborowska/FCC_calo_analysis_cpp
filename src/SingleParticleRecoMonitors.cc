@@ -256,7 +256,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
           // correct for energy upstream (lost in tracker, cryostat...)
           // calculate parameters based on reconstructed energy
           double EupstreamP0 = m_P0p0 + m_P0p1 * maxEnergy;
-          double EupstreamP1 = m_P0p0 + m_P0p1 / sqrt( maxEnergy );
+          double EupstreamP1 = m_P1p0 + m_P1p1 / sqrt( maxEnergy );
           double Eupstream = EupstreamP0 + EupstreamP1 * EfirstLayer;
           hEnCorr->Fill(maxEnergy + Eupstream);
           hEnFirstLayer->Fill(EfirstLayer);
