@@ -15,8 +15,8 @@ namespace podio {
 class ClustersAnalysis: public BaseAnalysis {
 
  public:
-  ClustersAnalysis(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
-  ClustersAnalysis(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
+  ClustersAnalysis(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi);
+  ClustersAnalysis(const std::string& aCluserCollName, const std::string& aPosHitCollName, double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
     const std::string& aCellCollName,  const std::string& aBitfield, const std::string& aLayerField, int aLayerFirst, int aLayerLast, double aFirstLayerSF,
     double aP0p0, double aP0p1, double aP1p0, double aP1p1);
   ~ClustersAnalysis();
@@ -57,6 +57,7 @@ class ClustersAnalysis: public BaseAnalysis {
   std::string m_readout;
   double m_energy;
   double m_etaMax;
+  double m_phiMax;
   int m_noEta;
   int m_noPhi;
   double m_dEta;

@@ -43,13 +43,13 @@ void SingleParticleRecoMonitors::Initialize_histos() {
 
   hEnTotal = new TH1F("energyTotal",
     ("Energy of all clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
-    99,0.,1.5*m_energy);
+		      99,0.8*m_energy,1.2*m_energy);
   hEn = new TH1F("energy",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
-    99,0.,1.5*m_energy);
+    99,0.8*m_energy,1.2*m_energy);
   hEnCorr = new TH1F("energyCorrected",
     ("Energy of clusters corrected for upstrem energy (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
-    99,0.,1.5*m_energy);
+    99,0.8*m_energy,1.2*m_energy);
   hEnFirstLayer = new TH1F("energyFirstLayer",
     ("Energy of cells within cluster in the first layer (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
     999,0.,0.2*m_energy);
@@ -87,7 +87,7 @@ void SingleParticleRecoMonitors::Initialize_histos() {
     7,-0.5,7.5);
   hEnMoreClu = new TH1F("energy_duplicates",
     ("Energy of cluster duplicates (e^{-}, "+std::to_string(int(m_energy))+" GeV);E (GeV);number of clusters").c_str(),
-    99,0.,1.5*m_energy);
+    99,0.8*m_energy,1.2*m_energy);
   hEnDiffMoreClu = new TH1F("energy_diff",
     ("#DeltaE/E for events with more than 1 cluster (e^{-}, "+std::to_string(int(m_energy))+" GeV);#Delta E / E;number of clusters").c_str(),
     101,0,1);
@@ -256,7 +256,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
           // correct for energy upstream (lost in tracker, cryostat...)
           // calculate parameters based on reconstructed energy
           double EupstreamP0 = m_P0p0 + m_P0p1 * maxEnergy;
-          double EupstreamP1 = m_P0p0 + m_P0p1 / sqrt( maxEnergy );
+          double EupstreamP1 = m_P1p0 + m_P1p1 / sqrt( maxEnergy );
           double Eupstream = EupstreamP0 + EupstreamP1 * EfirstLayer;
           hEnCorr->Fill(maxEnergy + Eupstream);
           hEnFirstLayer->Fill(EfirstLayer);
