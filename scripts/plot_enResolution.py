@@ -95,6 +95,10 @@ if not calo_init.args.noLinearity:
     if calo_init.args.specialLabel:
         draw_text([calo_init.args.specialLabel], [0.67,0.78, 0.95,0.88], kGray+3, 0).SetTextSize(0.05*factor)
 
+if (calo_init.args.noLinearity):
+    pad2.cd()
+    gLin.Draw("ape")
+
 # Save canvas and root file with graph, const term and sampling term
 if calo_init.output(0):
     cRes.SaveAs(calo_init.output(0)+".gif")

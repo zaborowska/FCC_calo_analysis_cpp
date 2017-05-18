@@ -18,6 +18,7 @@ graphsRes=[]
 graphsLin=[]
 constTerm=[]
 samplTerm=[]
+
 # first loop over all files to get the resolutions
 for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)

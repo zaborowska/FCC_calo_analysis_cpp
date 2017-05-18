@@ -1,4 +1,4 @@
-#include "SingleParticleRecoMonitors.h"
+#include "ClustersAnalysis.h"
 
 // podio specific includes
 #include "podio/EventStore.h"
@@ -16,7 +16,7 @@
 #include <bitset>
 #include <cmath>
 
-SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
+ClustersAnalysis::ClustersAnalysis(const std::string& aClusterCollName, const std::string& aParticleCollName,
   double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax), m_phiMax(aPhiMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi), m_ifCorrectForUpstream(false),
@@ -25,7 +25,7 @@ SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClust
   Initialize_histos();
 }
 
-SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
+ClustersAnalysis::ClustersAnalysis(const std::string& aClusterCollName, const std::string& aParticleCollName,
   double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi,
   const std::string& aCellCollName, const std::string& aBitfield, const std::string& aLayerField, int aLayerFirst, int aLayerLast, double aFirstLayerSF,
   double aP0p0, double aP0p1, double aP1p0, double aP1p1):
@@ -36,14 +36,14 @@ SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClust
   Initialize_histos();
 }
 
-SingleParticleRecoMonitors::~SingleParticleRecoMonitors(){}
+ClustersAnalysis::~ClustersAnalysis(){}
 
 
-void SingleParticleRecoMonitors::Initialize_histos() {
+void ClustersAnalysis::Initialize_histos() {
 
   hEnTotal = new TH1F("energyTotal",
     ("Energy of all clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
-		      99,0.8*m_energy,1.2*m_energy);
+    99,0.8*m_energy,1.2*m_energy);
   hEn = new TH1F("energy",
     ("Energy of clusters (e^{-}, "+std::to_string(int(m_energy))+" GeV);energy (GeV);fraction of events").c_str(),
     99,0.8*m_energy,1.2*m_energy);
@@ -129,13 +129,13 @@ void SingleParticleRecoMonitors::Initialize_histos() {
   m_histograms.push_back(hRDiffMoreClu);
 }
 
-void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podio::EventStore& aStoreRec, int aEventId, bool aVerbose) {
+void ClustersAnalysis::processEvent(podio::EventStore& aStore, int aEventId, bool aVerbose) {
   // Get the collections
   const fcc::CaloClusterCollection* clusters(nullptr);
   const fcc::MCParticleCollection* particles(nullptr);
 
-  bool testParticles = aStoreSim.get(m_particleCollName, particles);       
-  bool testClusters = aStoreRec.get(m_clusterCollName, clusters);
+  bool testParticles = aStore.get(m_particleCollName, particles);       
+  bool testClusters = aStore.get(m_clusterCollName, clusters);
 
   TVector3 momentum;
 
@@ -200,7 +200,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
     if( m_ifCorrectForUpstream ) {
       // get cells to calculate energy deposited in first layer
       const fcc::CaloHitCollection* cells(nullptr);
-      bool testCells = aStoreRec.get(m_cellCollName, cells);
+      bool testCells = aStore.get(m_cellCollName, cells);
       if (testCells) {
         if (aVerbose) {
           std::cout << "Number of cells: " << cells->size() << std::endl;
@@ -218,7 +218,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
             if ((fabs(etaPos - etaAtMaxEnergy) < m_noEta * m_dEta) &&
               ((fabs(phiPos - phiAtMaxEnergy) < m_noPhi * m_dPhi) || (fabs(phiPos - phiAtMaxEnergy) > 2 * M_PI - m_noPhi * m_dPhi)  )) {
               EfirstLayer += icell->core().energy;
-            }
+	    }
           }
         }
         // if cells were already calibrated to EM scale, scale them back
@@ -270,7 +270,7 @@ void SingleParticleRecoMonitors::processEvent(podio::EventStore& aStoreSim, podi
   }
 }
 
-void SingleParticleRecoMonitors::finishLoop(int aNumEvents, bool aVerbose) {
+void ClustersAnalysis::finishLoop(int aNumEvents, bool aVerbose) {
   int numClusters = hEn->GetEntries();
   hEnTotal->Scale(1./aNumEvents);
   hEn->Scale(1./numClusters);

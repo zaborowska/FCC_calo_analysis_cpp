@@ -8,7 +8,6 @@ calo_init.parser.add_argument("--maxEta", help="Maximum eta", type = float)
 group = calo_init.parser.add_mutually_exclusive_group()
 group.add_argument("--dPhi", help="Size of the tower in phi", type = float)
 group.add_argument("--numPhi", help="Number of the towers in phi", type = int)
-calo_init.parser.add_argument("inputSim", help="Additional input file name with the simulated events (to get MC particle phi,eta,E)", type = str)
 calo_init.parser.add_argument("--cellColl", help="Name of the cells collection (fcc::CaloHitCollection) for the upstream energy correction", type = str)
 calo_init.parser.add_argument("--correctionParams", help="Parameters for the upstream energy correction", type = float, nargs=4)
 calo_init.parser.add_argument("--bitfield", help="Bitfield used to encode the IDs (from DD4hep xml, e.g. \"system:4,x:4,y:4\"", type = str)
@@ -18,13 +17,12 @@ from math import pi, floor
 # set of default parameters
 maxEta = 1.716
 maxPhi = pi-(pi/512.)
-nPhi = 629 # artificially increase by 1 (odd number) - to make plots look OK
+nPhi = 512 # artificially increase by 1 (odd number) - to make plots look OK
 dEta = 0.01
 nEta = int(2*maxEta/dEta + 1)
 dPhi = 2*pi/nPhi
 nameClusterCollection = "caloClusters"
 nameParticlesCollection = "GenParticles"
-filenamesSim, checkRegexInSimInput = calo_init.substitute(calo_init.args.inputSim)
 
 # get parameters if passed from command line
 if calo_init.args.maxEta:
@@ -52,7 +50,7 @@ else:
 
 from ROOT import gSystem
 gSystem.Load("libCaloAnalysis")
-from ROOT import SingleParticleRecoMonitors, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
+from ROOT import ClustersAnalysis, TCanvas, TFile, gStyle, gPad, kGreen, kRed, kBlue, TColor, TF1
 from draw_functions import *
 
 # use this script for multiple files
@@ -62,12 +60,10 @@ gStyle.SetOptFit(1)
 
 for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
-    filenameSim = filenamesSim[ifile] if checkRegexInSimInput else filenamesSim[0]
     print "Initial particle energy: " + str(energy) + "GeV"
-    print "File with simulation results: " + filenameSim
     print "File with reconstruction results: " + filename
     if doMaterialInFrontCorrection:
-        analysis = SingleParticleRecoMonitors(nameClusterCollection,
+        analysis = ClustersAnalysis(nameClusterCollection,
                                               nameParticlesCollection,
                                               energy,
                                               maxEta, # max eta
@@ -87,7 +83,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               par10,
                                               par11)
     else:
-        analysis = SingleParticleRecoMonitors(nameClusterCollection,
+        analysis = ClustersAnalysis(nameClusterCollection,
                                               nameParticlesCollection,
                                               energy,
                                               maxEta, # max eta
@@ -96,7 +92,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               nPhi, # number of bins in phi
                                               dEta, # tower size in eta
                                               dPhi)# tower size in phi
-    analysis.loop(filenameSim, filename, calo_init.verbose)
+    analysis.loop(filename, calo_init.verbose)
     # retrieve histograms to draw them
     hEn = analysis.hEn
     hEnTotal = analysis.hEnTotal
@@ -138,19 +134,19 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hPhiFncPhi.GetYaxis().SetRangeUser(-50*dPhi,50*dPhi)
 
     # fit functions
-    fitEnergy = TF1('fitEnergy','gaus',0.8*energy,1.2*energy)
-    resultFitEn = hEn.Fit('fitEnergy','S')
-    resultFitEnCorr = hEnCorrected.Fit('fitEnergy','S')
-    fitEnergy2 = TF1('fitEnergy2','gaus',resultFitEn.Get().Parameter(1)-2.*resultFitEn.Get().Parameter(2),
-                     resultFitEn.Get().Parameter(1)+2.*resultFitEn.Get().Parameter(2))
-    resultFitEn2 = hEn.Fit('fitEnergy2','SR')
-    fitEnergy2Corr = TF1('fitEnergy2Corr','gaus',resultFitEnCorr.Get().Parameter(1)-2.*resultFitEnCorr.Get().Parameter(2),
-                     resultFitEnCorr.Get().Parameter(1)+2.*resultFitEnCorr.Get().Parameter(2))
-    resultFitEn2Corr = hEnCorrected.Fit('fitEnergy2Corr','SR')
-    fitEta = TF1('fitEta','gaus',-10*dEta,10*dEta)
-    resEta = hEta.Fit('fitEta','S')
-    fitPhi = TF1('fitPhi','gaus',-10*dPhi,10*dPhi)
-    resPhi = hPhi.Fit('fitPhi','S')
+    #fitEnergy = TF1('fitEnergy','gaus',0.8*energy,1.2*energy)
+    #resultFitEn = hEn.Fit('fitEnergy','S')
+    #resultFitEnCorr = hEnCorrected.Fit('fitEnergy','S')
+    #fitEnergy2 = TF1('fitEnergy2','gaus',resultFitEn.Get().Parameter(1)-2.*resultFitEn.Get().Parameter(2),
+    #                 resultFitEn.Get().Parameter(1)+2.*resultFitEn.Get().Parameter(2))
+    #resultFitEn2 = hEn.Fit('fitEnergy2','SR')
+    #fitEnergy2Corr = TF1('fitEnergy2Corr','gaus',resultFitEnCorr.Get().Parameter(1)-2.*resultFitEnCorr.Get().Parameter(2),
+    #                 resultFitEnCorr.Get().Parameter(1)+2.*resultFitEnCorr.Get().Parameter(2))
+    #resultFitEn2Corr = hEnCorrected.Fit('fitEnergy2Corr','SR')
+    #fitEta = TF1('fitEta','gaus',-10*dEta,10*dEta)
+    #resEta = hEta.Fit('fitEta','S')
+    #fitPhi = TF1('fitPhi','gaus',-10*dPhi,10*dPhi)
+    #resPhi = hPhi.Fit('fitPhi','S')
 
 
     canv = TCanvas('ECal_monitor_plots_e'+str(energy)+'GeV', 'ECal', 2000, 1600 )
@@ -158,22 +154,23 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     canv.cd(1)
     if doMaterialInFrontCorrection:
         hEnCorrected.Draw('bar')
-        draw_text(["energy: "+str(round(resultFitEn2Corr.Get().Parameter(1),1))+" GeV",
-                   "           "+str(round(resultFitEn2Corr.Get().Parameter(1),1)/energy*100.)+" %",
-                   "resolution: "+str(round(resultFitEn2Corr.Get().Parameter(2)/resultFitEn2Corr.Get().Parameter(1)*100,1))+" %"],
-                  [0.1,0.6,0.4,0.9])
+#        draw_text(["energy: "+str(round(resultFitEn2Corr.Get().Parameter(1),1))+" GeV",
+#                   "           "+str(round(resultFitEn2Corr.Get().Parameter(1),1)/energy*100.)+" %",
+#                   "resolution: "+str(round(resultFitEn2Corr.Get().Parameter(2)/resultFitEn2Corr.Get().Parameter(1)*100,1))+" %"],
+#                  [0.1,0.6,0.4,0.9])
     else:
         hEn.Draw('bar')
-        draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
-                   "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
-                   "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
-                  [0.1,0.6,0.4,0.9])
+#        draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
+#                   "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
+#                   "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
+#                  [0.1,0.6,0.4,0.9])
     canv.cd(2)
     draw_hist2d(hEnFncPhi)
     canv.cd(5)
     hEta.Draw('bar')
     canv.cd(6)
-    draw_hist2d(hEtaFncEta)
+    #draw_hist2d(hEtaFncEta)
+    hEn.Draw('bar')
     canv.cd(9)
     hPhi.Draw('bar')
     canv.cd(10)
