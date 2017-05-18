@@ -228,8 +228,10 @@ Example of use of additional parameters:
 
 ~~~{.sh}
 python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l '?' --sequentialColours
-python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l 'no B field: c1+a1/#sqrt{E}' 'B = 4 T: c2+a2/#sqrt{E}'
+python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r noBfield withBfield -t 'Histogram title' -m 0.1 -l 'no B field: formula' 'B = 4 T: formula'
 ~~~
+
+`formula` inside the legend will be replaced with energy resolution formula with fit parameters.
 
 # How to create own analysis
 
