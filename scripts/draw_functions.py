@@ -73,8 +73,9 @@ def draw_text(lines, coordinates = [0.1,0.8,0.5,0.9], colour = 36, border = 1):
                     coordinates[1],
                     coordinates[2],
                     coordinates[3],"brNDC")
-   text.SetFillColorAlpha(0,1)
+   text.SetFillColorAlpha(0,0)
    text.SetBorderSize(border)
+   text.SetTextFont(62)
    for line in lines:
       text.AddText("#color["+str(colour)+"]{"+line+"}")
       print(line)
@@ -99,11 +100,10 @@ def prepare_graph(graph, name, title, colour = 1, markerStyle = 21, factor = 1):
    graph.SetTitle(title)
    graph.SetName(name)
    graph.SetMarkerStyle(markerStyle)
-   graph.SetMarkerSize(1.3)
+   graph.SetMarkerSize(1.4)
    graph.SetMarkerColor(colour)
    graph.SetLineColor(colour)
    # set Y axis
-   graph.GetYaxis().CenterTitle()
    graph.GetYaxis().SetTitleSize(0.06)
    graph.GetYaxis().SetTitleOffset(1.1)
    graph.GetYaxis().SetLabelSize(0.045)
@@ -112,6 +112,7 @@ def prepare_graph(graph, name, title, colour = 1, markerStyle = 21, factor = 1):
    graph.GetXaxis().SetTitleSize(0.07)
    graph.GetXaxis().SetTitleOffset(1.)
    graph.GetXaxis().SetLabelSize(0.05)
+   graph.GetYaxis().SetNdivisions(506)
 
 def prepare_second_graph(secondary, main, name, title, factor = 2):
    # graph settings
@@ -126,6 +127,7 @@ def prepare_second_graph(secondary, main, name, title, factor = 2):
    secondary.GetXaxis().SetTitleSize(0)
    secondary.GetXaxis().SetTickLength(main.GetXaxis().GetTickLength()*factor)
    # set Y axis
+   main.GetYaxis().CenterTitle()
    secondary.GetYaxis().CenterTitle()
    secondary.GetYaxis().SetLabelSize(main.GetYaxis().GetLabelSize()*factor)
    secondary.GetYaxis().SetLabelOffset(main.GetYaxis().GetLabelOffset()/factor)
@@ -168,3 +170,15 @@ def prepare_double_canvas(name, title, factor = 1):
    ROOT.SetOwnership(pad1,False)
    ROOT.SetOwnership(pad2,False)
    return c, pad1, pad2
+
+def prepare_divided_canvas(name, title, x, y):
+   c = TCanvas(name, title, 1200, 900)
+   c.Divide(x,y)
+   for ipad in range(1, x * y):
+      pad = c.cd(ipad)
+      pad.SetTopMargin(0.01)
+      pad.SetRightMargin(0.03)
+      pad.SetLeftMargin(0.15)
+      pad.SetBottomMargin(0.15)
+   ROOT.SetOwnership(c,False)
+   return c

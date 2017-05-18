@@ -214,7 +214,7 @@ List of additional options:
 
 ## Energy resolution
 
-Input files: ROOT files with energy distribution saved under name "energy" (can be changed using option `-n`). Each ROOT file should contain distribution for one energy. Such input files may be obtained e.g. by `plot_recoMonitor.py` macro.
+Input files: ROOT files with energy distribution saved under name "energy" (can be changed using option `-n`). Each ROOT file should contain distribution for one energy. Such input files may be obtained e.g. by [`plot_recoMonitor.py`](scripts/plot_recoMonitor.py) macro.
 Energy distributions are fitted twice with Gaussian, and the energy resolution plot is fitted with p0+p1/sqrt(E) function.
 
 ~~~{.sh}
@@ -246,6 +246,25 @@ python scripts/plot_compareResolution.py '?/energy_resolution_plots.root' 0 -r n
 ~~~
 
 `formula` inside the legend will be replaced with energy resolution formula with fit parameters.
+
+
+
+## Sampling fraction
+
+Input files: ROOT files with sampling fraction histograms, as generated in [`FCCSW`](https://github.com/HEP-FCC/FCCSW) using [`SamplingFractionInLayers` algorithm](https://github.com/HEP-FCC/FCCSW/blob/master/Detector/DetStudies/src/components/SamplingFractionInLayers.h).
+
+If simulation was performed initially for more layers than the number of layers to study, one can use `--merge` option, specifying the number of consecutive layers to be merged into one layer. E.g. if simulation was run for 10 layers, using `--merge 4 6` means that he sampling fraction is ploted for 2 layers (layers 1-4 as the first layer, and layers 5-10 as the second one).
+
+### Example
+Using the output of an [`example from FCCSW`](https://github.com/HEP-FCC/FCCSW/blob/master/Detector/DetStudies/tests/options/samplingFraction_inclinedEcal.py), one may generate the sampling fraction for the calibration to EM scale.
+
+~~~{.sh}
+python scripts/plot_samplingFraction.py histSF_inclined_e50GeV_eta0_1events.root 0 --merge 4 4 4 4 4 4 4 4
+~~~
+
+The output ROOT file, as well as the printout of the macro contain the values of the sampling fractions for detector layers.
+The printout `samplingFraction = [ ... ]` may be directly copied to the option of the [`CalibrateInLayers` algorithm](https://github.com/HEP-FCC/FCCSW/blob/master/Reconstruction/RecCalorimeter/src/components/CalibrateInLayersTool.h), as in the [example](https://github.com/HEP-FCC/FCCSW/blob/master/Reconstruction/RecCalorimeter/tests/options/runEcalInclinedDigitisation.py#L28).
+
 
 # How to create own analysis
 
