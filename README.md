@@ -259,8 +259,15 @@ If simulation was performed initially for more layers than the number of layers 
 Using the output of an [`example from FCCSW`](https://github.com/HEP-FCC/FCCSW/blob/master/Detector/DetStudies/tests/options/samplingFraction_inclinedEcal.py), one may generate the sampling fraction for the calibration to EM scale.
 
 ~~~{.sh}
+python scripts/plot_samplingFraction.py histSF_inclined_e50GeV_eta0_1events.root 0
+~~~
+-> to extract sampling fraction for every existing layer in the geometry;
+
+
+~~~{.sh}
 python scripts/plot_samplingFraction.py histSF_inclined_e50GeV_eta0_1events.root 0 --merge 4 4 4 4 4 4 4 4
 ~~~
+-> to extract sampling fraction for 8 layers, created by merging 4 adjacent layers into one;
 
 The output ROOT file, as well as the printout of the macro contain the values of the sampling fractions for detector layers.
 The printout `samplingFraction = [ ... ]` may be directly copied to the option of the [`CalibrateInLayers` algorithm](https://github.com/HEP-FCC/FCCSW/blob/master/Reconstruction/RecCalorimeter/src/components/CalibrateInLayersTool.h), as in the [example](https://github.com/HEP-FCC/FCCSW/blob/master/Reconstruction/RecCalorimeter/tests/options/runEcalInclinedDigitisation.py#L28).
