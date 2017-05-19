@@ -273,6 +273,31 @@ The output ROOT file, as well as the printout of the macro contain the values of
 The printout `samplingFraction = [ ... ]` may be directly copied to the option of the [`CalibrateInLayers` algorithm](https://github.com/HEP-FCC/FCCSW/blob/master/Reconstruction/RecCalorimeter/src/components/CalibrateInLayersTool.h), as in the [example](https://github.com/HEP-FCC/FCCSW/blob/master/Reconstruction/RecCalorimeter/tests/options/runEcalInclinedDigitisation.py#L28).
 
 
+## Correction for the upstream material
+
+Input: ROOT file with histograms of the energy in the first layer of the calorimeter (X-axis) and the correspoding energy deposited in the upstream material.
+For sufficiently thin layer it is a linear dependence.
+The parameters for the upstream correction depend on both energy and direction of the particle (pseudorapidity). It is assumed there is no azimuthal angle dependence (which can be checked on the control plot, if `--preview` option is used). `--preview` option also plots the dependence of the upstream energy on the energy deposited in the first layer.
+
+~~~{.sh}
+python scripts/plot_upstreamCorrecton.py histUpstreamCorrection_e?GeV_Bfield1.root 100 -r energy -o Bfield1  --preview
+~~~
+
+Plots a preview plot.
+
+~~~{.sh}
+python scripts/plot_upstreamCorrecton.py histUpstreamCorrection_e?GeV_Bfield1.root 20 50 100 200 500 -r energy -o Bfield1  --preview
+~~~
+
+Plots the energy dependence of parameters. It is assumed that the constant parameter increases linearily with the energy. The slope parameter is fitted with [0]+[1]/sqrt(E) function.
+
+~~~{.sh}
+python scripts/plot_upstreamCorrecton.py histUpstreamCorrection_e?GeV_Bfield1.root 20 50 100 200 500 -r energy --etaValues 0 0.25 0.5 0.75 1.0 1.25 1.5 -o Bfield1  --preview
+~~~
+
+Plots the pseudorapidity dependence of the parameters describing the energy-dependance.
+
+
 # How to create own analysis
 
 1. Create Class deriving from `BaseAnalysis` or `BaseTwoFileAnalysis`. Include:
