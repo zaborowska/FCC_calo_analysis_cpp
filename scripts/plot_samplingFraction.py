@@ -3,7 +3,7 @@ calo_init.add_defaults()
 calo_init.parser.add_argument("--merge", help="merge layers", default = [1] * 32, type = int, nargs='+') # bin 0 is empty! (before calo)
 calo_init.parser.add_argument("-t","--title", default="Sampling fraction", help="Graph title", type=str)
 calo_init.parser.add_argument("-n","--histogramName", default="ecal_sf_layer", help="Name of the histogram with sampling fraction (postfixed with number of layer)", type = str)
-calo_init.parser.add_argument("--histogramNameMean", default="ecal_sf", help="Name of the histogram with sampling fraction (postfixed with number of layer)", type = str)
+calo_init.parser.add_argument("--histogramNameMean", default="ecal_sf", help="Name of the histogram with sampling fraction (sufixed with number of layer)", type = str)
 calo_init.parser.add_argument("-max","--axisMax", help="Maximum of the axis", type = float)
 calo_init.parser.add_argument("-min","--axisMin", help="Minimum of the axis", type = float)
 calo_init.parser.add_argument("--totalNumLayers", default = 32, help="Total number of the layers used in simulation", type = int)
@@ -63,7 +63,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     gSF = TGraphErrors()
     # now fit SF with Gaussians
     if calo_init.args.preview:
-        cPreview = prepare_divided_canvas('preview_e'+str(energy)+'GeV', 'Preview for '+str(energy)+'GeV', ceil(Nslicesmerged / ceil(sqrt(Nslicesmerged))), ceil(sqrt(Nslicesmerged)))
+        cPreview = prepare_divided_canvas('preview_e'+str(energy)+'GeV', 'Preview for '+str(energy)+'GeV', Nslicesmerged)
         fitoptions = "SQR"
     else:
         fitoptions = "SQRN"

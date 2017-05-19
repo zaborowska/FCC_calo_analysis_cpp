@@ -1,8 +1,9 @@
 # Setup ROOT
 import ROOT
 from ROOT import TH1F, TLegend, gPad, TCanvas, SetOwnership, TPaveText, TLine, kRed, TPad, kGray
+from math import sqrt,ceil
 
-def draw_1histogram( histo, x_axisName, y_axisName ):
+def draw_1histogram( histo, x_axisName, y_axisName="", colour = 9, markerStyle = 21):
    histo.GetXaxis().SetTitle(x_axisName)
    if (y_axisName==""):
       histo.GetYaxis().SetTitle("Entries/per bin")
@@ -11,6 +12,20 @@ def draw_1histogram( histo, x_axisName, y_axisName ):
    maximum = 1.2*histo.GetMaximum()
    histo.SetMaximum(maximum)
    histo.Draw()
+   histo.SetMarkerStyle(markerStyle)
+   histo.SetMarkerSize(1.4)
+   histo.SetMarkerColor(colour)
+   histo.SetLineColor(colour)
+   # set Y axis
+   histo.GetYaxis().SetTitleSize(0.06)
+   histo.GetYaxis().SetTitleOffset(1.1)
+   histo.GetYaxis().SetLabelSize(0.045)
+   histo.GetYaxis().SetNdivisions(504)
+   # set X axis
+   histo.GetXaxis().SetTitleSize(0.07)
+   histo.GetXaxis().SetTitleOffset(1.)
+   histo.GetXaxis().SetLabelSize(0.05)
+   histo.GetYaxis().SetNdivisions(506)
    gPad.Update()
    return
 
@@ -95,7 +110,7 @@ def draw_rectangle(start = [0,0], end = [1,1], colour = 2, width = 2):
       line.Draw()
       ROOT.SetOwnership(line,False)
 
-def prepare_graph(graph, name, title, colour = 1, markerStyle = 21, factor = 1):
+def prepare_graph(graph, name, title, colour = 9, markerStyle = 21, factor = 1):
    # graph settings
    graph.SetTitle(title)
    graph.SetName(name)
@@ -171,10 +186,12 @@ def prepare_double_canvas(name, title, factor = 1):
    ROOT.SetOwnership(pad2,False)
    return c, pad1, pad2
 
-def prepare_divided_canvas(name, title, x, y):
+def prepare_divided_canvas(name, title, N):
    c = TCanvas(name, title, 1200, 900)
-   c.Divide(x,y)
-   for ipad in range(1, x * y):
+   c.Divide(ceil(sqrt(N)), ceil(N / ceil(sqrt(N))))
+   print("=====> Dividing canvas into : ",N, sqrt(N),ceil(sqrt(N)), N / ceil(sqrt(N)), ceil(N / ceil(sqrt(N))))
+   print("=====> Dividing canvas into : ",ceil(sqrt(N)), ceil(N / ceil(sqrt(N))) )
+   for ipad in range(1, N+1):
       pad = c.cd(ipad)
       pad.SetTopMargin(0.01)
       pad.SetRightMargin(0.03)
