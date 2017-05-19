@@ -4,6 +4,10 @@ from ROOT import TH1F, TLegend, gPad, TCanvas, SetOwnership, TPaveText, TLine, k
 from math import sqrt,ceil
 
 def draw_1histogram( histo, x_axisName, y_axisName="", colour = 9, markerStyle = 21):
+   prepare_histogram(histo)
+   histo.SetMarkerStyle(markerStyle)
+   histo.SetMarkerColor(colour)
+   histo.SetLineColor(colour)
    histo.GetXaxis().SetTitle(x_axisName)
    if (y_axisName==""):
       histo.GetYaxis().SetTitle("Entries/per bin")
@@ -11,7 +15,13 @@ def draw_1histogram( histo, x_axisName, y_axisName="", colour = 9, markerStyle =
       histo.GetYaxis().SetTitle(y_axisName)
    maximum = 1.2*histo.GetMaximum()
    histo.SetMaximum(maximum)
-   histo.Draw()
+   histo.Draw("ep")
+   gPad.Update()
+   return
+
+def prepare_histogram(histo, title='', colour = 9, markerStyle = 21):
+   if title != '':
+      histo.SetTitle(title)
    histo.SetMarkerStyle(markerStyle)
    histo.SetMarkerSize(1.4)
    histo.SetMarkerColor(colour)
@@ -26,8 +36,6 @@ def draw_1histogram( histo, x_axisName, y_axisName="", colour = 9, markerStyle =
    histo.GetXaxis().SetTitleOffset(1.)
    histo.GetXaxis().SetLabelSize(0.05)
    histo.GetYaxis().SetNdivisions(506)
-   gPad.Update()
-   return
 
 def draw_2histograms( histo1, histo2, x_axisName, y_axisName, leg1Name, leg2Name ):
    histo1.GetXaxis().SetTitle(x_axisName)
