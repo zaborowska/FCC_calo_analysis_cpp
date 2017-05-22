@@ -5,6 +5,7 @@ calo_init.parser.add_argument("--legend","-l",default=[],type=str,nargs='+')
 calo_init.parser.add_argument("-m","--axisMax", help="Maximum of the axis", type = float)
 calo_init.parser.add_argument("--roundBrackets", help="Use round brackets for unit", action = 'store_true')
 calo_init.parser.add_argument("--preview", help="Plot preview of fits", action = 'store_true')
+calo_init.parser.add_argument("--noLinearity", help="Add legend with linearity", action = 'store_true')
 calo_init.parser.add_argument("--specialLabel", help="Additional label to be plotted", type=str, default = "FCC-hh simulation")
 calo_init.parse_args()
 calo_init.print_config()
@@ -82,12 +83,17 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
 
 canv.Update()
 
-draw_text(["energy resolution", "#color[1]{#sigma_{E_{rec}}/#LTE_{rec}#GT}"]
-          + resolution_list,
-          [0.17,0.8-0.05*len(resolution_list),0.42,0.88], 1, 1)
-draw_text(["linearity", "#color[1]{(#LTE_{rec}#GT-E_{beam})/E_{beam}}"]
-          + mean_list,
-          [0.7,0.8-0.05*len(resolution_list),0.95,0.88], 1, 1)
+if not calo_init.args.noLinearity:
+    draw_text(["energy resolution", "#color[1]{#sigma_{E_{rec}}/#LTE_{rec}#GT}"]
+              + resolution_list,
+              [0.17,0.8-0.05*len(resolution_list),0.42,0.88], 1, 1)
+    draw_text(["linearity", "#color[1]{(#LTE_{rec}#GT-E_{beam})/E_{beam}}"]
+              + mean_list,
+              [0.7,0.8-0.05*len(resolution_list),0.95,0.88], 1, 1)
+else:
+    draw_text(["energy resolution", "#color[1]{#sigma_{E_{rec}}/#LTE_{rec}#GT}"]
+              + resolution_list,
+              [0.6,0.7-0.07*len(resolution_list),0.95,0.78], 1, 0)
 if calo_init.args.specialLabel:
     draw_text([calo_init.args.specialLabel], [0.57,0.88, 0.85,0.98], kGray+3, 0).SetTextSize(0.05)
 canv.Update()
