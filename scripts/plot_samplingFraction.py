@@ -173,11 +173,11 @@ plots.Close()
 print("============================================================")
 print("== to be used in FCCSW, with CalibrateInLayers algorithm: ==")
 print("============================================================")
-print("samplingFraction = ",end="")
+print"samplingFraction = ",
 for islice in range(0, Nslicesmerged):
     if islice > 0:
-        print(" + ",end="")
-    print("["+str(gSF.GetY()[islice])+"] * "+str(calo_init.args.merge[islice]),end="")
+        print" + ",
+    print"["+str(gSF.GetY()[islice])+"] * "+str(calo_init.args.merge[islice]),
 print()
 print("============================================================")
 
