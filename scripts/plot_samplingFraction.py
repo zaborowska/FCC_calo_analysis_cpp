@@ -69,6 +69,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
         fitoptions = "SQRN"
     for islice, h in enumerate(hmerged):
         fitPre = TF1("fitPre","gaus", h.GetMean() - 1. * h.GetRMS(), h.GetMean() + 1. * h.GetRMS())
+        h.Rebin(10)
         resultPre = h.Fit(fitPre, fitoptions)
         fit = TF1("fit","gaus",resultPre.Get().Parameter(1) - 2. * resultPre.Get().Parameter(2), resultPre.Get().Parameter(1) + 2. * resultPre.Get().Parameter(2) )
         result = h.Fit(fit, fitoptions)
@@ -106,7 +107,7 @@ canv.Update()
 lines = []
 for iLine, line in enumerate(avgSF):
     lines.append(TLine(0, avgSF[iLine], Nslices * sliceWidth, avgSF[iLine]))
-    lines[iLine].SetLineColor(iLine+9)
+    lines[iLine].SetLineColor(iLine+1)
     lines[iLine].Draw('same')
 
 # add second axis

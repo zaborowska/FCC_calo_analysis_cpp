@@ -16,13 +16,13 @@ from draw_functions import draw_1histogram, draw_2histograms
 energy = calo_init.energies[0]
 filename = calo_init.filenamesIn[0]
 if len(calo_init.filenamesIn) > 1:
-    print "WARNING: analysis of the first input file, ignoring the rest"
+    print( "WARNING: analysis of the first input file, ignoring the rest")
 
 
 ma = ShowerProfiles(energy, SF)
 ma.loop(filename, calo_init.verbose)
-print "Mean hit energy: ", ma.h_hitEnergy.GetMean()
-print "1/SF calculated: ", energy/(ma.h_hitEnergy.GetMean())
+print( "Mean hit energy: ", ma.h_hitEnergy.GetMean())
+print( "1/SF calculated: ", energy/(ma.h_hitEnergy.GetMean()))
 
   #Longo-Sestili formula
   #http://arxiv.org/pdf/hep-ex/0001020.pdf
@@ -51,6 +51,18 @@ ma.h_longProfile.Fit("fit")
 gPad.SetLogy(1)
 c1.cd(6)
 draw_2histograms(ma.h_radialProfile_particle, ma.h_radialProfile, "Radial distance/X0", "Energy [GeV]", "Particle dir.", "Hits in 1st layer")
+
+fileOut = TFile("profiles_e"+str(int(energy))+"GeV_eta1.root","RECREATE")
+fileOut.cd()
+ma.h_ptGen.Write()
+ma.h_pdgGen.Write()
+ma.h_cellEnergy.Write()
+ma.h_longProfile_particle.Write()
+ma.h_longProfile.Write()
+ma.h_radialProfile_particle.Write()
+ma.h_radialProfile.Write()
+fileOut.Write()
+fileOut.Close()
 
 raw_input("Press ENTER to exit")
 #c1.SaveAs("plots_"+PARTICLE+str(ENERGY)+".gif")

@@ -3,10 +3,14 @@ calo_init.add_defaults()
 calo_init.parser.add_argument("--numLayers", help="Number of layers that create the first readout layer", default = 1, type = int)
 calo_init.parser.add_argument("--simulation", help="Path to the simulation file, to extract the total deposited energy in calorimeter. If undefined, the beam energy is used", type = str)
 calo_init.parser.add_argument("--etaValues", help="Values of eta for which the upstream material correction was calculated. They are used in the file names.", default = [0], type = float, nargs='+')
+calo_init.parser.add_argument("--rebin", help="Rebin profile (one value common for all energies or multiple values for each energy)", default = [1], type = int, nargs='+')
+calo_init.parser.add_argument("--fitRangeUp", help="Range for the fitting (multiple values for each energy)", default = [], type = float, nargs='+')
+calo_init.parser.add_argument("--fitRangeDown", help="Range for the fitting (multiple values for each energy)", default = [], type = float, nargs='+')
 calo_init.parser.add_argument("-n","--histogramName", default="upstreamEnergy_presamplerEnergy2D", help="Name of the histogram with the histogram of energy in first layer (X-axis) and the upstrem energy (Y-axis)", type = str)
-calo_init.parser.add_argument("--layerWidth", default = 2, help="Width of the layer (cm)", type = float)
+calo_init.parser.add_argument("--layerWidth", default = 0.5, help="Width of the layer (cm)", type = float)
 calo_init.parser.add_argument("--roundBrackets", help="Use round brackets for unit", action = 'store_true')
 calo_init.parser.add_argument("--preview", help="Plot preview of fits", action = 'store_true')
+calo_init.parser.add_argument("--previewPhi", help="Plot preview of phi distribution", action = 'store_true')
 calo_init.parser.add_argument("--specialLabel", help="Additional label to be plotted", type=str, default = "FCC-hh simulation")
 calo_init.parse_args()
 calo_init.print_config()
@@ -26,12 +30,26 @@ else:
     energyUnit = '[GeV]'
     angleUnit = '[rad]'
 
+if len(calo_init.args.rebin) > 1:
+    if len(calo_init.args.rebin) != len(calo_init.filenamesIn):
+        print("Length of 'rebin' argument (",len(calo_init.args.rebin),") is not equal to the number of input files(",len(calo_init.filenamesIn),")")
+        exit()
+    else:
+        rebin = calo_init.args.rebin
+else:
+    rebin = [calo_init.args.rebin[0]] * len(calo_init.filenamesIn)
+
+if len(calo_init.args.fitRangeUp) > 0:
+    if (len(calo_init.args.fitRangeDown) > 0 and len(calo_init.args.fitRangeUp) != len(calo_init.args.fitRangeDown) ) or len(calo_init.args.fitRangeUp) != len(calo_init.filenamesIn):
+        print("Length of 'fitRangeUp' argument (",len(calo_init.args.fitRangeUp),") is not equal to 'fitRangeDown' (",len(calo_init.args.fitRangeDown),") and/or to the number of input files(",len(calo_init.filenamesIn),")")
+        exit()
+
 from ROOT import gSystem, gROOT, TCanvas, TGraphErrors, TF1, gStyle, kRed, kBlue, kGray, TFile, TTree, TPad, TGaxis, gPad, TLine
 from draw_functions import prepare_graph, prepare_divided_canvas,  prepare_single_canvas, draw_text, draw_1histogram
 import numpy
 from math import sqrt, ceil, floor
-gStyle.SetOptFit(0000)
-gStyle.SetOptStat(0000)
+gStyle.SetOptFit(1111)
+gStyle.SetOptStat(1111)
 
 # graphs for the eta-dependent correction parameters
 par0par0 = TGraphErrors()
@@ -68,16 +86,27 @@ for ieta, eta in enumerate(calo_init.args.etaValues):
             filename = filename.replace('eta0','eta'+str(eta))
         # get phi distribution and profile of upstream energy vs deposited in first layer
         f = TFile(filename, "READ")
-        hCellPhi = f.Get('presamplerEnergy_phi'+str(layer))
-        hCellPhi.Scale(1. / hCellPhi.GetEntries())
-        hUpstremCellProfile = f.Get(calo_init.args.histogramName+str(layer)).ProfileX("profile")
+        if calo_init.args.previewPhi:
+            hCellPhi = f.Get('presamplerEnergy_phi'+str(layer))
+            hCellPhi.Scale(1. / hCellPhi.GetEntries())
+            hCellPhi.SetTitle('')
+            hCellPhi.GetXaxis().SetRangeUser(-0.02,0.02)
+        hUpstreamCellEnergy = f.Get(calo_init.args.histogramName+str(layer))
+        hUpstreamCellEnergy.RebinX(int(0.0025/hUpstreamCellEnergy.GetXaxis().GetBinWidth(1)) )
+        hUpstreamCellEnergy.RebinX(rebin[ifile])
+        hUpstremCellProfile = hUpstreamCellEnergy.ProfileX("profile")
         hUpstremCellProfile.SetTitle('')
-        hCellPhi.SetTitle('')
-        hCellPhi.GetXaxis().SetRangeUser(-0.02,0.02)
 
-        # hUpstremCellProfile.Rebin(layer)
-        fitProfile = TF1("fitProfile","pol1", 0, energy)
-        result = hUpstremCellProfile.Fit(fitProfile, "SN")
+        if len(calo_init.args.fitRangeUp) > 0:
+            if len(calo_init.args.fitRangeDown) > 0:
+                fitProfile = TF1("fitProfile","pol1", calo_init.args.fitRangeDown[ifile], calo_init.args.fitRangeUp[ifile])
+                print("fitting in range: ", calo_init.args.fitRangeDown[ifile], calo_init.args.fitRangeUp[ifile])
+            else:
+                fitProfile = TF1("fitProfile","pol1", 0, calo_init.args.fitRangeUp[ifile])
+                print("fitting in range: ", 0, calo_init.args.fitRangeUp[ifile])
+        else:
+            fitProfile = TF1("fitProfile","pol1", 0, energy)
+        result = hUpstremCellProfile.Fit(fitProfile, "SNR")
 
         # fill energy-dependent graphs
         param0.SetPoint(ifile,energyGraph,result.Get().Parameter(0))
@@ -88,13 +117,22 @@ for ieta, eta in enumerate(calo_init.args.etaValues):
         if calo_init.args.preview:
             canvProfile = prepare_single_canvas( 'upstreamEnergy_e'+str(energy)+'GeV_eta'+str(eta), 'Upstream energy vs energy in first layer for #eta = '+str(eta))
             draw_1histogram(hUpstremCellProfile, 'E_{firstLayer} '+energyUnit,'upstream energy '+energyUnit)
-            hUpstremCellProfile.Fit(fitProfile, "S")
+            hUpstremCellProfile.Fit(fitProfile, "SR")
             for ibin in reversed(range(0,hUpstremCellProfile.GetXaxis().GetNbins())):
                 if hUpstremCellProfile.GetBinContent(ibin) > 0:
                     lastNonEmpty = ibin
                     break
             hUpstremCellProfile.GetXaxis().SetRange(0, lastNonEmpty + 3)
+            legendProfile = draw_text([str(energy)+' GeV e^{-}, B = 4T'], [0.67,0.18, 0.85,0.28], 9, 0)
+            legendProfile.SetTextSize(0.05)
+            legendProfile.SetTextFont(42)
             canvProfile.Update()
+            # save canvases filled for each energy and eta
+            if calo_init.output(ifile):
+                canvProfile.SaveAs(calo_init.output(ifile) + "_previewProfile_eta" + str(eta) + "_e"+str(energy)+"GeV.png")
+            else:
+                canvProfile.SaveAs("upstremCorrection_previewProfile_eta"+str(eta)+"_"+str(layer*width)+"cm.png")
+        if calo_init.args.previewPhi:
             canvPhi = prepare_single_canvas( 'phi_e'+str(energy)+'GeV__eta'+str(eta), 'Phi distribution of first layer deposits for #eta = '+str(eta))
             draw_1histogram(hCellPhi, '#varphi ' + angleUnit,'E_{firstLayer} ' + energyUnit)
             # Draw all labels
@@ -103,11 +141,6 @@ for ieta, eta in enumerate(calo_init.args.etaValues):
                 draw_text([calo_init.args.specialLabel], [0.57,0.88, 0.85,0.98], kGray+3, 0).SetTextSize(0.05)
                 canvPhi.cd()
                 draw_text([calo_init.args.specialLabel], [0.57,0.88, 0.85,0.98], kGray+3, 0).SetTextSize(0.05)
-            canvProfile.cd()
-            legendProfile = draw_text([str(energy)+' GeV e^{-}, B = 4T'], [0.67,0.18, 0.85,0.28], 9, 0)
-            legendProfile.SetTextSize(0.05)
-            legendProfile.SetTextFont(42)
-            canvPhi.cd()
             legendPhi = draw_text([str(energy)+' GeV e^{-}, B = 4T'], [0.67,0.18, 0.85,0.28], 9, 0)
             legendPhi.SetTextSize(0.05)
             legendPhi.SetTextFont(42)
@@ -116,16 +149,14 @@ for ieta, eta in enumerate(calo_init.args.etaValues):
             # save canvases filled for each energy and eta
             if calo_init.output(ifile):
                 canvPhi.SaveAs(calo_init.output(ifile) + "_previewPhi_eta" + str(eta) + ".png")
-                canvProfile.SaveAs(calo_init.output(ifile) + "_previewProfile_eta" + str(eta) + ".png")
             else:
                 canvPhi.SaveAs("upstremCorrection_previewPhi_eta"+str(eta)+"_"+str(layer*width)+"cm.png")
-                canvProfile.SaveAs("upstremCorrection_previewProfile_eta"+str(eta)+"_"+str(layer*width)+"cm.png")
 
     # fit energy-dependent parameters
     fitP0 = TF1("fitP0","pol1", 0, energy)
-    par0result = param0.Fit(fitP0, "S")
+    par0result = param0.Fit(fitP0, "SR")
     fitP1 = TF1("fitP1","[0]+[1]/sqrt(x)", 0, energy)
-    par1result = param1.Fit(fitP1, "S")
+    par1result = param1.Fit(fitP1, "SR")
     cEnergy = prepare_divided_canvas('upstreamParams_eta'+str(eta), 'Energy upstream E=p0+p1E for eta='+str(eta), 2)
     cEnergy.cd(1)
     prepare_graph(param0, "param0", 'P0 (E);'+axisName+'; parameter P0')
@@ -150,43 +181,45 @@ for ieta, eta in enumerate(calo_init.args.etaValues):
     # save canvases filled for each eta
     if calo_init.output(ifile):
         cEnergy.SaveAs(calo_init.output(ifile) + "_energyDependent_eta"+str(eta) + ".png")
+        cEnergy.SaveAs(calo_init.output(ifile) + "_energyDependent_eta"+str(eta) + ".root")
     else:
         cEnergy.SaveAs("upstreamCorrection_energyDependent_eta"+str(eta)+"_"+str(layer*width)+"cm.png")
 
 # plot eta-dependent parameters
-cParams = prepare_divided_canvas( 'etaParameters', 'Upstream energy correction parameters E_{upstream}=(p00(#eta)+p01(#eta)#cdot E) + (p10(#eta)+ p11(#eta)/#sqrt{E})#cdot E', 4 )
-paramGraphs = [par0par0, par0par1, par1par0, par1par1]
-parTitles = ['P00', 'P01', 'P10', 'P11']
-paramValues = []
-for igraph, g in enumerate(paramGraphs):
-    pad = cParams.cd(igraph + 1)
-    prepare_graph(g, parTitles[igraph], parTitles[igraph]+'(#eta);#eta; parameter '+parTitles[igraph])
-    g.Draw("aep")
-    paramValues.append(list(g.GetY()))
-    pad.Update()
+if len(calo_init.args.etaValues) > 1:
+    cParams = prepare_divided_canvas( 'etaParameters', 'Upstream energy correction parameters E_{upstream}=(p00(#eta)+p01(#eta)#cdot E) + (p10(#eta)+ p11(#eta)/#sqrt{E})#cdot E', 4 )
+    paramGraphs = [par0par0, par0par1, par1par0, par1par1]
+    parTitles = ['P00', 'P01', 'P10', 'P11']
+    paramValues = []
+    for igraph, g in enumerate(paramGraphs):
+        pad = cParams.cd(igraph + 1)
+        prepare_graph(g, parTitles[igraph], parTitles[igraph]+'(#eta);#eta; parameter '+parTitles[igraph])
+        g.Draw("aep")
+        paramValues.append(list(g.GetY()))
+        pad.Update()
 
-# save
-if calo_init.output(0):
-    cParams.SaveAs(calo_init.output(0)+".png")
-    fileParCorrection = TFile(calo_init.output(0)+".root","RECREATE")
-else:
-    cParams.SaveAs("upstreamCorrection_etaDependent_"+str(layer*width)+"cm.png")
-    fileParCorrection = TFile("upstreamCorrection_etaDependent_"+str(layer*width)+"cm.root","RECREATE")
-fileParCorrection.cd()
-for par in paramGraphs:
-    par.Write()
-fileParCorrection.Close()
+    # save
+    if calo_init.output(0):
+        cParams.SaveAs(calo_init.output(0)+".png")
+        fileParCorrection = TFile(calo_init.output(0)+".root","RECREATE")
+    else:
+        cParams.SaveAs("upstreamCorrection_etaDependent_"+str(layer*width)+"cm.png")
+        fileParCorrection = TFile("upstreamCorrection_etaDependent_"+str(layer*width)+"cm.root","RECREATE")
+    fileParCorrection.cd()
+    for par in paramGraphs:
+        par.Write()
+    fileParCorrection.Close()
 
-print("===================================")
-print("correction parameters: " +str(layer*width)+"cm    ")
-if calo_init.output(0):
-    print(calo_init.output(0))
-print("===================================")
-print("etaValues = ", calo_init.args.etaValues)
-print("P00 = ", paramValues[0])
-print("P01 = ", paramValues[1])
-print("P10 = ", paramValues[2])
-print("P11 = ", paramValues[3])
-print("===================================")
+    print("===================================")
+    print("correction parameters: " +str(layer*width)+"cm    ")
+    if calo_init.output(0):
+        print(calo_init.output(0))
+    print("===================================")
+    print("etaValues = ", calo_init.args.etaValues)
+    print("P00 = ", paramValues[0])
+    print("P01 = ", paramValues[1])
+    print("P10 = ", paramValues[2])
+    print("P11 = ", paramValues[3])
+    print("===================================")
 
 input("Press ENTER to exit")

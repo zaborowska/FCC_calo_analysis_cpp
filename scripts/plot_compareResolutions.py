@@ -1,8 +1,9 @@
 import calo_init
 calo_init.add_defaults()
 calo_init.parser.add_argument("--legend","-l",default=[],type=str,nargs='+')
-calo_init.parser.add_argument("--title","-t",default="Energy resolution",type=str)
-calo_init.parser.add_argument("-m","--axisMax", help="Maximum of the axis", type = float)
+calo_init.parser.add_argument("--title","-t",type=str)
+calo_init.parser.add_argument("-max","--axisMax", help="Maximum of the axis", type = float)
+calo_init.parser.add_argument("-min","--axisMin", help="Minimum of the axis", type = float, default = 0)
 calo_init.parser.add_argument("--sequentialColours", "--colours", help="If Gradient of colours should be used insted of ROOT standard", default=False, action='store_true')
 calo_init.parser.add_argument("--noLinearity", help="If linearity plot should not be drawn", action = 'store_true')
 calo_init.parser.add_argument("--specialLabel", help="Additional label to be plotted", type=str)
@@ -39,16 +40,25 @@ else:
 
 # Prepare graphs: set colours, axis range, ...
 if calo_init.args.sequentialColours and len(graphsRes) < 8:
-    if calo_init.filenamesIn[0].find("Bfield1"):
+    if calo_init.filenamesIn[0].find("Bfield1") == -1:
         colour = ['#b84341','#bc5e42','#be7a42','#c09644','#c2b246','#b9c448','#a0c54a']
         colour = [colour[len(colour)-i-1] for i,c in enumerate(colour)]
         colour = [TColor.GetColor(c) for c in colour]
     else:
-        colour = ['#4aa7bf','#4c90c0','#4d79c2','#4f62c4','#5851c6','#7253c7','#8d55c9']
+        if len(calo_init.filenamesIn) == 7:
+            colour = ['#4aa7bf','#4c90c0','#4d79c2','#4f62c4','#5851c6','#7253c7','#8d55c9']
+        elif len(calo_init.filenamesIn) == 5:
+            colour = ['#4aa7bf','#4c90c0','#4f62c4','#5851c6','#8d55c9']
+        elif len(calo_init.filenamesIn) == 3:
+            colour = ['#4aa7bf','#4f62c4','#8d55c9']
+        elif len(calo_init.filenamesIn) == 2:
+            colour = ['#4aa7bf','#8d55c9']
+        else:
+            exit()
         colour = [TColor.GetColor(c) for c in colour]
 else:
     colour = [c for c in range(1,100)]
-print(colour)
+    colour = [TColor.GetColor(c) for c in colour]
 minima=[]
 maxima=[]
 for i,g in enumerate(graphsRes):
@@ -57,7 +67,7 @@ for i,g in enumerate(graphsRes):
     minima.append(g.GetYaxis().GetXmin())
     maxima.append(g.GetYaxis().GetXmax())
 if calo_init.args.axisMax:
-    graphsRes[0].GetYaxis().SetRangeUser(0, calo_init.args.axisMax)
+    graphsRes[0].GetYaxis().SetRangeUser(calo_init.args.axisMin, calo_init.args.axisMax)
 else:
     graphsRes[0].GetYaxis().SetRangeUser(0.8*min(minima),0.55*max(maxima))
 if not calo_init.args.noLinearity:
@@ -82,18 +92,20 @@ elif calo_init.args.legend:
 else:
     graphTitles=[]
 for ileg, legend in enumerate(graphTitles):
-    graphTitles[ileg] = legend.replace("formula","#frac{#sigma_{E}}{E} = #frac{"+str(round(samplTerm[ileg]*100.,2))+"%}{#sqrt{E}} + "+str(round(constTerm[ileg]*100.,2))+"%")
+    graphTitles[ileg] = legend.replace("formula","#frac{#sigma_{E}}{E} = #frac{"+str(round(samplTerm[ileg]*100.,2))+"%}{#sqrt{E}} #oplus "+str(abs(round(constTerm[ileg]*100.,2)))+"%")
 graphTitles = ['#color['+str(colour[i])+']{'+t+'}' for i,t in enumerate(graphTitles)]
 
 # Draw all labels
 if not calo_init.args.noLinearity:
     padRes.cd()
-    draw_text(graphTitles, [0.55,0.95 - 0.08 * len(graphTitles),0.95,0.95], 1, 0).SetTextSize(0.04)
-elif not calo_init.args.specialLabel:
-    draw_text(graphTitles, [0.55,0.95 - 0.08 * len(graphTitles),0.95,0.95], 1, 0).SetTextSize(0.04)
+    draw_text(graphTitles, [0.4,0.85 - 0.07 * len(graphTitles),0.95,0.95], 1, 0).SetTextSize(0.04)
 else:
-    draw_text(graphTitles, [0.55,0.9 - 0.08 * len(graphTitles),0.95,0.85], 1, 0).SetTextSize(0.04)
-draw_text(["energy resolution"], [0.2,0.88, 0.4,0.98], 1, 0).SetTextSize(0.05)
+    draw_text(graphTitles, [0.3,0.8 - 0.07 * len(graphTitles),0.95,0.86], 1, 0).SetTextSize(0.04)
+if not (calo_init.args.noLinearity and calo_init.args.title):
+    draw_text(["energy resolution"], [0.2,0.88, 0.4,0.98], 1, 0).SetTextSize(0.05)
+else:
+    cRes.SetTopMargin(0.1)
+    draw_text([calo_init.args.title], [0.,0.9, 1,1], 1, 0).SetTextSize(0.05)
 if calo_init.args.noLinearity and calo_init.args.specialLabel:
     draw_text([calo_init.args.specialLabel], [0.67,0.88, 0.95,0.98], 1, 0).SetTextSize(0.05)
 if not calo_init.args.noLinearity:
