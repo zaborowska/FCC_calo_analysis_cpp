@@ -1,22 +1,59 @@
 from ROOT import TH1F, TF1, TF2, TCanvas, TLegend, TFile, Double, gStyle
 from math import ceil, sin, cos, atan, exp, log, tan, pi
 
-deltaEta = 0.01
-maxEta = 1.5
-numEta = int(ceil(maxEta/deltaEta))
-layerThickness = [26.9] + [120.9] * 7 #mm
-tracesPerLayer = [1, 0, 0, 1, 2, 3, 4, 5]
-tracesLength0 = [26.9 * 0, 26.9 * 1,
-          120.9 * 5, 120.9 * 4, 120.9 * 3,
-          120.9 * 2, 120.9 * 1, 120.9 * 0]
 
-pcbThickness = 1.2 #mm
-pcbThicknessNoHV = 1.0 #mm (0.1 mm between PCB inside & HV layer on both sides)
+#Options:
+#Traces 1: traces from first 2 layers go in the front, 5 layers to the back
+#Traces 2 (default): traces from first 3 layers go in the front, 5 layers to the back
+#Impedance: 50 (default) or 33 Ohm
+#Shields width: 2 (default) or 4 - how many times are shield larger than gap hs 
+
+flagTraces = 'traces2'
+flagImpedance = '50'
+flagsShieldsWidth = 2
+
+#Check the flags
+if flagTraces!='traces1' and flagTraces!='traces2':
+    print "WARNING: Trace option ", flagTraces, "not know, setting to default (traces2)"
+    flagTraces = 'traces2'
+
+if flagImpedance!='50' and flagImpedance!='33':
+    print "WARNING: thickness hs for impedance ", flagImpedance, " Ohm not know, setting to default (50 Ohm)"
+    flagImpedance = '50'
+
+print "Calculating capacitances for this setup:"
+print "Trace option -", flagTraces, ", impedance -", flagImpedance, " Ohm , shield width -", flagsShieldsWidth, " * hs" 
+    
+filename = "capacitances_ecalBarrel_"+flagImpedance+"Ohm_"+flagTraces+"_"+str(flagsShieldsWidth)+"shieldWidth.root"
+
+print "Capacitances stored in ", filename
+
+tracesPerLayer = []
+tracesLength0 = []
+if flagTraces=='traces2':
+    tracesPerLayer = [2, 1, 0, 0, 1, 2, 3, 4]
+    tracesLength0 = [26.9 * 0, 26.9 * 1,
+                     26.9 * 1 + 120.9 * 1, 120.9 * 4, 120.9 * 3,
+                     120.9 * 2, 120.9 * 1, 120.9 * 0]
+else:
+    tracesPerLayer = [1, 0, 0, 1, 2, 3, 4, 5]
+    tracesLength0 = [26.9 * 0, 26.9 * 1,
+                     120.9 * 5, 120.9 * 4, 120.9 * 3,
+                     120.9 * 2, 120.9 * 1, 120.9 * 0]
+
+#Detector
 Nplanes = 1408
 angle = 50./180. * pi #inclination angle
 passiveThickness = 2.0 #mm
+#Segmentation
+deltaEta = 0.01
+maxEta = 1.68
+numEta = int(ceil(maxEta/deltaEta))
+layerThickness = [26.9] + [120.9] * 7 #mm
 
-filename = "capacitances_50Ohm_default.root"
+#PCB dimensions
+pcbThickness = 1.2 #mm
+pcbThicknessNoHV = 1.0 #mm (0.1 mm between PCB inside & HV layer on both sides)
 
 #constants:
 # distance from signal trace to shield (HS) - from impedance vs. trace width vs. distance to ground layer 2D plot (Z = 50 Ohm)
@@ -25,12 +62,18 @@ filename = "capacitances_50Ohm_default.root"
 # distance from shield to the edge of PCB
 #http://www.analog.com/media/en/training-seminars/design-handbooks/Basic-Linear-Design/Chapter12.pdf, page 40
 #signal trace
-hs=0.17 # for 50 Ohm
-#hs = 0.09 # for 33 Ohm
+hs = 0
+if flagImpedance=='50':
+    hs=0.17 # for 50 Ohm
+else:    
+    hs = 0.09 # for 33 Ohm
+    
 w=0.127
 t=0.035
 #shield
-nmult_ws = 2 # how many times are shield larger than gap hs (consider 2 and 4 - extreme case)
+nmult_ws = flagsShieldsWidth
+# how many times are shield larger than gap hs (consider 2 - default and 4 - extreme case)
+
 ws = nmult_ws*hs
 hm = (pcbThicknessNoHV - 5*t - 2*hs)/2.
 
@@ -77,7 +120,7 @@ fImpedance1D.GetYaxis().SetTitle("Impedance [#Omega]")
 
 hCapTrace = []
 hCapShield = []
-hCapArea = []
+hCapDetector = []
 for i in range (0, len(layerThickness)):
     #traces
     hCapTrace.append(TH1F())
@@ -94,16 +137,16 @@ for i in range (0, len(layerThickness)):
     hCapShield[i].SetTitle("Capacitance of shields; |#eta|; Capacitance [pF]")
     hCapShield[i].SetName("hCapacitance_shields"+str(i))
     #area
-    hCapArea.append(TH1F())
-    hCapArea[i].SetBins(numEta, 0, maxEta)
-    hCapArea[i].SetLineColor(i+1)
-    hCapArea[i].SetLineWidth(2)
-    hCapArea[i].SetTitle("Capacitance of detector area; |#eta|; Capacitance [pF]")
-    hCapArea[i].SetName("hCapacitance_area"+str(i))
+    hCapDetector.append(TH1F())
+    hCapDetector[i].SetBins(numEta, 0, maxEta)
+    hCapDetector[i].SetLineColor(i+1)
+    hCapDetector[i].SetLineWidth(2)
+    hCapDetector[i].SetTitle("Capacitance of detector area; |#eta|; Capacitance [pF]")
+    hCapDetector[i].SetName("hCapacitance_detector"+str(i))
 
 cTrace = TCanvas("cTrace","",600,400)
 cShield = TCanvas("cShield","",600,400)
-cArea = TCanvas("cArea","",600,400)
+cDetector = TCanvas("cDetector","",600,400)
 
 legend = TLegend(0.1,0.5,0.3,0.9)
 legend.SetHeader("Longitudinal layers")
@@ -127,10 +170,10 @@ for i in range (0, len(layerThickness)):
                  + radius[i + 1] * ( 1 / (tan(2. * atan(exp(- (index + 1) * deltaEta)))) -  1 / (tan(2. * atan(exp(- index * deltaEta))) ) )
                  ) / 2. * (radius[i+1] - radius[i])
         distance = (radius[i+1] + radius[i]) / 2. * pi / Nplanes * cos (angle) - pcbThickness / 2. - passiveThickness / 2.
-        capacitanceArea = nmult * epsilon0 * epsilonRLAr * area / distance
-        hCapArea[i].SetBinContent(index+1, capacitanceArea)
+        capacitanceDetector = nmult * epsilon0 * epsilonRLAr * area / distance
+        hCapDetector[i].SetBinContent(index+1, capacitanceDetector)
         if index==0:
-            print "layer %d" %i, "eta==0: capacitanceTrace %.0f mm," %capacitanceTrace, "capacitanceShield %.0f pF" %capacitanceShield, "capacitanceArea %.0f pF" %capacitanceArea
+            print "layer %d" %i, "eta==0: capacitanceTrace %.0f pF," %capacitanceTrace, "capacitanceShield %.0f pF" %capacitanceShield, "capacitanceDetector %.0f pF" %capacitanceDetector
             #, "distance %.1f mm" %distance
 
     #Draw
@@ -145,11 +188,11 @@ for i in range (0, len(layerThickness)):
         hCapShield[i].Draw()
     else:
         hCapShield[i].Draw("same")
-    cArea.cd()
+    cDetector.cd()
     if i == 0:
-        hCapArea[i].Draw()
+        hCapDetector[i].Draw()
     else:
-        hCapArea[i].Draw("same")
+        hCapDetector[i].Draw("same")
 
 maximum = 1600
 
@@ -162,9 +205,9 @@ for i in range (0, len(layerThickness)):
     hCapShield[i].SetMinimum(0)
     hCapShield[i].SetMaximum(maximum*1.2)
     hCapShield[i].Write()
-    hCapArea[i].SetMinimum(0)
-    hCapArea[i].SetMaximum(maximum*1.2)
-    hCapArea[i].Write()
+    hCapDetector[i].SetMinimum(0)
+    hCapDetector[i].SetMaximum(maximum*1.2)
+    hCapDetector[i].Write()
 
 cTrace.cd()
 legend.Draw()
@@ -174,10 +217,10 @@ cShield.cd()
 legend.Draw()
 cShield.Update()
 cShield.Write()
-cArea.cd()
+cDetector.cd()
 legend.Draw()
-cArea.Update()
-cArea.Write()
+cDetector.Update()
+cDetector.Write()
 
 fImpedance.Write()
 fImpedance1D.Write()

@@ -1,40 +1,88 @@
 from ROOT import TH1F, TCanvas, TLegend, TFile, gStyle, gPad
 import itertools
 
-#filename = "50Ohm_default"
-filename = "50Ohm_default_differentTraces"
+#Options:
+#Traces 1: traces from first 2 layers go in the front, 5 layers to the back
+#Traces 2 (default): traces from first 3 layers go in the front, 5 layers to the back
+#Impedance: 50 (default) or 33 Ohm
+#Shields width: 2 (default) or 4 - how many times are shield larger than gap hs 
+
+flagTraces = 'traces2'
+flagImpedance = '50'
+flagsShieldsWidth = 2
+
+#Check the flags
+if flagTraces!='traces1' and flagTraces!='traces2':
+    print "WARNING: Trace option ", flagTraces, "not know, setting to default (traces2)"
+    flagTraces = 'traces2'
+
+if flagImpedance!='50' and flagImpedance!='33':
+    print "WARNING: thickness hs for impedance ", flagImpedance, " Ohm not know, setting to default (50 Ohm)"
+    flagImpedance = '50'
+
+filename = "ecalBarrel_"+flagImpedance+"Ohm_"+flagTraces+"_"+str(flagsShieldsWidth)+"shieldWidth"
 fIn = TFile("capacitances_"+filename+".root","r")
 
+fSaveAll = TFile("elecNoise_"+filename+".root","RECREATE")
+fSave = TFile("elecNoise_ecalBarrel.root","RECREATE")
+
 nLayers = 8
-etaMax = 1.5
-nbins = 150
+
+SFatlas = 0.18
+SFfcc = [0.12125, 0.14283, 0.16354, 0.17662, 0.18867, 0.19890, 0.20637, 0.20802]
 noisePerCapacitance = 0.0397372130805
-print "noise per capacitance ", noisePerCapacitance, " MeV/pF"
+print "noise per capacitance in ATLAS ", noisePerCapacitance, " MeV/pF"
 GeV = 1000.
 
 gStyle.SetOptStat(0)
 
-#Graphs with capacitances
+#TH1 with capacitances
 hCapShield = []
 hCapTrace = []
 hCapDetector = []
 hCapTotal = []
-# electronic noise histograms 
-h_elecNoise_fcc = [] # total noise from shield + trace + detector capacitance
+# electronic noise histograms
+h_elecNoise_fcc = [] # default total noise shield + detector capacitance (without trace capacitance) -> to be used in FCCSW as noise estimation
+h_elecNoise_all = [] # total noise shield + trace + detector capacitance
 h_elecNoise_withoutTraceCap = [] # total noise without trace capacitance (as in ATLAS - trace cap. can be neglected): from shield + detector capacitance
 h_elecNoise_shield = []
 h_elecNoise_trace = []
 h_elecNoise_detector = []
 
-for i in range (0, nLayers):
-    #Prepare electronic noise histograms
+#Read graphs from files
+for i in range (0, nLayers):  
+    nameShield = "hCapacitance_shields"+str(i)
+    hCapShield.append(fIn.Get(nameShield))
+    nameTrace = "hCapacitance_traces"+str(i)
+    hCapTrace.append(fIn.Get(nameTrace))
+    nameDetector = "hCapacitance_detector"+str(i)
+    hCapDetector.append(fIn.Get(nameDetector))
+
+index = 0    
+nbins = hCapShield[index].GetNbinsX()
+etaMax = hCapShield[index].GetXaxis().GetBinUpEdge(nbins)
+print "number of bins ", nbins, ", etaMax ", etaMax
+
+maximumCap = 0.
+maximumNoiseAll = 0.
+maximumNoise = 0.
+
+for i in range (0, nLayers):  
+    #Prepare electronic noise histograms    
     h_elecNoise_fcc.append( TH1F() )
     h_elecNoise_fcc[i].SetLineWidth(3)
     h_elecNoise_fcc[i].SetLineColor(i+1)
     h_elecNoise_fcc[i].SetBins(nbins, 0., etaMax)
-    h_elecNoise_fcc[i].SetTitle("Total electronic noise; |#eta|; Electronic noise [GeV]")
+    h_elecNoise_fcc[i].SetTitle("Default electronic noise - shield + detector capacitance; |#eta|; Electronic noise [GeV]")
     h_elecNoise_fcc[i].SetName("h_elecNoise_fcc_"+str(i+1))
 
+    h_elecNoise_all.append( TH1F() )
+    h_elecNoise_all[i].SetLineWidth(3)
+    h_elecNoise_all[i].SetLineColor(i+1)
+    h_elecNoise_all[i].SetBins(nbins, 0., etaMax)
+    h_elecNoise_all[i].SetTitle("Total electronic noise - shield + trace + detector capacitance; |#eta|; Electronic noise [GeV]")
+    h_elecNoise_all[i].SetName("h_elecNoise_all_"+str(i+1))
+    
     h_elecNoise_withoutTraceCap.append( TH1F() )
     h_elecNoise_withoutTraceCap[i].SetLineWidth(3)
     h_elecNoise_withoutTraceCap[i].SetLineColor(i+1)
@@ -62,48 +110,49 @@ for i in range (0, nLayers):
     h_elecNoise_detector[i].SetBins(nbins, 0., etaMax)
     h_elecNoise_detector[i].SetTitle("Electronic noise - detector; |#eta|; Electronic noise [GeV]")
     h_elecNoise_detector[i].SetName("h_elecNoise_detector_"+str(i+1))
-  
-    #Read graphs from files
-    nameShield = "hCapacitance_shields"+str(i)
-    hCapShield.append(fIn.Get(nameShield))
-    nameTrace = "hCapacitance_traces"+str(i)
-    hCapTrace.append(fIn.Get(nameTrace))
-    nameDetector = "hCapacitance_area"+str(i)
-    hCapDetector.append(fIn.Get(nameDetector))
-    #Sum the capacitances
+
+    #Total capacitance plot (shield + trace + detector)
     hCapTotal.append( TH1F() )
     hCapTotal[i].SetBins(nbins, 0, etaMax)
     hCapTotal[i].SetLineColor(i+1)
     hCapTotal[i].SetLineWidth(3)
     hCapTotal[i].SetTitle("Total capacitance; |#eta|; Capacitance [pF]")
     hCapTotal[i].SetName("hCapacitance"+str(i))
-    #hCapTotal[i] = hCapShield[i] + hCapTrace[i] + hCapDetector[i]
 
-    for ibin in range(0, hCapShield[i].GetNbinsX()):
+    #Correct for different SF in ATLAS and FCC
+    noiseConversionFactor = noisePerCapacitance * SFatlas / SFfcc[i]
+    for ibin in range(0, nbins+1):
         capShield = hCapShield[i].GetBinContent(ibin)
         capTrace = hCapTrace[i].GetBinContent(ibin)
         capDetector = hCapDetector[i].GetBinContent(ibin)
         #total capacitance
         hCapTotal[i].SetBinContent( ibin, capShield + capTrace + capDetector )
         #noise
-        noise = noisePerCapacitance * ( capShield + capTrace + capDetector ) / GeV
-        noiseWithoutTrace = noisePerCapacitance * ( capShield + capDetector ) / GeV
-        noiseShield = noisePerCapacitance * capShield / GeV
-        noiseTrace = noisePerCapacitance * capTrace / GeV
-        noiseDetector = noisePerCapacitance * capDetector / GeV
+        noiseAll = noiseConversionFactor * ( capShield + capTrace + capDetector ) / GeV
+        noiseWithoutTrace = noiseConversionFactor * ( capShield + capDetector ) / GeV
+        noiseShield = noiseConversionFactor * capShield / GeV
+        noiseTrace = noiseConversionFactor * capTrace / GeV
+        noiseDetector = noiseConversionFactor * capDetector / GeV
+        #find maximum for drawing of histograms
+        if noiseAll>maximumNoiseAll:
+            maximumNoiseAll = noiseAll
+        if noiseWithoutTrace>maximumNoise:
+            maximumNoise = noiseWithoutTrace
+        if (capShield + capTrace + capDetector)>maximumCap:
+            maximumCap = (capShield + capTrace + capDetector)
+            
         #fill histogram
-        h_elecNoise_fcc[i].SetBinContent(ibin, noise)
+        #default: without traces
+        h_elecNoise_fcc[i].SetBinContent(ibin, noiseWithoutTrace)
+        h_elecNoise_all[i].SetBinContent(ibin, noiseAll)
         h_elecNoise_withoutTraceCap[i].SetBinContent(ibin, noiseWithoutTrace)
         h_elecNoise_shield[i].SetBinContent(ibin, noiseShield)
         h_elecNoise_trace[i].SetBinContent(ibin, noiseTrace)
         h_elecNoise_detector[i].SetBinContent(ibin, noiseDetector)
         if ibin==1:
-            print "layer %d" %i, "eta==0: capacitance %.0f pF," %( capShield + capTrace + capDetector ), "total elec. noise %.4f GeV" %noise, "elec. noise without trace cap. %.4f GeV" %noiseWithoutTrace
+            print "layer %d" %i, "eta==0: capacitance %.0f pF," %( capShield + capTrace + capDetector ), "total elec. noise %.4f GeV" %noiseAll, "elec. noise without trace cap. %.4f GeV" %noiseWithoutTrace
 
-maximumCap = 1500.
-maximumNoise = 0.08
-
-fSave = TFile("elecNoise_"+filename+".root","RECREATE")
+#print maximumCap, maximumNoiseAll, maximumNoise
 
 cCapacitance = TCanvas("cCapacitance","Capacitance per cell",800,600)
 cCapacitance.cd()
@@ -119,7 +168,9 @@ for i, h in enumerate(hCapTotal):
         h.Draw("same")
     legend.AddEntry(h,str(i)+" layer","l")
 
-print maximumCap
+
+# Prepare "nice" plots & save all capacitances + noise
+fSaveAll.cd()
 
 for h in hCapTotal:
     h.SetMinimum(0.)
@@ -131,9 +182,15 @@ legend.Draw()
 cCapacitance.Update()
 cCapacitance.Write()
 
+for h in h_elecNoise_all:
+    h.SetMinimum(0.)
+    h.SetMaximum(maximumNoiseAll*1.2)
+    h.GetYaxis().SetTitleOffset(1.4)
+    h.Write()
+
 for h in itertools.chain(h_elecNoise_fcc, h_elecNoise_withoutTraceCap, h_elecNoise_shield, h_elecNoise_trace, h_elecNoise_detector):
     h.SetMinimum(0.)
-    h.SetMaximum(maximumNoise)
+    h.SetMaximum(maximumNoise*1.2)
     h.GetYaxis().SetTitleOffset(1.4)
     h.Write()
 
@@ -191,5 +248,10 @@ for i in range (0, nLayers):
     legendP.Draw()
 
 cCapParts.Write()
+
+#Save final noise plot (to be used in FCCSW)
+fSave.cd()
+for h in h_elecNoise_fcc:
+    h.Write()
 
 closeInput = raw_input("Press ENTER to exit")
