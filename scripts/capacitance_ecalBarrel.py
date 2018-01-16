@@ -47,7 +47,7 @@ angle = 50./180. * pi #inclination angle
 passiveThickness = 2.0 #mm
 #Segmentation
 deltaEta = 0.01
-maxEta = 1.68
+maxEta = 1.685
 numEta = int(ceil(maxEta/deltaEta))
 layerThickness = [26.9] + [120.9] * 7 #mm
 
