@@ -16,9 +16,9 @@ calo_init.parse_args()
 
 from math import pi, floor
 # set of default parameters
-maxEta = 1.716
-maxPhi = pi-(pi/512.)
-nPhi = 629 # artificially increase by 1 (odd number) - to make plots look OK
+maxEta = 1.6802
+maxPhi = pi-(pi/704.)
+nPhi = 705 # artificially increase by 1 (odd number) - to make plots look OK
 dEta = 0.01
 nEta = int(2*maxEta/dEta + 1)
 dPhi = 2*pi/nPhi
@@ -78,9 +78,9 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               dPhi, # tower size in phi
                                               nameCellCollection,
                                               bitfield,
-                                              "cell", # layer field name in the bitfield
-                                              1, # Id of first layer
-                                              4, # Id of last layer that counts as first (= 4*2cm = 8cm layer)
+                                              "layer", # layer field name in the bitfield
+                                              0, # Id of first layer
+                                              0, # Id of last layer that counts as first (= 4*2cm = 8cm layer)
                                               0.168, # sampling fraction of the first layer, if calibrated cells were given
                                               par00,
                                               par01,
@@ -95,7 +95,17 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                                               nEta, # number of bins in eta
                                               nPhi, # number of bins in phi
                                               dEta, # tower size in eta
-                                              dPhi)# tower size in phi
+                                              dPhi,# tower size in phi
+                                              "",
+                                              "system:4",
+                                              "", # layer field name in the bitfield
+                                              0, # Id of first layer
+                                              0, # Id of last layer that counts as first (= 4*2cm = 8cm layer)
+                                              0, # sampling fraction of the first layer, if calibrated cells were given
+                                              0,
+                                              0,
+                                              0,
+                                              0)
     analysis.loop(filenameSim, filename, calo_init.verbose)
     # retrieve histograms to draw them
     hEn = analysis.hEn
@@ -164,10 +174,10 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
                   [0.1,0.6,0.4,0.9])
     else:
         hEn.Draw('bar')
-        draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
-                   "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
-                   "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
-                  [0.1,0.6,0.4,0.9])
+        # draw_text(["energy: "+str(round(resultFitEn2.Get().Parameter(1),1))+" GeV",
+        #            "           "+str(round(resultFitEn2.Get().Parameter(1),1)/energy*100.)+" %",
+        #            "resolution: "+str(round(resultFitEn2.Get().Parameter(2)/resultFitEn2.Get().Parameter(1)*100,1))+" %"],
+                  # [0.1,0.6,0.4,0.9])
     canv.cd(2)
     draw_hist2d(hEnFncPhi)
     canv.cd(5)

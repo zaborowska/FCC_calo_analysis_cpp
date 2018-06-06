@@ -1,6 +1,8 @@
 #include "Decoder.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <vector>
+#include <cstring>
 #include <iostream>
 
 Decoder::Decoder(const std::string& aDescr): m_description(aDescr), m_currentValue(0) {
@@ -10,7 +12,7 @@ Decoder::Decoder(const std::string& aDescr): m_description(aDescr), m_currentVal
   boost::split(fields, aDescr, boost::is_any_of(","));
   unsigned long long offset = 0;
   for(auto s: fields) {
-    std::cout<<s<<"\t"<<std::endl;
+    // std::cout<<s<<"\t"<<std::endl;
     std::vector<std::string> onefield;
     boost::split(onefield, s, boost::is_any_of(":"));
     uint w =  abs(boost::lexical_cast<int>(onefield[1]));
@@ -28,14 +30,14 @@ Decoder::Decoder(const std::string& aDescr): m_description(aDescr), m_currentVal
       field.maxVal = ( 1LL << field.width ) - 1;
     }
     m_fields.insert(make_pair(field.name, field));
-    std::cout << "\tfield name:" << field.name
-              << "\tfield width:" << field.width
-              << "\tfield signed:" << field.isSigned
-              << "\tfield offset:" << std::hex <<field.offset << std::dec
-              << "\tfield min value:" << field.minVal
-              << "\tfield max value:" << field.maxVal
-              << "\tfield mask:" << std::hex << field.mask << std::dec
-              << std::endl;
+    // std::cout << "\tfield name:" << field.name
+    //           << "\tfield width:" << field.width
+    //           << "\tfield signed:" << field.isSigned
+    //           << "\tfield offset:" << std::hex <<field.offset << std::dec
+    //           << "\tfield min value:" << field.minVal
+    //           << "\tfield max value:" << field.maxVal
+    //           << "\tfield mask:" << std::hex << field.mask << std::dec
+    //           << std::endl;
     offset += w;
   }
 

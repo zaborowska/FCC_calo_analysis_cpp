@@ -1,6 +1,6 @@
 # Setup ROOT
 import ROOT
-from ROOT import TH1F, TLegend, gPad, TCanvas, SetOwnership, TPaveText, TLine, kRed, TPad, kGray
+from ROOT import TH1F, TLegend, gPad, TCanvas, SetOwnership, TPaveText, TLine, kRed, TPad, kGray, TEllipse
 from math import sqrt,ceil
 
 def draw_1histogram( histo, x_axisName, y_axisName="", colour = 9, markerStyle = 21):
@@ -118,6 +118,15 @@ def draw_rectangle(start = [0,0], end = [1,1], colour = 2, width = 2):
       line.Draw()
       ROOT.SetOwnership(line,False)
 
+def draw_ellipse(centre = [0,0], axes = [1,1], colour = 2, width = 2):
+   ellipse = TEllipse(centre[0], centre[1], axes[0], axes[1])
+   ellipse.SetLineColor(colour)
+   ellipse.SetLineWidth(width)
+   ellipse.Draw()
+   ellipse.Print()
+   ellipse.SetFillStyle(0)
+   ROOT.SetOwnership(ellipse,False)
+
 def prepare_graph(graph, name, title, colour = 9, markerStyle = 21, factor = 1):
    # graph settings
    graph.SetTitle(title)
@@ -169,7 +178,7 @@ def prepare_single_canvas(name, title):
    return c
 
 def prepare_double_canvas(name, title, factor = 1):
-   c = TCanvas(name, title, 1200, int(900 + 900 / factor))
+   c = TCanvas(name, title, 1500, int(900 + 900 / factor))
    pad1 = TPad("pad1","pad1",0,0,1,factor / (1. + factor))
    pad2 = TPad("pad2","pad2",0,factor / (1. + factor),1,1)
    print("heights:",factor / (1. + factor) )
@@ -196,13 +205,27 @@ def prepare_double_canvas(name, title, factor = 1):
    return c, pad1, pad2
 
 def prepare_divided_canvas(name, title, N):
-   c = TCanvas(name, title, 1200, 900)
-   c.Divide(ceil(sqrt(N)), ceil(N / ceil(sqrt(N))))
+   c = TCanvas(name, title, 1600, 1200)
    print("=====> Dividing canvas into : ",N, sqrt(N),ceil(sqrt(N)), N / ceil(sqrt(N)), ceil(N / ceil(sqrt(N))))
+   c.Divide(int(ceil(sqrt(N))), int(ceil(N / ceil(sqrt(N)))))
    print("=====> Dividing canvas into : ",ceil(sqrt(N)), ceil(N / ceil(sqrt(N))) )
    for ipad in range(1, N+1):
       pad = c.cd(ipad)
-      pad.SetTopMargin(0.01)
+      # pad.SetTopMargin(0.01)
+      pad.SetTopMargin(0.1)
+      pad.SetRightMargin(0.03)
+      pad.SetLeftMargin(0.15)
+      pad.SetBottomMargin(0.15)
+   ROOT.SetOwnership(c,False)
+   return c
+
+def prepare_long_canvas(name, title, N):
+   c = TCanvas(name, title, 1800, 1200)
+   c.Divide(N,1)
+   for ipad in range(1, N+1):
+      pad = c.cd(ipad)
+      # pad.SetTopMargin(0.01)
+      pad.SetTopMargin(0.1)
       pad.SetRightMargin(0.03)
       pad.SetLeftMargin(0.15)
       pad.SetBottomMargin(0.15)

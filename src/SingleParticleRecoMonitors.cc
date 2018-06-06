@@ -16,7 +16,7 @@
 #include <bitset>
 #include <cmath>
 
-SingleParticleRecoMonitors::SingleParticleRecoMonitors(const std::string& aClusterCollName, const std::string& aParticleCollName,
+SingleParticleRecoMonitors::SingleParticleRecoMonitors(const char* aClusterCollName, const char* aParticleCollName,
   double aEnergy, double aEtaMax, double aPhiMax, int aNoEta, int aNoPhi, double aDEta, double aDPhi):
   m_clusterCollName(aClusterCollName), m_particleCollName(aParticleCollName), m_energy(aEnergy), m_etaMax(aEtaMax), m_phiMax(aPhiMax),
   m_noEta(aNoEta), m_noPhi(aNoPhi), m_dEta(aDEta), m_dPhi(aDPhi), m_ifCorrectForUpstream(false),

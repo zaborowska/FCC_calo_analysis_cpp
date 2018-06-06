@@ -29,7 +29,7 @@ fSave = TFile("elecNoise_ecalBarrel.root","RECREATE")
 nLayers = 8
 
 SFatlas = 0.18
-SFfcc = [0.12125, 0.14283, 0.16354, 0.17662, 0.18867, 0.19890, 0.20637, 0.20802]
+SFfcc = [0.299041341789, 0.1306220735, 0.163243999965, 0.186360269398, 0.20637, 0.216211280314, 0.227140796653, 0.243315422934]
 noisePerCapacitance = 0.0397372130805
 print "noise per capacitance in ATLAS ", noisePerCapacitance, " MeV/pF"
 GeV = 1000.
@@ -87,7 +87,7 @@ for i in range (0, nLayers):
     h_elecNoise_withoutTraceCap[i].SetLineWidth(3)
     h_elecNoise_withoutTraceCap[i].SetLineColor(i+1)
     h_elecNoise_withoutTraceCap[i].SetBins(nbins, 0., etaMax)
-    h_elecNoise_withoutTraceCap[i].SetTitle("Electronic noise without trace capacitance; |#eta|; Electronic noise [GeV]")
+    h_elecNoise_withoutTraceCap[i].SetTitle("Electronic noise; |#eta|; Electronic noise [GeV]")
     h_elecNoise_withoutTraceCap[i].SetName("h_elecNoise_withoutTraceCap_"+str(i+1))
 
     h_elecNoise_shield.append( TH1F() )
@@ -156,18 +156,26 @@ for i in range (0, nLayers):
 
 cCapacitance = TCanvas("cCapacitance","Capacitance per cell",800,600)
 cCapacitance.cd()
-legend = TLegend(0.1,0.5,0.3,0.9)
+legend = TLegend(0.11,0.5,0.4,0.89)
+legend.SetLineWidth(0)
 legend.SetHeader("Longitudinal layers")
+legend2 = TLegend(0.36,0.5,0.55,0.802)
+gStyle.SetLegendTextSize(0.04)
+
+legend2.SetLineWidth(0)
 for i, h in enumerate(hCapTotal):
     h.SetMinimum(0)
     h.SetMaximum(maximumCap)
     h.GetYaxis().SetTitleOffset(1.4)
     if i == 0:
+        h.SetTitle("")
         h.Draw("")
     else:
         h.Draw("same")
-    legend.AddEntry(h,str(i)+" layer","l")
-
+    if i < 4:
+        legend.AddEntry(h,str(i)+" layer","l")
+    else:
+        legend2.AddEntry(h,str(i)+" layer","l")
 
 # Prepare "nice" plots & save all capacitances + noise
 fSaveAll.cd()
@@ -179,6 +187,7 @@ for h in hCapTotal:
     h.Write()
 
 legend.Draw()
+legend2.Draw()
 cCapacitance.Update()
 cCapacitance.Write()
 
@@ -203,6 +212,7 @@ for i, h in enumerate(h_elecNoise_fcc):
         h.Draw("same")
 
 legend.Draw()
+legend2.Draw()
 cNoise.Update()
 cNoise.Write()
 
@@ -215,14 +225,19 @@ for i, h in enumerate(h_elecNoise_withoutTraceCap):
         h.Draw("same")
 
 legend.Draw()
+legend2.Draw()
+from draw_functions import draw_text
+from ROOT import kGray
+draw_text(["FCC-hh simulation"], [0.55,0.82, 0.9,0.89], kGray+3, 0).SetTextSize(0.05)
 cNoiseWithoutTrace.Update()
 cNoiseWithoutTrace.Write()
+cNoiseWithoutTrace.Print("cNoiseWithoutTrace.pdf")
 
 legendP = TLegend(0.1,0.6,0.43,0.9)
 legendP.SetHeader("Capacitance")
 
 cCapParts = TCanvas("cCapParts","",1200,1000)
-cCapParts.Divide(3,3)    
+cCapParts.Divide(3,3)
 for i in range (0, nLayers):
     cCapParts.cd(i+1)
     if i<2:
