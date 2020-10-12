@@ -27,8 +27,10 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     energy = calo_init.energy(ifile)
     f = TFile(filename, "READ")
     htotal = f.Get(histName)
-    myfunPre = TF1("firstGaus","gaus", htotal.GetMean() - 2. * htotal.GetRMS(),
-                   htotal.GetMean() + 2. * htotal.GetRMS())
+    #myfunPre = TF1("firstGaus","gaus", htotal.GetMean() - 2. * htotal.GetRMS(),
+    #               htotal.GetMean() + 2. * htotal.GetRMS())
+    myfunPre = TF1("firstGaus","gaus", energy - 0.2 *  energy,
+                   energy +  0.2 * energy)       
     resultPre = htotal.Fit(myfunPre, "SRQN")
     myfun = TF1("finalGaus", "gaus", resultPre.Get().Parameter(1) - 2. * resultPre.Get().Parameter(2),
                 resultPre.Get().Parameter(1) + 2. * resultPre.Get().Parameter(2) )

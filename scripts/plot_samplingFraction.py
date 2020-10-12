@@ -1,13 +1,13 @@
 import calo_init
 calo_init.add_defaults()
-calo_init.parser.add_argument("--merge", help="merge layers", default = [1] * 32, type = int, nargs='+') # bin 0 is empty! (before calo)
+calo_init.parser.add_argument("--merge", help="merge layers", default = [1] * 8, type = int, nargs='+') # bin 0 is empty! (before calo)
 calo_init.parser.add_argument("-t","--title", default="Sampling fraction", help="Graph title", type=str)
 calo_init.parser.add_argument("-n","--histogramName", default="ecal_sf_layer", help="Name of the histogram with sampling fraction (postfixed with number of layer)", type = str)
 calo_init.parser.add_argument("--histogramNameMean", default="ecal_sf", help="Name of the histogram with sampling fraction (sufixed with number of layer)", type = str)
 calo_init.parser.add_argument("-max","--axisMax", help="Maximum of the axis", type = float)
 calo_init.parser.add_argument("-min","--axisMin", help="Minimum of the axis", type = float)
-calo_init.parser.add_argument("--totalNumLayers", default = 32, help="Total number of the layers used in simulation", type = int)
-calo_init.parser.add_argument("--numFirstLayer", default = 1, help="ID of first layer used in histograms name", type = int)
+calo_init.parser.add_argument("--totalNumLayers", default = 8, help="Total number of the layers used in simulation", type = int)
+calo_init.parser.add_argument("--numFirstLayer", default = 0, help="ID of first layer used in histograms name", type = int)
 calo_init.parser.add_argument("--layerWidth", default = 2, help="Width of the layer (cm)", type = float)
 calo_init.parser.add_argument("--X0density", default = 0.422, help="Xo density of a current detector (X0/cm)", type = float)
 calo_init.parser.add_argument("--roundBrackets", help="Use round brackets for unit", action = 'store_true')
@@ -19,7 +19,7 @@ calo_init.print_config()
 histName = calo_init.args.histogramName
 histNameMean = calo_init.args.histogramNameMean
 
-from ROOT import gSystem, gROOT, TCanvas, TGraphErrors, TF1, gStyle, kRed, kBlue, kGray, TFile, TTree, TPad, TGaxis, gPad, TLine
+from ROOT import gSystem, gROOT, TCanvas, TH1F, TGraphErrors, TF1, gStyle, kRed, kBlue, kGray, TFile, TTree, TPad, TGaxis, gPad, TLine
 from draw_functions import prepare_graph, prepare_divided_canvas,  prepare_single_canvas, draw_text, draw_1histogram
 import numpy
 from math import sqrt, ceil, floor
@@ -52,6 +52,7 @@ for ifile, filename in enumerate(calo_init.filenamesIn):
     hmerged = []
     # first merge adjacent layers and get histograms of SF
     for islice in range(startIndex, Nslices + startIndex):
+        h = TH1F() 
         h = f.Get(histName+str(islice))
         # if first hist to be merged
         lastIm = -1
